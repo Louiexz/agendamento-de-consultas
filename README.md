@@ -1,2 +1,14 @@
 # agendamento-de-consultas
-Vamos projetar um sistema para gerenciamento de consultas, visando a clínica médica do Centro Universitário Tiradentes (UNIT - PE). omo entrega final das disciplinas desenvolvimento web, seguro e mobile.
+Sistema para gerenciamento de consultas, com foco na clínica médica do Centro Universitário Tiradentes (UNIT - PE).<br>
+Análise e Desenvolvimento de Sistemas, 5º Período.<br>
+Entrega final das disciplinas: experiência extensionista, desenvolvimento web, seguro e mobile.
+
+# Autores e contribuições:
+
+Artur Ramos - [@Arturdev05](https://github.com/Arturdev05)<br>
+Carlos Eduardo - [@carlos-1ima](https://github.com/carlos-1ima)<br>
+Luiz Augusto - [@Louiexz](https://github.com/Louiexz)<br>
+Paulo Arthur - [@pauludelimaa](https://github.com/pauludelimaa)<br>
+Vinicius José - [@ViniciusRKX](https://github.com/ViniciusRKX)
+
+Contribuições restritas! Analisaremos issues e pull requests.
