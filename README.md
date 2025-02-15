@@ -5,7 +5,7 @@ Entrega final das disciplinas: experiência extensionista, desenvolvimento web, 
 
 # Autores e contribuições:
 
-Artur Ramos - [@Arturdev05](https://github.com/Arturdev05)<br>
+Artur Ramos - [@4rturr](https://github.com/4rturr)<br>
 Carlos Eduardo - [@carlos-1ima](https://github.com/carlos-1ima)<br>
 Luiz Augusto - [@Louiexz](https://github.com/Louiexz)<br>
 Paulo Arthur - [@pauludelimaa](https://github.com/pauludelimaa)<br>
