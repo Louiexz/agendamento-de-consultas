@@ -1,0 +1,42 @@
+# Compilação
+bin/
+obj/
+out/
+
+# Pacotes
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.assets.json
+
+# Configurações do Visual Studio
+.vscode/
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.cache
+*.csproj.user
+
+# Logs e depuração
+*.log
+*.tlog
+*.bak
+*.swp
+
+# Configuração do ambiente
+.env
+secrets.json
+appsettings.json
+appsettings.Development.json
+
+# Publicação
+wwwroot/
+node_modules/
+dist/
+publish/
+
+# Arquivos do Docker (caso utilize)
+docker-compose.override.yml
+**/Dockerfile
