@@ -5,7 +5,8 @@
         public int id_Consulta { get; set; }
         public DateTime? Data { get; set; }
         public TimeSpan? Horario { get; set; }
-        public string Status { get; set; } 
+        public string Status { get; set; }
+        public string Especialidade { get; set; }
 
         // Chaves estrangeiras
         public int PacienteId { get; set; }
