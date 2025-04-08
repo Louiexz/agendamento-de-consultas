@@ -50,11 +50,11 @@ namespace UnitSaude.Migrations
 
                     b.Property<DateTime>("dataCadastro")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("date")
+                        .HasDefaultValueSql("date");
 
                     b.Property<DateTime?>("dataNascimento")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("date");
 
                     b.Property<string>("email")
                         .IsRequired()
@@ -89,7 +89,7 @@ namespace UnitSaude.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id_Consulta"));
 
                     b.Property<DateTime?>("Data")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("date");
 
                     b.Property<TimeSpan?>("Horario")
                         .HasColumnType("interval");
@@ -149,11 +149,11 @@ namespace UnitSaude.Migrations
 
                     b.Property<DateTime>("dataCadastro")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("date")
+                        .HasDefaultValueSql("date");
 
                     b.Property<DateTime?>("dataNascimento")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("date");
 
                     b.Property<string>("email")
                         .IsRequired()
@@ -214,11 +214,11 @@ namespace UnitSaude.Migrations
 
                     b.Property<DateTime>("dataCadastro")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("date")
+                        .HasDefaultValueSql("date");
 
                     b.Property<DateTime?>("dataNascimento")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("date");
 
                     b.Property<string>("email")
                         .IsRequired()

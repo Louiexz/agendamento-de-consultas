@@ -14,13 +14,13 @@ namespace UnitSaude.Data.Map
             builder.Property(u => u.Status).IsRequired().HasMaxLength(20);
 
             builder.HasOne(u => u.Paciente)
-                   .WithMany()
+                   .WithMany(u => u.Consultas)
                    .HasForeignKey(u => u.PacienteId)
                    .IsRequired()
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(u => u.Professor)
-                .WithMany()
+                 .WithMany(u => u.Consultas)
                 .HasForeignKey(u => u.ProfessorId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);

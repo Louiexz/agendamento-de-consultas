@@ -14,7 +14,7 @@ namespace UnitSaude.Data.Map
             builder.Property(u => u.email).IsRequired().HasMaxLength(255);
             builder.Property(u => u.senhaHash).IsRequired();
             builder.Property(u => u.telefone).HasMaxLength(20);
-            builder.Property(u => u.dataCadastro).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            builder.Property(u => u.dataCadastro).HasColumnType("date");
             builder.Property(u => u.TipoUsuario).HasMaxLength(50);
             builder.Property(u => u.ativo).HasDefaultValue(true);
         }

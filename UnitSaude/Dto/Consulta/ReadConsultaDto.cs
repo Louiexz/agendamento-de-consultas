@@ -1,9 +1,9 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using UnitSaude.Utils;
 
 namespace UnitSaude.Dto.Consulta
 {
-    public class CreateConsultaDto
+    public class ReadConsultaDto
     {
         [JsonConverter(typeof(DateTimeConverter))]
         public DateTime? Data { get; set; }

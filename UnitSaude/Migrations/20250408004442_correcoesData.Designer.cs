@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UnitSaude.Data;
@@ -11,9 +12,11 @@ using UnitSaude.Data;
 namespace UnitSaude.Migrations
 {
     [DbContext(typeof(ClinicaDbContext))]
-    partial class ClinicaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250408004442_correcoesData")]
+    partial class correcoesData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -96,7 +99,13 @@ namespace UnitSaude.Migrations
                     b.Property<int>("PacienteId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("PacienteId_Usuario")
+                        .HasColumnType("integer");
+
                     b.Property<int>("ProfessorId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ProfessorId_Usuario")
                         .HasColumnType("integer");
 
                     b.Property<string>("Status")
@@ -108,7 +117,11 @@ namespace UnitSaude.Migrations
 
                     b.HasIndex("PacienteId");
 
+                    b.HasIndex("PacienteId_Usuario");
+
                     b.HasIndex("ProfessorId");
+
+                    b.HasIndex("ProfessorId_Usuario");
 
                     b.ToTable("Consultas");
                 });
@@ -203,7 +216,7 @@ namespace UnitSaude.Migrations
                         .HasColumnType("date");
 
                     b.Property<DateTime?>("dataNascimento")
-                        .HasColumnType("date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("email")
                         .IsRequired()
@@ -237,16 +250,24 @@ namespace UnitSaude.Migrations
             modelBuilder.Entity("UnitSaude.Models.Consulta", b =>
                 {
                     b.HasOne("UnitSaude.Models.Paciente", "Paciente")
-                        .WithMany("Consultas")
+                        .WithMany()
                         .HasForeignKey("PacienteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("UnitSaude.Models.Professor", "Professor")
+                    b.HasOne("UnitSaude.Models.Paciente", null)
                         .WithMany("Consultas")
+                        .HasForeignKey("PacienteId_Usuario");
+
+                    b.HasOne("UnitSaude.Models.Professor", "Professor")
+                        .WithMany()
                         .HasForeignKey("ProfessorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("UnitSaude.Models.Professor", null)
+                        .WithMany("Consultas")
+                        .HasForeignKey("ProfessorId_Usuario");
 
                     b.Navigation("Paciente");
 

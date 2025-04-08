@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using UnitSaude.Dto.Paciente;
 using UnitSaude.Dto.Professor;
+using UnitSaude.Interfaces;
 using UnitSaude.Models;
+using UnitSaude.Services;
 
 namespace UnitSaude.Controllers
 {
@@ -8,34 +11,60 @@ namespace UnitSaude.Controllers
     [Route("api/[controller]")]
     public class ProfessorController : ControllerBase
     {
+        private readonly ProfessorInterface _professorService;
+
+        public ProfessorController(ProfessorInterface professorService)
+        {
+            _professorService = professorService;
+        }
+
         [HttpPost("CreateProfessor")]
-        public async Task<ActionResult<ResponseModel<object>>> CadastrarProfessor(CreateProfessorDto professor)
+        public async Task<ActionResult<ResponseModel<ReadProfessorDto>>> CadastrarProfessor([FromBody] CreateProfessorDto professor)
         {
-            // Implementation for creating Professor
-            return Ok();
+            var response = await _professorService.CadastrarProfessor(professor);
+            if (!response.Status) return BadRequest(response);
+            return Ok(response);
         }
-        [HttpGet("GetProfessor")]
-        public async Task<ActionResult<ResponseModel<ReadProfessorDto>>> ListarProfessor(int ProfessorId)
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ResponseModel<ReadProfessorDto>>> ListarProfessor(int id)
         {
-            // Implementation for getting Professor by ID
-            return Ok();
+            var response = await _professorService.ListarProfessor(id);
+            if (response.Data == null) return NotFound(response);
+            return Ok(response);
         }
-        [HttpGet("GetProfessoresPorEspecialidade")]
-        public async Task<ActionResult<ResponseModel<List<ReadProfessorDto>>>> ListarProfessoresPorEspecialidade(string especialidade){
-            // Implementation for getting Professores by Especialidade
-            return Ok();
-        }
-        [HttpPatch("UpdateProfessor")]
-        public async Task<ActionResult<ResponseModel<object>>> GerenciarProfessor(UpdateProfessorDto professor, int ProfessorId)
+
+        [HttpGet("ListarTodos")]
+        public async Task<ActionResult<ResponseModel<List<ReadProfessorDto>>>> ListarTodos()
         {
-            // Implementation for updating Professor
-            return Ok();
+            var response = await _professorService.ListarProfessores();
+            return Ok(response);
         }
-        [HttpDelete("DeleteProfessor")]
-        public async Task<ActionResult<ResponseModel<object>>> RemoverProfessor(int ProfessorId)
+
+        [HttpPatch("Update/{id}")]
+        public async Task<ActionResult<ResponseModel<ReadProfessorDto>>> GerenciarProfessor(int id, [FromBody] UpdateProfessorDto professor)
         {
-            // Implementation for deleting Professor
-            return Ok();
+            var response = await _professorService.GerenciarProfessor(professor, id);
+            if (!response.Status) return NotFound(response);
+            return Ok(response);
+        }
+
+        [HttpDelete("Delete/{id}")]
+        public async Task<ActionResult<ResponseModel<Professor>>> RemoverProfessor(int id)
+        {
+            var response = await _professorService.RemoverProfessor(id);
+            if (!response.Status) return NotFound(response);
+            return Ok(response);
+        }
+
+        [HttpPatch("AlterarSenha/{professorId}")]
+        public async Task<ActionResult<ResponseModel<string>>> AlterarSenha(int professorId, [FromBody] UpdateSenhaProfessorDto dto)
+        {
+            var resultado = await _professorService.AlterarSenhaProfessor(professorId, dto);
+
+            if (!resultado.Status) return BadRequest(resultado);
+
+            return Ok(resultado);
         }
     }
 }

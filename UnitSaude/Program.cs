@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using UnitSaude.Data;
 using UnitSaude.Interfaces;
 using UnitSaude.Services;
+using UnitSaude.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +22,12 @@ builder.Services.AddScoped<ProntuarioInterface, ProntuarioService>();
 builder.Services.AddScoped<UsuarioInterface, UsuarioService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
+        options.JsonSerializerOptions.Converters.Add(new NullableDateTimeConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

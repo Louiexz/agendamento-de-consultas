@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using UnitSaude.Dto.Paciente;
+using UnitSaude.Interfaces;
 using UnitSaude.Models;
 
 namespace UnitSaude.Controllers
@@ -8,33 +9,61 @@ namespace UnitSaude.Controllers
     [Route("api/[controller]")]
     public class PacienteController : ControllerBase
     {
+        private readonly PacienteInterface _pacienteService;
+
+        public PacienteController(PacienteInterface pacienteService)
+        {
+            _pacienteService = pacienteService;
+        }
+
         [HttpPost("CreatePaciente")]
-        public async Task<ActionResult<ResponseModel<object>>> CadastrarPaciente(CreatePacienteDto paciente)
+        public async Task<ActionResult<ResponseModel<ReadPacienteDto>>> CadastrarPaciente([FromBody] CreatePacienteDto paciente)
         {
-            // Implementation for creating Paciente
-            return Ok();
+            var response = await _pacienteService.CadastrarPaciente(paciente);
+            if (!response.Status) return BadRequest(response);
+            return Ok(response);
         }
-        [HttpGet("GetPaciente")]
-        public async Task<ActionResult<ResponseModel<ReadPacienteDto>>> ListarPaciente(int PacienteId){
-            // Implementation for getting Paciente by ID
-            return Ok();
-        }
-        [HttpGet("GetPacientesEmFilaDeEspera")]
-        public async Task<ActionResult<ResponseModel<List<ReadPacienteDto>>>> ListarPacientesEmFilaDeEspera(){
-            // Implementation for getting Pacientes in waiting list
-            return Ok();
-        }
-        [HttpPatch("UpdatePaciente")]
-        public async Task<ActionResult<ResponseModel<object>>> GerenciarPaciente(UpdatePacienteDto paciente, int PacienteId)
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ResponseModel<ReadPacienteDto>>> ListarPaciente(int id)
         {
-            // Implementation for updating Paciente
-            return Ok();
+            var response = await _pacienteService.ListarPaciente(id);
+            if (response.Data == null) return NotFound(response);
+            return Ok(response);
         }
-        [HttpDelete("DeletePaciente")]
-        public async Task<ActionResult<ResponseModel<object>>> RemoverPaciente(int PacienteId)
+
+        [HttpGet("ListarTodos")]
+        public async Task<ActionResult<ResponseModel<List<ReadPacienteDto>>>> ListarTodos()
         {
-            // Implementation for deleting Paciente
-            return Ok();
+            var response = await _pacienteService.ListarPacientes();
+            return Ok(response);
         }
+
+        [HttpPatch("Update/{id}")]
+        public async Task<ActionResult<ResponseModel<ReadPacienteDto>>> GerenciarPaciente(int id, [FromBody] UpdatePacienteDto paciente)
+        {
+            var response = await _pacienteService.GerenciarPaciente(paciente, id);
+            if (!response.Status) return NotFound(response);
+            return Ok(response);
+        }
+
+        [HttpDelete("Delete/{id}")]
+        public async Task<ActionResult<ResponseModel<Paciente>>> RemoverPaciente(int id)
+        {
+            var response = await _pacienteService.RemoverPaciente(id);
+            if (!response.Status) return NotFound(response);
+            return Ok(response);
+        }
+
+        [HttpPatch("AlterarSenha/{pacienteId}")]
+        public async Task<ActionResult<ResponseModel<string>>> AlterarSenha(int pacienteId, [FromBody] UpdateSenhaPacienteDto dto)
+        {
+            var resultado = await _pacienteService.AlterarSenhaPaciente(pacienteId, dto);
+
+            if (!resultado.Status) return BadRequest(resultado);
+
+            return Ok(resultado);
+        }
+
     }
 }

@@ -1,3 +1,6 @@
+using System.Text.Json.Serialization;
+using UnitSaude.Utils;
+
 namespace UnitSaude.Dto.Paciente
 {
     public class CreatePacienteDto
@@ -5,8 +8,10 @@ namespace UnitSaude.Dto.Paciente
         public string cpf { get; set; }
         public string nome { get; set; }
         public string email { get; set; }
-        public string senhaHash { get; private set; }
+        public string senhaHash { get; set; }
         public string telefone { get; set; }
+
+        [JsonConverter(typeof(DateTimeConverter))]
         public DateTime? dataNascimento { get; set; }
     }
 }

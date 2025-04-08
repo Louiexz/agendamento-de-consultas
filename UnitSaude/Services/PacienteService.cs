@@ -1,7 +1,9 @@
+using Microsoft.EntityFrameworkCore;
 using UnitSaude.Data;
 using UnitSaude.Dto.Paciente;
 using UnitSaude.Interfaces;
 using UnitSaude.Models;
+using UnitSaude.Utils;
 
 namespace UnitSaude.Services
 {
@@ -13,29 +15,242 @@ namespace UnitSaude.Services
             _context = context;
         }
 
-        public Task<ResponseModel<object>> CadastrarPaciente(CreatePacienteDto paciente)
+        public async Task<ResponseModel<ReadPacienteDto>> CadastrarPaciente(CreatePacienteDto pacienteDTO)
         {
-            throw new NotImplementedException();
+            ResponseModel<ReadPacienteDto> response = new();
+
+            try
+            {
+                var paciente = new Paciente
+                {
+                    cpf = pacienteDTO.cpf,
+                    nome = pacienteDTO.nome,
+                    email = pacienteDTO.email,
+                    senhaHash = PasswordHasher.HashPassword(pacienteDTO.senhaHash),
+                    telefone = pacienteDTO.telefone,
+                    dataCadastro = DateTime.UtcNow,
+                    dataNascimento = pacienteDTO.dataNascimento,
+                    TipoUsuario = "Paciente",
+                    ativo = true
+
+                };
+
+                _context.Pacientes.Add(paciente);
+                await _context.SaveChangesAsync();
+
+                var ReadPacienteDto = new ReadPacienteDto
+                {
+                    id = paciente.Id_Usuario,
+                    cpf = paciente.cpf,
+                    nome = paciente.nome,
+                    email = paciente.email,
+                    telefone = paciente.telefone,
+                    dataNascimento = paciente.dataNascimento
+
+                };
+                response.Data = ReadPacienteDto;
+                response.Message = "Paciente cadastrado com sucesso!";
+
+            } 
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+
+            }
+
+            return response;
         }
 
-        public Task<ResponseModel<object>> GerenciarPaciente(UpdatePacienteDto paciente, int PacienteId)
+        public async Task<ResponseModel<List<ReadPacienteDto>>> ListarPacientes()
         {
-            throw new NotImplementedException();
+            ResponseModel<List<ReadPacienteDto>> response = new();
+
+            try
+            {
+                var pacientes = _context.Pacientes
+                    .Include(x => x.Consultas)
+                    .Select(x => new ReadPacienteDto
+                    {
+                        id = x.Id_Usuario,
+                        cpf = x.cpf,
+                        nome = x.nome,
+                        email = x.email,
+                        telefone = x.telefone,
+                        dataNascimento = x.dataNascimento
+
+                    }).ToListAsync();
+
+                response.Data = await pacientes;
+                response.Message = "Pacientes listados!";
+            }
+
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+            }
+
+            return await Task.FromResult(response);
         }
 
-        public Task<ResponseModel<ReadPacienteDto>> ListarPaciente(int PacienteId)
+        public async Task<ResponseModel<ReadPacienteDto>> ListarPaciente (int pacienteId)
         {
-            throw new NotImplementedException();
+            ResponseModel<ReadPacienteDto> response = new();
+
+            try
+            {
+                var paciente = await _context.Pacientes.FindAsync(pacienteId);
+
+
+                if (paciente == null)
+                {
+                    response.Message = "Paciente não encontrado.";
+                    return response;
+                }
+
+                var pacienteDTO = new ReadPacienteDto
+                {
+                    id = paciente.Id_Usuario,
+                    cpf = paciente.cpf,
+                    nome = paciente.nome,
+                    email = paciente.email,
+                    telefone = paciente.telefone,
+                    dataNascimento = paciente.dataNascimento
+                };
+
+                response.Data = pacienteDTO;
+                response.Message = "Paciente encontrado com sucesso!";
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+
+            }
+
+            return response;
         }
 
-        public Task<ResponseModel<List<ReadPacienteDto>>> ListarPacientesEmFilaDeEspera()
+        public async Task<ResponseModel<ReadPacienteDto>> GerenciarPaciente(UpdatePacienteDto pacienteDto, int pacienteId)
         {
-            throw new NotImplementedException();
+            ResponseModel<ReadPacienteDto> response = new();
+
+            try
+            {
+                var pacienteExistente = await _context.Pacientes.FindAsync(pacienteId);
+
+                if (pacienteExistente == null)
+                {
+                    response.Status = false;
+                    response.Message = "Paciente não encontrado.";
+                    return response;
+                }
+
+                pacienteExistente.cpf = pacienteDto.cpf;
+                pacienteExistente.nome = pacienteDto.nome;
+                pacienteExistente.email = pacienteDto.email;
+                pacienteExistente.telefone = pacienteDto.telefone;
+                pacienteExistente.dataNascimento = pacienteDto.dataNascimento;
+
+                await _context.SaveChangesAsync();
+
+                var ReadPacienteDto = new ReadPacienteDto
+                {
+                    id = pacienteExistente.Id_Usuario,
+                    cpf = pacienteExistente.cpf,
+                    nome = pacienteExistente.nome,
+                    email = pacienteExistente.email,
+                    telefone = pacienteExistente.telefone,
+                    dataNascimento = pacienteExistente.dataNascimento
+
+                };
+
+                response.Data = ReadPacienteDto;
+                response.Message = "Paciente atualizado com sucesso!";
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
         }
 
-        public Task<ResponseModel<object>> RemoverPaciente(int PacienteId)
+        public async Task<ResponseModel<string>> AlterarSenhaPaciente(int pacienteId, UpdateSenhaPacienteDto dto)
         {
-            throw new NotImplementedException();
+            var response = new ResponseModel<string>();
+
+            try
+            {
+                var paciente = await _context.Pacientes.FindAsync(pacienteId);
+
+                if (paciente == null)
+                {
+                    response.Status = false;
+                    response.Message = "Paciente não encontrado.";
+                    return response;
+                }
+
+                // Verifica a senha atual
+                if (!PasswordHasher.VerifyPassword(dto.SenhaAtual, paciente.senhaHash))
+                {
+                    response.Status = false;
+                    response.Message = "Senha atual incorreta.";
+                    return response;
+                }
+
+                // Aplica nova hash
+                paciente.senhaHash = PasswordHasher.HashPassword(dto.NovaSenha);
+
+                await _context.SaveChangesAsync();
+
+                response.Data = "Senha atualizada com sucesso!";
+                response.Message = "Senha alterada com sucesso!";
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
         }
+
+        public async Task<ResponseModel<Paciente>> RemoverPaciente(int pacienteId)
+        {
+            ResponseModel<Paciente> response = new();
+
+            try
+            {
+                var paciente = await _context.Pacientes.FindAsync(pacienteId);
+
+                if (paciente == null)
+                {
+                    response.Status = false;
+                    response.Message = "Paciente não encontrado.";
+                    return response;
+                }
+
+                _context.Pacientes.Remove(paciente);
+
+                await _context.SaveChangesAsync();
+
+                response.Data = paciente;
+                response.Message = "Paciente removido com sucesso!";
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+
+
+
+
     }
 }
