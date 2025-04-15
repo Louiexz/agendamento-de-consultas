@@ -28,7 +28,7 @@ namespace UnitSaude.Services
                     email = pacienteDTO.email,
                     senhaHash = PasswordHasher.HashPassword(pacienteDTO.senhaHash),
                     telefone = pacienteDTO.telefone,
-                    dataCadastro = DateTime.UtcNow,
+                    dataCadastro = DateOnly.FromDateTime(DateTime.UtcNow),
                     dataNascimento = pacienteDTO.dataNascimento,
                     TipoUsuario = "Paciente",
                     ativo = true
@@ -250,6 +250,15 @@ namespace UnitSaude.Services
         }
 
 
+        public async Task<bool> ResetarSenhaPaciente(int id, string novaSenhaHash)
+        {
+            var admin = await _context.Pacientes.FindAsync(id);
+            if (admin == null) return false;
+
+            admin.senhaHash = novaSenhaHash;
+            await _context.SaveChangesAsync();
+            return true;
+        }
 
 
     }

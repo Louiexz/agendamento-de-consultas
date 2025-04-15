@@ -30,7 +30,7 @@ namespace UnitSaude.Services
                     email = professorDto.email,
                     senhaHash = PasswordHasher.HashPassword(professorDto.senhaHash),
                     telefone = professorDto.telefone,
-                    dataCadastro = DateTime.UtcNow,
+                    dataCadastro = DateOnly.FromDateTime(DateTime.UtcNow),
                     dataNascimento = professorDto.dataNascimento,
                     area = professorDto.area,
                     especialidade = professorDto.especialidade,
@@ -270,5 +270,14 @@ namespace UnitSaude.Services
         }
 
 
+        public async Task<bool> ResetarSenhaProfessor(int id, string novaSenhaHash)
+        {
+            var admin = await _context.Professores.FindAsync(id);
+            if (admin == null) return false;
+
+            admin.senhaHash = novaSenhaHash;
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

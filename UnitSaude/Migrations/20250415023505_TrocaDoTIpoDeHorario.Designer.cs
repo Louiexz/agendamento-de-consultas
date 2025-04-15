@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UnitSaude.Data;
@@ -11,9 +12,11 @@ using UnitSaude.Data;
 namespace UnitSaude.Migrations
 {
     [DbContext(typeof(ClinicaDbContext))]
-    partial class ClinicaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250415023505_TrocaDoTIpoDeHorario")]
+    partial class TrocaDoTIpoDeHorario
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,8 +90,8 @@ namespace UnitSaude.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateOnly?>("Data")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("Data")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Especialidade")
                         .IsRequired()

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UnitSaude.Dto.Paciente;
 using UnitSaude.Interfaces;
@@ -5,6 +6,7 @@ using UnitSaude.Models;
 
 namespace UnitSaude.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class PacienteController : ControllerBase

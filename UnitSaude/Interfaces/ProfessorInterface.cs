@@ -11,5 +11,7 @@ namespace UnitSaude.Interfaces
         public Task<ResponseModel<ReadProfessorDto>> GerenciarProfessor(UpdateProfessorDto professorDto, int professorId);
         public Task<ResponseModel<string>> AlterarSenhaProfessor(int professorId, UpdateSenhaProfessorDto dto);
         public Task<ResponseModel<Professor>> RemoverProfessor(int ProfessorId);
+
+        public Task<bool> ResetarSenhaProfessor(int id, string novaSenhaHash);
     }
 }

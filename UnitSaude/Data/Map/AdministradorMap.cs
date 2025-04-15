@@ -15,6 +15,7 @@ namespace UnitSaude.Data.Map
             builder.Property(u => u.senhaHash).IsRequired();
             builder.Property(u => u.telefone).HasMaxLength(20);
             builder.Property(u => u.dataCadastro).HasColumnType("date");
+            builder.Property(u => u.dataNascimento).IsRequired(false).HasColumnType("date");
             builder.Property(u => u.TipoUsuario).HasMaxLength(50);
             builder.Property(u => u.ativo).HasDefaultValue(true);
         }

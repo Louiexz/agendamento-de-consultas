@@ -10,5 +10,7 @@ namespace UnitSaude.Interfaces
         public Task<ResponseModel<ReadPacienteDto>> GerenciarPaciente(UpdatePacienteDto paciente, int PacienteId);
         public Task<ResponseModel<string>> AlterarSenhaPaciente(int pacienteId, UpdateSenhaPacienteDto dto);
         public Task<ResponseModel<Paciente>> RemoverPaciente(int PacienteId);
+
+        public Task<bool> ResetarSenhaPaciente(int id, string novaSenhaHash);
     }
 }

@@ -11,8 +11,8 @@ namespace UnitSaude.Dto.Professor
         public string senhaHash { get; set; }
         public string telefone { get; set; }
 
-        [JsonConverter(typeof(DateTimeConverter))]
-        public DateTime? dataNascimento { get; set; }
+        [JsonConverter(typeof(DateOnlyConverter))]
+        public DateOnly? dataNascimento { get; set; }
         public string area { get; set; }
         public string especialidade { get; set; }
         public string codigoProfissional { get; set; }

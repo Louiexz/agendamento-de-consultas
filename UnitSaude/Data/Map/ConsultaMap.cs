@@ -9,7 +9,7 @@ namespace UnitSaude.Data.Map
         public void Configure(EntityTypeBuilder<Consulta> builder)
         {
             builder.HasKey(u => u.id_Consulta);
-            builder.Property(u => u.Data).IsRequired(false);
+            builder.Property(u => u.Data).IsRequired(false).HasColumnType("date");
             builder.Property(u => u.Horario).IsRequired(false);
             builder.Property(u => u.Status).IsRequired().HasMaxLength(20);
 

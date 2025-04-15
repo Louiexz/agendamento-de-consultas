@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UnitSaude.Data;
@@ -11,9 +12,11 @@ using UnitSaude.Data;
 namespace UnitSaude.Migrations
 {
     [DbContext(typeof(ClinicaDbContext))]
-    partial class ClinicaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250408160325_AddAdminTable")]
+    partial class AddAdminTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,19 +86,15 @@ namespace UnitSaude.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id_Consulta"));
 
-                    b.Property<string>("Area")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateOnly?>("Data")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("Data")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Especialidade")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<TimeOnly?>("Horario")
-                        .HasColumnType("time without time zone");
+                    b.Property<TimeSpan?>("Horario")
+                        .HasColumnType("interval");
 
                     b.Property<int>("PacienteId")
                         .HasColumnType("integer");

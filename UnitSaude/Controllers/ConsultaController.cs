@@ -1,42 +1,90 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UnitSaude.Dto.Consulta;
+using UnitSaude.Interfaces;
 using UnitSaude.Models;
 
 namespace UnitSaude.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ConsultaController : ControllerBase
     {
+        private readonly ConsultaInterface _consultaService;
+
+        public ConsultaController(ConsultaInterface consultaService)
+        {
+            _consultaService = consultaService;
+        }
+
         [HttpPost("CreateConsulta")]
-        public async Task<ActionResult<ResponseModel<object>>> CreateConsulta([FromBody] CreateConsultaDto Consulta)
+        public async Task<ActionResult<ResponseModel<ReadConsultaDto>>> CadastrarConsulta([FromBody] CreateConsultaDto consulta)
         {
-            // Implementation for creating Consulta
-            return Ok();
+            var response = await _consultaService.CadastrarConsulta(consulta);
+            if (!response.Status) return BadRequest(response);
+            return Ok(response);
         }
-        [HttpGet("GetConsulta")]
-        public async Task<ActionResult<ResponseModel<Consulta>>> ListarConsultaPorId(int ConsultaId)
+
+        [HttpGet("GetConsultaPorId/{consultaId}")]
+        public async Task<ActionResult<ResponseModel<ReadConsultaDto>>> ListarConsultaPorId(int consultaId)
         {
-            // Implementation for getting Consulta by ID
-            return Ok();
+            var response = await _consultaService.ListarConsultaPorId(consultaId);
+            if (!response.Status) return NotFound(response);
+            return Ok(response);
         }
-        [HttpGet("GetConsultaPorPaciente/{paciente_id}")]
-        public async  Task<ActionResult<ResponseModel<List<Consulta>>>> ListarConsultaPorPaciente(Paciente paciente)
+
+        [HttpGet("GetConsultaPorPaciente/{pacienteId}")]
+        public async Task<ActionResult<ResponseModel<List<ReadConsultaDto>>>> ListarConsultaPorPaciente(int pacienteId)
         {
-            // Implementation for getting Consulta by Paciente
-            return Ok();
+            var response = await _consultaService.ListarConsultaPorPaciente(pacienteId);
+            if (!response.Status) return NotFound(response);
+            return Ok(response);
         }
-        [HttpGet("GetConsultaPorProfessor/{professor_id}")]
-        public async Task<ActionResult<ResponseModel<List<Consulta>>>> ListarConsultaPorProfessor(Professor professor)
+
+        [HttpGet("GetConsultaPorProfessor/{professorId}")]
+        public async Task<ActionResult<ResponseModel<List<ReadConsultaDto>>>> ListarConsultaPorProfessor(int professorId)
         {
-            // Implementation for getting Consulta by Professor
-            return Ok();
+            var response = await _consultaService.ListarConsultaPorProfessor(professorId);
+            if (!response.Status) return NotFound(response);
+            return Ok(response);
         }
-        [HttpPatch("UpdateConsulta")]
-        public async Task<ActionResult<ResponseModel<object>>> UpdateConsulta([FromBody] UpdateConsultaDto Consulta, int ConsultaId)
+
+        [HttpGet("GetConsultaPorStatus/{status}")]
+        public async Task<ActionResult<ResponseModel<List<ReadConsultaDto>>>> ListarConsultaPorStatus(string status)
         {
-            // Implementation for updating Consulta
-            return Ok();
+            var response = await _consultaService.ListarConsultaPorStatus(status);
+            if (!response.Status) return NotFound(response);
+            return Ok(response);
         }
+
+        [HttpGet("GetConsultaPorNomeOuCpf/{valor}")]
+        public async Task<ActionResult<ResponseModel<List<ReadConsultaDto>>>> ListarConsultaPorNomeOuCpf(string valor)
+        {
+            var response = await _consultaService.ListarConsultasPorNomeOuCpf(valor);
+            if (!response.Status) return NotFound(response);
+            return Ok(response);
+        }
+
+        [HttpGet("GetTodasConsultas")]
+        public async Task<ActionResult<ResponseModel<List<ReadConsultaDto>>>> ListarConsultas()
+        {
+            var response = await _consultaService.ListarConsultas();
+            if (!response.Status) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpGet("horarios-disponiveis")]
+        public async Task<ActionResult<ResponseModel<List<string>>>> ObterHorariosDisponiveis(
+            [FromQuery] DateOnly data,
+            [FromQuery] string area,
+            [FromQuery] string especialidade)
+        {
+            var response = await _consultaService.ObterHorariosDisponiveis(data, area, especialidade);
+            return Ok(response);
+        }
+
+
+
     }
 }

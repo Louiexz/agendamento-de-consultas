@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UnitSaude.Dto.Paciente;
 using UnitSaude.Dto.Professor;
@@ -7,6 +8,7 @@ using UnitSaude.Services;
 
 namespace UnitSaude.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProfessorController : ControllerBase

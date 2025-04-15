@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UnitSaude.Dto.Anexo;
 using UnitSaude.Models;
 
 namespace UnitSaude.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class AnexoController : ControllerBase
