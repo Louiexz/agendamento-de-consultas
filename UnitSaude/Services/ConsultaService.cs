@@ -47,17 +47,69 @@ namespace UnitSaude.Services
                     return response;
                 }
 
+                // Validação de Área
+                if (!DadosFixosConsulta.EspecialidadesPorArea.ContainsKey(consultaDTO.Area))
+                {
+                    response.Status = false;
+                    response.Message = "Área inválida.";
+                    return response;
+                }
+
+                // Validação de Especialidade para a Área
+                var especialidadesPermitidas = DadosFixosConsulta.EspecialidadesPorArea[consultaDTO.Area];
+                if (!especialidadesPermitidas.Contains(consultaDTO.Especialidade))
+                {
+                    response.Status = false;
+                    response.Message = "Especialidade inválida para a área selecionada.";
+                    return response;
+                }
+
+                // Validação de Status
+                if (!DadosFixosConsulta.Status.Contains(consultaDTO.Status))
+                {
+                    response.Status = false;
+                    response.Message = "Status inválido.";
+                    return response;
+                }
+
+                // Verifica se o horário está dentro dos horários válidos (multiplo de 40 minutos + 15 minutos de intervalo)
+                TimeOnly horarioInicial = new(8, 0); // Início das consultas
+                TimeSpan duracaoComIntervalo = TimeSpan.FromMinutes(55); // 40 minutos + 15 minutos
+
+                bool horarioValido = false;
+
+                // Verifica se o horário solicitado é um múltiplo de 55 minutos após o horário inicial
+                while (horarioInicial.Add(duracaoComIntervalo) <= new TimeOnly(21, 0)) // Fim das consultas
+                {
+                    if (horarioInicial == consultaDTO.Horario)
+                    {
+                        horarioValido = true;
+                        break;
+                    }
+                    horarioInicial = horarioInicial.Add(duracaoComIntervalo);
+                }
+
+                if (!horarioValido)
+                {
+                    response.Status = false;
+                    response.Message = "Horário inválido. Escolha um horário disponível.";
+                    return response;
+                }
+
+                // Verifica se já existe alguma consulta marcada para o mesmo horário
                 var conflito = await _context.Consultas
                     .AnyAsync(c =>
-                        c.Data == consultaDTO.Data && // Comparando diretamente o DateOnly
-                        c.Horario == consultaDTO.Horario && // Comparando o TimeOnly
-                        c.Status != "Cancelada");
-
+                        c.Area == consultaDTO.Area && // Verifica a área
+                        c.Especialidade == consultaDTO.Especialidade && // Verifica a especialidade
+                        c.Status != "Concluída" && // Verifica se o status não é Concluída
+                        c.Status != "Cancelada" && // Verifica se o status não é Cancelada
+                        c.Data == consultaDTO.Data && // Verifica se a data é a mesma
+                        c.Horario == consultaDTO.Horario); // Verifica se o horário é o mesmo
 
                 if (conflito)
                 {
                     response.Status = false;
-                    response.Message = "Este horário já está ocupado.";
+                    response.Message = "Este horário já está reservado.";
                     return response;
                 }
 
@@ -103,6 +155,8 @@ namespace UnitSaude.Services
 
             return response;
         }
+
+
 
 
         public async Task<ResponseModel<ReadConsultaDto>> ListarConsultaPorId(int ConsultaId)
@@ -159,7 +213,8 @@ namespace UnitSaude.Services
             {
                 var paciente = await _context.Pacientes
                     .FirstOrDefaultAsync(p =>
-                        p.nome.ToLower().Contains(valor.ToLower()) || p.Id_Usuario.ToString() == valor);
+                        p.nome.ToLower().Contains(valor.ToLower()) || p.cpf == valor);
+
 
                 if (paciente == null)
                 {
@@ -378,32 +433,37 @@ namespace UnitSaude.Services
 
         public async Task<ResponseModel<List<string>>> ObterHorariosDisponiveis(DateOnly data, string area, string especialidade)
         {
-            TimeOnly inicio = new(8, 0);
-            TimeOnly fim = new(21, 0);
-            TimeSpan duracao = TimeSpan.FromMinutes(40);
-            TimeSpan intervalo = TimeSpan.FromMinutes(15);
+            TimeOnly inicio = new(8, 0);  // Início das consultas
+            TimeOnly fim = new(21, 0);    // Fim das consultas
+            TimeSpan duracao = TimeSpan.FromMinutes(40);  // Duração de cada consulta
+            TimeSpan intervalo = TimeSpan.FromMinutes(15); // Intervalo entre as consultas
 
+            // Obter os horários ocupados considerando o status diferente de "Cancelada" ou "Concluída"
             var horariosOcupados = await _context.Consultas
                 .Where(c => c.Data == data &&
                             c.Area == area &&
                             c.Especialidade == especialidade &&
-                            c.Status != "Cancelada")
+                            (c.Status != "Cancelada" && c.Status != "Concluída")) // Garantir que o status não seja "Cancelada" ou "Concluída"
                 .Select(c => c.Horario)
                 .ToListAsync();
 
             List<string> horariosDisponiveis = new();
             TimeOnly horarioAtual = inicio;
 
+            // Loop para verificar todos os horários possíveis dentro do intervalo permitido
             while (horarioAtual.Add(duracao) <= fim)
             {
+                // Verifica se o horário atual não está na lista de horários ocupados
                 if (!horariosOcupados.Contains(horarioAtual))
                 {
                     horariosDisponiveis.Add(horarioAtual.ToString("HH:mm"));
                 }
 
+                // Incrementa o horário pelo tempo de duração mais o intervalo (55 minutos no total)
                 horarioAtual = horarioAtual.Add(duracao + intervalo);
             }
 
+            // Retorna os horários disponíveis encontrados
             return new ResponseModel<List<string>>
             {
                 Status = true,
@@ -411,6 +471,47 @@ namespace UnitSaude.Services
                 Data = horariosDisponiveis
             };
         }
+
+
+
+        public async Task<ResponseModel<string>> AtualizarStatusConsulta(int id, UpdateStatusConsultaDto dto)
+        {
+            var response = new ResponseModel<string>();
+
+            try
+            {
+                if (!DadosFixosConsulta.Status.Contains(dto.NovoStatus))
+                {
+                    response.Status = false;
+                    response.Message = "Status inválido.";
+                    return response;
+                }
+
+                var consulta = await _context.Consultas.FindAsync(id);
+
+                if (consulta == null)
+                {
+                    response.Status = false;
+                    response.Message = "Consulta não encontrada.";
+                    return response;
+                }
+
+                consulta.Status = dto.NovoStatus;
+                await _context.SaveChangesAsync();
+
+                response.Status = true;
+                response.Message = "Status atualizado com sucesso!";
+                response.Data = consulta.Status;
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+
 
     }
 }

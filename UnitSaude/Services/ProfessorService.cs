@@ -23,6 +23,24 @@ namespace UnitSaude.Services
 
             try
             {
+
+                // Validação da área
+                if (!DadosFixosConsulta.ObterAreas().Contains(professorDto.area))
+                {
+                    response.Status = false;
+                    response.Message = "Área inválida.";
+                    return response;
+                }
+
+                // Validação da especialidade
+                var especialidadesPermitidas = DadosFixosConsulta.ObterEspecialidadesPorArea(professorDto.area);
+                if (!especialidadesPermitidas.Contains(professorDto.especialidade))
+                {
+                    response.Status = false;
+                    response.Message = "Especialidade inválida para a área especificada.";
+                    return response;
+                }
+
                 var professor = new Professor
                 {
                     cpf = professorDto.cpf,
@@ -163,6 +181,23 @@ namespace UnitSaude.Services
                     return response;
                 }
 
+                // Validação da área
+                if (!DadosFixosConsulta.ObterAreas().Contains(professorDto.area))
+                {
+                    response.Status = false;
+                    response.Message = "Área inválida.";
+                    return response;
+                }
+
+                // Validação da especialidade
+                var especialidadesPermitidas = DadosFixosConsulta.ObterEspecialidadesPorArea(professorDto.area);
+                if (!especialidadesPermitidas.Contains(professorDto.especialidade))
+                {
+                    response.Status = false;
+                    response.Message = "Especialidade inválida para a área especificada.";
+                    return response;
+                }
+
                 professorExistente.cpf = professorDto.cpf;
                 professorExistente.nome = professorDto.nome;
                 professorExistente.email = professorDto.email;
@@ -182,6 +217,7 @@ namespace UnitSaude.Services
                     email = professorExistente.email,
                     telefone = professorExistente.telefone,
                     dataNascimento = professorExistente.dataNascimento,
+                    especialidade = professorExistente.especialidade,
                     area = professorExistente.area,
 
                 };

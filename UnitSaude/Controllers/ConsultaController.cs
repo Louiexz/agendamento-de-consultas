@@ -84,6 +84,17 @@ namespace UnitSaude.Controllers
             return Ok(response);
         }
 
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> AtualizarStatusConsulta(int id, [FromBody] UpdateStatusConsultaDto dto)
+        {
+            var resultado = await _consultaService.AtualizarStatusConsulta(id, dto);
+
+            if (!resultado.Status)
+                return BadRequest(resultado);
+
+            return Ok(resultado);
+        }
+
 
 
     }
