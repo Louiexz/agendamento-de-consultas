@@ -5,11 +5,12 @@ using UnitSaude.Models;
 
 namespace UnitSaude.Controllers
 {
-    [Authorize]
-    [ApiController]
-    [Route("api/[controller]")]
+    //[Authorize]
+    //[ApiController]
+    //[Route("api/[controller]")]
     public class ProntuarioController : ControllerBase
     {
+        /*
         [HttpPost("CreateProntuario")]
         public async Task<ActionResult<ResponseModel<object>>> CadastrarProntuario(CreateProntuarioDto prontuario)
         {
@@ -28,5 +29,6 @@ namespace UnitSaude.Controllers
             // Implement the logic to manage prontuario by ID
             return Ok();
         }
+        */
     }
 }

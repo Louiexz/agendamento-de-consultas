@@ -10,6 +10,33 @@ using UnitSaude.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Lê variáveis de ambiente para sobrescrever configurações sensíveis
+var config = builder.Configuration;
+
+void SetIfExists(string key, string envVar)
+{
+    var value = Environment.GetEnvironmentVariable(envVar);
+    if (!string.IsNullOrEmpty(value))
+        config[key] = value;
+}
+
+// JWT
+SetIfExists("Jwt:Key", "JWT_KEY");
+SetIfExists("Jwt:Issuer", "JWT_ISSUER");
+SetIfExists("Jwt:Audience", "JWT_AUDIENCE");
+
+// Conexão
+SetIfExists("ConnectionStrings:DefaultConnection", "CONNECTION_STRING");
+
+// Email
+SetIfExists("EmailSettings:Servidor", "EMAIL_SERVIDOR");
+SetIfExists("EmailSettings:Porta", "EMAIL_PORTA");
+SetIfExists("EmailSettings:Usuario", "EMAIL_USUARIO");
+SetIfExists("EmailSettings:Senha", "EMAIL_SENHA");
+SetIfExists("EmailSettings:UsarSSL", "EMAIL_SSL");
+SetIfExists("EmailSettings:UrlRedefinicaoSenha", "URL_REDEFINICAO");
+
+
 // Add services to the container.
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -88,6 +115,19 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Configuration.AddEnvironmentVariables();
+
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Administrador", policy =>
+        policy.RequireClaim("TipoUsuario", "Administrador"));
+
+    options.AddPolicy("Professor", policy =>
+        policy.RequireClaim("TipoUsuario", "Professor"));
+
+    options.AddPolicy("Paciente", policy =>
+        policy.RequireClaim("TipoUsuario", "Paciente"));
+});
 
 var app = builder.Build();
 

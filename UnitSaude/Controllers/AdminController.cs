@@ -7,7 +7,7 @@ using UnitSaude.Models;
 
 namespace UnitSaude.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "Administrador")]
     [ApiController]
     [Route("api/[controller]")]
     public class AdminController : ControllerBase

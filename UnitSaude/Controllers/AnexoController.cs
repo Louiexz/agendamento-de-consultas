@@ -5,11 +5,13 @@ using UnitSaude.Models;
 
 namespace UnitSaude.Controllers
 {
-    [Authorize]
-    [ApiController]
-    [Route("api/[controller]")]
+    //[Authorize]
+    //[ApiController]
+    //[Route("api/[controller]")]
     public class AnexoController : ControllerBase
     {
+        /*
+
         [HttpGet("GetAnexo")]
         public async Task<ActionResult<ResponseModel<ReadAnexoDto>>> GetAnexo()
         {
@@ -34,9 +36,8 @@ namespace UnitSaude.Controllers
             // Implementation for deleting anexo
             return Ok();
         }
+        */
     }
 
-    public class ReadAnexoDto
-    {
-    }
+
 }
