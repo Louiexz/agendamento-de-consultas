@@ -5,11 +5,11 @@ namespace UnitSaude.Dto.Paciente
 {
     public class CreatePacienteDto
     {
-        public string cpf { get; set; }
-        public string nome { get; set; }
-        public string email { get; set; }
-        public string senhaHash { get; set; }
-        public string telefone { get; set; }
+        public required string cpf { get; set; }
+        public required string nome { get; set; }
+        public required string email { get; set; }
+        public required string senhaHash { get; set; }
+        public required string telefone { get; set; }
 
         [JsonConverter(typeof(DateOnlyConverter))]
         public DateOnly? dataNascimento { get; set; }

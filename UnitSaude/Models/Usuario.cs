@@ -9,18 +9,18 @@ namespace UnitSaude.Models
     {
 
         public int Id_Usuario { get; set; }
-        public string cpf { get; set; }
-        public string nome { get; set; }
-        public string email { get; set; }
-        public string senhaHash { get; set; }
-        public string telefone { get; set; }
+        public required string cpf { get; set; }
+        public required string nome { get; set; }
+        public required string email { get; set; }
+        public required string senhaHash { get; set; }
+        public required string telefone { get; set; }
 
         [JsonConverter(typeof(DateOnlyConverter))]
         public DateOnly dataCadastro { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
         [JsonConverter(typeof(DateOnlyConverter))]
         public DateOnly? dataNascimento { get; set; }
-        public string TipoUsuario { get; set; }
+        public required string TipoUsuario { get; set; }
         public bool ativo { get; set; } = true;
     }
 }

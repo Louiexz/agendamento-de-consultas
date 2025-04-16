@@ -105,7 +105,7 @@ namespace UnitSaude.Services
 
                 if (paciente == null)
                 {
-                    response.Message = "Paciente não encontrado.";
+                    response.Message = "Paciente nï¿½o encontrado.";
                     return response;
                 }
 
@@ -143,15 +143,22 @@ namespace UnitSaude.Services
                 if (pacienteExistente == null)
                 {
                     response.Status = false;
-                    response.Message = "Paciente não encontrado.";
+                    response.Message = "Paciente nï¿½o encontrado.";
                     return response;
                 }
 
-                pacienteExistente.cpf = pacienteDto.cpf;
-                pacienteExistente.nome = pacienteDto.nome;
-                pacienteExistente.email = pacienteDto.email;
-                pacienteExistente.telefone = pacienteDto.telefone;
-                pacienteExistente.dataNascimento = pacienteDto.dataNascimento;
+                foreach (var property in pacienteDto.GetType().GetProperties())
+                {
+                    var newValue = property.GetValue(pacienteDto);
+                    if (newValue != null)
+                    {
+                        var userProperty = pacienteExistente.GetType().GetProperty(property.Name);
+                        if (userProperty != null && userProperty.CanWrite)
+                        {
+                            userProperty.SetValue(pacienteExistente, newValue);
+                        }
+                    }
+                }
 
                 await _context.SaveChangesAsync();
 
@@ -189,7 +196,7 @@ namespace UnitSaude.Services
                 if (paciente == null)
                 {
                     response.Status = false;
-                    response.Message = "Paciente não encontrado.";
+                    response.Message = "Paciente nï¿½o encontrado.";
                     return response;
                 }
 
@@ -229,7 +236,7 @@ namespace UnitSaude.Services
                 if (paciente == null)
                 {
                     response.Status = false;
-                    response.Message = "Paciente não encontrado.";
+                    response.Message = "Paciente nï¿½o encontrado.";
                     return response;
                 }
 

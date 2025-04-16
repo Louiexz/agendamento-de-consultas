@@ -2,11 +2,11 @@
 {
     public class Professor : Usuario
     {
-        public string area { get; set; }
-        public string especialidade { get; set; }
-        public string codigoProfissional { get; set; }
+        public required string area { get; set; }
+        public required string especialidade { get; set; }
+        public required string codigoProfissional { get; set; }
 
-        public ICollection<Consulta> Consultas { get; set; }
+        public ICollection<Consulta> Consultas { get; set; } = new List<Consulta>();
       //  public ICollection<Prontuario> Prontuarios { get; set; }
      
     }

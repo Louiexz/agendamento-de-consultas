@@ -2,6 +2,6 @@
 {
     public class UpdateStatusConsultaDto
     {
-        public string NovoStatus { get; set; } 
+        public required string NovoStatus { get; set; } 
     }
 }

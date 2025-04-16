@@ -105,7 +105,7 @@ namespace UnitSaude.Services
 
                 if (admin == null)
                 {
-                    response.Message = "Administrador não encontrado.";
+                    response.Message = "Administrador nï¿½o encontrado.";
                     return response;
                 }
 
@@ -143,15 +143,22 @@ namespace UnitSaude.Services
                 if (adminExistente == null)
                 {
                     response.Status = false;
-                    response.Message = "Admin não encontrado.";
+                    response.Message = "Admin nï¿½o encontrado.";
                     return response;
                 }
 
-                adminExistente.cpf = adminDTO.cpf;
-                adminExistente.nome = adminDTO.nome;
-                adminExistente.email = adminDTO.email;
-                adminExistente.telefone = adminDTO.telefone;
-                adminExistente.dataNascimento = adminDTO.dataNascimento;
+                foreach (var property in adminDTO.GetType().GetProperties())
+                {
+                    var newValue = property.GetValue(adminDTO);
+                    if (newValue != null)
+                    {
+                        var userProperty = adminExistente.GetType().GetProperty(property.Name);
+                        if (userProperty != null && userProperty.CanWrite)
+                        {
+                            userProperty.SetValue(adminExistente, newValue);
+                        }
+                    }
+                }
 
                 await _context.SaveChangesAsync();
 
@@ -189,7 +196,7 @@ namespace UnitSaude.Services
                 if (admin == null)
                 {
                     response.Status = false;
-                    response.Message = "Administrador não encontrado.";
+                    response.Message = "Administrador nï¿½o encontrado.";
                     return response;
                 }
 
@@ -229,7 +236,7 @@ namespace UnitSaude.Services
                 if (admin == null)
                 {
                     response.Status = false;
-                    response.Message = "Administrador não encontrado.";
+                    response.Message = "Administrador nï¿½o encontrado.";
                     return response;
                 }
 

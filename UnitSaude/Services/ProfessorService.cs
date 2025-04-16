@@ -24,20 +24,20 @@ namespace UnitSaude.Services
             try
             {
 
-                // Validação da área
+                // Validaï¿½ï¿½o da ï¿½rea
                 if (!DadosFixosConsulta.ObterAreas().Contains(professorDto.area))
                 {
                     response.Status = false;
-                    response.Message = "Área inválida.";
+                    response.Message = "ï¿½rea invï¿½lida.";
                     return response;
                 }
 
-                // Validação da especialidade
+                // Validaï¿½ï¿½o da especialidade
                 var especialidadesPermitidas = DadosFixosConsulta.ObterEspecialidadesPorArea(professorDto.area);
                 if (!especialidadesPermitidas.Contains(professorDto.especialidade))
                 {
                     response.Status = false;
-                    response.Message = "Especialidade inválida para a área especificada.";
+                    response.Message = "Especialidade invï¿½lida para a ï¿½rea especificada.";
                     return response;
                 }
 
@@ -134,7 +134,7 @@ namespace UnitSaude.Services
 
                 if (professor == null)
                 {
-                    response.Message = "professor não encontrado.";
+                    response.Message = "professor nï¿½o encontrado.";
                     return response;
                 }
 
@@ -177,35 +177,43 @@ namespace UnitSaude.Services
                 if (professorExistente == null)
                 {
                     response.Status = false;
-                    response.Message = "Paciente não encontrado.";
+                    response.Message = "Paciente nï¿½o encontrado.";
                     return response;
                 }
 
-                // Validação da área
-                if (!DadosFixosConsulta.ObterAreas().Contains(professorDto.area))
+                // Validaï¿½ï¿½o da ï¿½rea
+                if (professorDto.area != null && !DadosFixosConsulta.ObterAreas().Contains(professorDto.area))
                 {
                     response.Status = false;
-                    response.Message = "Área inválida.";
+                    response.Message = "ï¿½rea invï¿½lida.";
                     return response;
                 }
+                if (professorDto.area != null){
+                    // Validaï¿½ï¿½o da especialidade
+                    var especialidadesPermitidas = DadosFixosConsulta.ObterEspecialidadesPorArea(professorDto.area);
+                    if (professorDto.especialidade != null &&
+                        !especialidadesPermitidas.Contains(professorDto.especialidade))
+                    {
+                        response.Status = false;
+                        response.Message = "Especialidade invï¿½lida para a ï¿½rea especificada.";
+                        return response;
+                    }
+                }
 
-                // Validação da especialidade
-                var especialidadesPermitidas = DadosFixosConsulta.ObterEspecialidadesPorArea(professorDto.area);
-                if (!especialidadesPermitidas.Contains(professorDto.especialidade))
+                
+
+                foreach (var property in professorDto.GetType().GetProperties())
                 {
-                    response.Status = false;
-                    response.Message = "Especialidade inválida para a área especificada.";
-                    return response;
+                    var newValue = property.GetValue(professorDto);
+                    if (newValue != null)
+                    {
+                        var userProperty = professorExistente.GetType().GetProperty(property.Name);
+                        if (userProperty != null && userProperty.CanWrite)
+                        {
+                            userProperty.SetValue(professorExistente, newValue);
+                        }
+                    }
                 }
-
-                professorExistente.cpf = professorDto.cpf;
-                professorExistente.nome = professorDto.nome;
-                professorExistente.email = professorDto.email;
-                professorExistente.telefone = professorDto.telefone;
-                professorExistente.dataNascimento = professorDto.dataNascimento;
-                professorExistente.area = professorDto.area;
-                professorExistente.especialidade = professorDto.especialidade;
-                professorExistente.codigoProfissional = professorDto.codigoProfissional;
 
                 await _context.SaveChangesAsync();
 
@@ -216,10 +224,10 @@ namespace UnitSaude.Services
                     nome = professorExistente.nome,
                     email = professorExistente.email,
                     telefone = professorExistente.telefone,
+                    codigoProfissional = professorExistente.codigoProfissional,
                     dataNascimento = professorExistente.dataNascimento,
                     especialidade = professorExistente.especialidade,
                     area = professorExistente.area,
-
                 };
 
                 response.Data = ReadProfessorDto;
@@ -245,7 +253,7 @@ namespace UnitSaude.Services
                 if (professor == null)
                 {
                     response.Status = false;
-                    response.Message = "Professor não encontrado.";
+                    response.Message = "Professor nï¿½o encontrado.";
                     return response;
                 }
 
@@ -285,7 +293,7 @@ namespace UnitSaude.Services
                 if (professor == null)
                 {
                     response.Status = false;
-                    response.Message = "Professor não encontrado.";
+                    response.Message = "Professor nï¿½o encontrado.";
                     return response;
                 }
 

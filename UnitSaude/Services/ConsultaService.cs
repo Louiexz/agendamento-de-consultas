@@ -23,62 +23,58 @@ namespace UnitSaude.Services
             {
                 // Verifica se o paciente existe
                 var paciente = await _context.Pacientes
-                    .Where(p => p.Id_Usuario == consultaDTO.PacienteId)
-                    .Select(p => new { p.Id_Usuario, p.nome })
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(p => p.Id_Usuario == consultaDTO.PacienteId);
 
                 if (paciente == null)
                 {
                     response.Status = false;
-                    response.Message = "Paciente não encontrado.";
+                    response.Message = "Paciente nï¿½o encontrado.";
                     return response;
                 }
 
                 // Verifica se o professor existe
                 var professor = await _context.Professores
-                    .Where(p => p.Id_Usuario == consultaDTO.ProfessorId)
-                    .Select(p => new { p.Id_Usuario, p.nome })
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(p => p.Id_Usuario == consultaDTO.ProfessorId);
 
                 if (professor == null)
                 {
                     response.Status = false;
-                    response.Message = "Professor não encontrado.";
+                    response.Message = "Professor nï¿½o encontrado.";
                     return response;
                 }
 
-                // Validação de Área
+                // Validaï¿½ï¿½o de ï¿½rea
                 if (!DadosFixosConsulta.EspecialidadesPorArea.ContainsKey(consultaDTO.Area))
                 {
                     response.Status = false;
-                    response.Message = "Área inválida.";
+                    response.Message = "ï¿½rea invï¿½lida.";
                     return response;
                 }
 
-                // Validação de Especialidade para a Área
+                // Validaï¿½ï¿½o de Especialidade para a ï¿½rea
                 var especialidadesPermitidas = DadosFixosConsulta.EspecialidadesPorArea[consultaDTO.Area];
                 if (!especialidadesPermitidas.Contains(consultaDTO.Especialidade))
                 {
                     response.Status = false;
-                    response.Message = "Especialidade inválida para a área selecionada.";
+                    response.Message = "Especialidade invï¿½lida para a ï¿½rea selecionada.";
                     return response;
                 }
 
-                // Validação de Status
+                // Validaï¿½ï¿½o de Status
                 if (!DadosFixosConsulta.Status.Contains(consultaDTO.Status))
                 {
                     response.Status = false;
-                    response.Message = "Status inválido.";
+                    response.Message = "Status invï¿½lido.";
                     return response;
                 }
 
-                // Verifica se o horário está dentro dos horários válidos (multiplo de 40 minutos + 15 minutos de intervalo)
-                TimeOnly horarioInicial = new(8, 0); // Início das consultas
+                // Verifica se o horï¿½rio estï¿½ dentro dos horï¿½rios vï¿½lidos (multiplo de 40 minutos + 15 minutos de intervalo)
+                TimeOnly horarioInicial = new(8, 0); // Inï¿½cio das consultas
                 TimeSpan duracaoComIntervalo = TimeSpan.FromMinutes(55); // 40 minutos + 15 minutos
 
                 bool horarioValido = false;
 
-                // Verifica se o horário solicitado é um múltiplo de 55 minutos após o horário inicial
+                // Verifica se o horï¿½rio solicitado ï¿½ um mï¿½ltiplo de 55 minutos apï¿½s o horï¿½rio inicial
                 while (horarioInicial.Add(duracaoComIntervalo) <= new TimeOnly(21, 0)) // Fim das consultas
                 {
                     if (horarioInicial == consultaDTO.Horario)
@@ -92,28 +88,28 @@ namespace UnitSaude.Services
                 if (!horarioValido)
                 {
                     response.Status = false;
-                    response.Message = "Horário inválido. Escolha um horário disponível.";
+                    response.Message = "Horï¿½rio invï¿½lido. Escolha um horï¿½rio disponï¿½vel.";
                     return response;
                 }
 
-                // Verifica se já existe alguma consulta marcada para o mesmo horário
+                // Verifica se jï¿½ existe alguma consulta marcada para o mesmo horï¿½rio
                 var conflito = await _context.Consultas
                     .AnyAsync(c =>
-                        c.Area == consultaDTO.Area && // Verifica a área
+                        c.Area == consultaDTO.Area && // Verifica a ï¿½rea
                         c.Especialidade == consultaDTO.Especialidade && // Verifica a especialidade
-                        c.Status != "Concluída" && // Verifica se o status não é Concluída
-                        c.Status != "Cancelada" && // Verifica se o status não é Cancelada
-                        c.Data == consultaDTO.Data && // Verifica se a data é a mesma
-                        c.Horario == consultaDTO.Horario); // Verifica se o horário é o mesmo
+                        c.Status != "Concluï¿½da" && // Verifica se o status nï¿½o ï¿½ Concluï¿½da
+                        c.Status != "Cancelada" && // Verifica se o status nï¿½o ï¿½ Cancelada
+                        c.Data == consultaDTO.Data && // Verifica se a data ï¿½ a mesma
+                        c.Horario == consultaDTO.Horario); // Verifica se o horï¿½rio ï¿½ o mesmo
 
                 if (conflito)
                 {
                     response.Status = false;
-                    response.Message = "Este horário já está reservado.";
+                    response.Message = "Este horï¿½rio jï¿½ estï¿½ reservado.";
                     return response;
                 }
 
-                // Criação da consulta
+                // Criaï¿½ï¿½o da consulta
                 var consulta = new Consulta
                 {
                     Data = consultaDTO.Data,
@@ -122,9 +118,10 @@ namespace UnitSaude.Services
                     Area = consultaDTO.Area,
                     Especialidade = consultaDTO.Especialidade,
                     PacienteId = consultaDTO.PacienteId,
-                    ProfessorId = consultaDTO.ProfessorId
+                    ProfessorId = consultaDTO.ProfessorId,
+                    Professor = professor,
+                    Paciente = paciente, // Assign the full Paciente entity
                 };
-
                 _context.Consultas.Add(consulta);
                 await _context.SaveChangesAsync();
 
@@ -174,7 +171,7 @@ namespace UnitSaude.Services
 
                 if (consulta == null)
                 {
-                    response.Message = "Consulta não encontrado.";
+                    response.Message = "Consulta nï¿½o encontrado.";
                     return response;
                 }
 
@@ -218,7 +215,7 @@ namespace UnitSaude.Services
 
                 if (paciente == null)
                 {
-                    response.Message = "Paciente não encontrado.";
+                    response.Message = "Paciente nï¿½o encontrado.";
                     return response;
                 }
 
@@ -433,41 +430,41 @@ namespace UnitSaude.Services
 
         public async Task<ResponseModel<List<string>>> ObterHorariosDisponiveis(DateOnly data, string area, string especialidade)
         {
-            TimeOnly inicio = new(8, 0);  // Início das consultas
+            TimeOnly inicio = new(8, 0);  // Inï¿½cio das consultas
             TimeOnly fim = new(21, 0);    // Fim das consultas
-            TimeSpan duracao = TimeSpan.FromMinutes(40);  // Duração de cada consulta
+            TimeSpan duracao = TimeSpan.FromMinutes(40);  // Duraï¿½ï¿½o de cada consulta
             TimeSpan intervalo = TimeSpan.FromMinutes(15); // Intervalo entre as consultas
 
-            // Obter os horários ocupados considerando o status diferente de "Cancelada" ou "Concluída"
+            // Obter os horï¿½rios ocupados considerando o status diferente de "Cancelada" ou "Concluï¿½da"
             var horariosOcupados = await _context.Consultas
                 .Where(c => c.Data == data &&
                             c.Area == area &&
                             c.Especialidade == especialidade &&
-                            (c.Status != "Cancelada" && c.Status != "Concluída")) // Garantir que o status não seja "Cancelada" ou "Concluída"
+                            (c.Status != "Cancelada" && c.Status != "Concluï¿½da")) // Garantir que o status nï¿½o seja "Cancelada" ou "Concluï¿½da"
                 .Select(c => c.Horario)
                 .ToListAsync();
 
             List<string> horariosDisponiveis = new();
             TimeOnly horarioAtual = inicio;
 
-            // Loop para verificar todos os horários possíveis dentro do intervalo permitido
+            // Loop para verificar todos os horï¿½rios possï¿½veis dentro do intervalo permitido
             while (horarioAtual.Add(duracao) <= fim)
             {
-                // Verifica se o horário atual não está na lista de horários ocupados
+                // Verifica se o horï¿½rio atual nï¿½o estï¿½ na lista de horï¿½rios ocupados
                 if (!horariosOcupados.Contains(horarioAtual))
                 {
                     horariosDisponiveis.Add(horarioAtual.ToString("HH:mm"));
                 }
 
-                // Incrementa o horário pelo tempo de duração mais o intervalo (55 minutos no total)
+                // Incrementa o horï¿½rio pelo tempo de duraï¿½ï¿½o mais o intervalo (55 minutos no total)
                 horarioAtual = horarioAtual.Add(duracao + intervalo);
             }
 
-            // Retorna os horários disponíveis encontrados
+            // Retorna os horï¿½rios disponï¿½veis encontrados
             return new ResponseModel<List<string>>
             {
                 Status = true,
-                Message = "Horários disponíveis encontrados.",
+                Message = "Horï¿½rios disponï¿½veis encontrados.",
                 Data = horariosDisponiveis
             };
         }
@@ -483,7 +480,7 @@ namespace UnitSaude.Services
                 if (!DadosFixosConsulta.Status.Contains(dto.NovoStatus))
                 {
                     response.Status = false;
-                    response.Message = "Status inválido.";
+                    response.Message = "Status invï¿½lido.";
                     return response;
                 }
 
@@ -492,7 +489,7 @@ namespace UnitSaude.Services
                 if (consulta == null)
                 {
                     response.Status = false;
-                    response.Message = "Consulta não encontrada.";
+                    response.Message = "Consulta nï¿½o encontrada.";
                     return response;
                 }
 

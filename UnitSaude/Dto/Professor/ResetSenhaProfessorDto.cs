@@ -2,6 +2,6 @@
 {
     public class ResetSenhaProfessorDto
     {
-        public string NovaSenha { get; set; }
+        public required string NovaSenha { get; set; }
     }
 }

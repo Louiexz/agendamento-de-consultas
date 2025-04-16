@@ -6,14 +6,14 @@ namespace UnitSaude.Dto.Professor
     public class ReadProfessorDto
     {
         public int id { get; set; }
-        public string cpf { get; set; }
-        public string nome { get; set; }
-        public string email { get; set; }
-        public string telefone { get; set; }
+        public required string cpf { get; set; }
+        public required string nome { get; set; }
+        public required string email { get; set; }
+        public required string telefone { get; set; }
         [JsonConverter(typeof(DateOnlyConverter))]
         public DateOnly? dataNascimento { get; set; }
-        public string area { get; set; }
-        public string especialidade { get; set; }
-        public string codigoProfissional { get; set; }
+        public required string area { get; set; }
+        public required string especialidade { get; set; }
+        public required string codigoProfissional { get; set; }
     }
 }

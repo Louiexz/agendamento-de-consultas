@@ -2,15 +2,18 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using DotNetEnv;
 using System.Text;
 using UnitSaude.Data;
 using UnitSaude.Interfaces;
 using UnitSaude.Services;
 using UnitSaude.Utils;
 
+// Load environment variables from .env file
+Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
-// Lê variáveis de ambiente para sobrescrever configurações sensíveis
+// Lï¿½ variï¿½veis de ambiente para sobrescrever configuraï¿½ï¿½es sensï¿½veis
 var config = builder.Configuration;
 
 void SetIfExists(string key, string envVar)
@@ -25,7 +28,7 @@ SetIfExists("Jwt:Key", "JWT_KEY");
 SetIfExists("Jwt:Issuer", "JWT_ISSUER");
 SetIfExists("Jwt:Audience", "JWT_AUDIENCE");
 
-// Conexão
+// Conexï¿½o
 SetIfExists("ConnectionStrings:DefaultConnection", "CONNECTION_STRING");
 
 // Email
@@ -91,7 +94,10 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
+
+var key = jwtSettings["Key"]
+    ?? Environment.GetEnvironmentVariable("JWT_KEY");
+var keyBytes = Encoding.UTF8.GetBytes(key);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -108,9 +114,11 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(key)
+        ValidIssuer = jwtSettings["Issuer"]
+            ?? Environment.GetEnvironmentVariable("JWT_ISSUER"),
+        ValidAudience = jwtSettings["Audience"]
+            ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+        IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
     };
 });
 

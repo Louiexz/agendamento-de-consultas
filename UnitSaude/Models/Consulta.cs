@@ -5,9 +5,9 @@
         public int id_Consulta { get; set; }
         public DateOnly? Data { get; set; }
         public TimeOnly? Horario { get; set; }
-        public string Status { get; set; }
-        public string Area { get; set; }
-        public string Especialidade { get; set; }
+        public required string Status { get; set; }
+        public required string Area { get; set; }
+        public required string Especialidade { get; set; }
 
 
         // Chaves estrangeiras
@@ -15,8 +15,8 @@
         public int ProfessorId { get; set; }
 
         // Navegação
-        public Paciente Paciente { get; set; }
-        public Professor Professor { get; set; }
+        public required Paciente Paciente { get; set; }
+        public required Professor Professor { get; set; }
 
     }
 }

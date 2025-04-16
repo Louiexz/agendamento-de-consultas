@@ -7,10 +7,10 @@ namespace UnitSaude.Dto.Paciente
     public class ReadPacienteDto
     {
         public int id { get; set; }
-        public string cpf { get; set; }
-        public string nome { get; set; }
-        public string email { get; set; }
-        public string telefone { get; set; }
+        public required string cpf { get; set; }
+        public required string nome { get; set; }
+        public required string email { get; set; }
+        public string? telefone { get; set; }
 
         [JsonConverter(typeof(DateOnlyConverter))]
         public DateOnly? dataNascimento { get; set; }

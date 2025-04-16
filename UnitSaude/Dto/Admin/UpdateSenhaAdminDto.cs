@@ -2,7 +2,7 @@
 {
     public class UpdateSenhaAdminDto
     {
-        public string SenhaAtual { get; set; }
-        public string NovaSenha { get; set; }
+        public required string SenhaAtual { get; set; }
+        public required string NovaSenha { get; set; }
     }
 }

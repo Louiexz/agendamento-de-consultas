@@ -12,15 +12,15 @@ namespace UnitSaude.Dto.Consulta
 
         public TimeOnly? Horario { get; set; }
 
-        public string Status { get; set; }
+        public required string Status { get; set; }
 
-        public string Especialidade { get; set; }
-        public string Area { get; set; }
+        public required string Especialidade { get; set; }
+        public required string Area { get; set; }
 
         public int PacienteId { get; set; }
         public int ProfessorId { get; set; }
 
-        public string NomePaciente { get; set; }
-        public string NomeProfessor { get; set; }
+        public required string NomePaciente { get; set; }
+        public required string NomeProfessor { get; set; }
     }
 }

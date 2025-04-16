@@ -2,7 +2,7 @@
 {
     public class RedefinirSenhaDto
     {
-        public string Token { get; set; }
-        public string NovaSenha { get; set; }
+        public required string Token { get; set; }
+        public required string NovaSenha { get; set; }
     }
 }
