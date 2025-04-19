@@ -1,4 +1,6 @@
-﻿namespace UnitSaude.Models
+﻿using System.Text.Json.Serialization;
+
+namespace UnitSaude.Models
 {
     public class Consulta
     {
@@ -11,6 +13,7 @@
 
 
         // Chaves estrangeiras
+
         public int PacienteId { get; set; }
         public int ProfessorId { get; set; }
 

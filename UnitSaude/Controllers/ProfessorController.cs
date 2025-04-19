@@ -19,7 +19,7 @@ namespace UnitSaude.Controllers
         {
             _professorService = professorService;
         }
-
+        [Authorize(Policy = "Administrador")]
         [HttpPost("CreateProfessor")]
         public async Task<ActionResult<ResponseModel<ReadProfessorDto>>> CadastrarProfessor([FromBody] CreateProfessorDto professor)
         {
@@ -42,7 +42,7 @@ namespace UnitSaude.Controllers
             var response = await _professorService.ListarProfessores();
             return Ok(response);
         }
-
+        [Authorize(Policy = "Professor")]
         [HttpPatch("Update/{id}")]
         public async Task<ActionResult<ResponseModel<ReadProfessorDto>>> GerenciarProfessor(int id, [FromBody] UpdateProfessorDto professor)
         {
@@ -50,7 +50,7 @@ namespace UnitSaude.Controllers
             if (!response.Status) return NotFound(response);
             return Ok(response);
         }
-
+        [Authorize(Policy = "Administrador")]
         [HttpDelete("Delete/{id}")]
         public async Task<ActionResult<ResponseModel<Professor>>> RemoverProfessor(int id)
         {
@@ -58,7 +58,7 @@ namespace UnitSaude.Controllers
             if (!response.Status) return NotFound(response);
             return Ok(response);
         }
-
+        [Authorize(Policy = "Professor")]
         [HttpPatch("AlterarSenha/{professorId}")]
         public async Task<ActionResult<ResponseModel<string>>> AlterarSenha(int professorId, [FromBody] UpdateSenhaProfessorDto dto)
         {

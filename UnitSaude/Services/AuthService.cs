@@ -3,37 +3,44 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using UnitSaude.Models;
-using UnitSaude.Dto.User;
+using DotNetEnv;
 
 namespace UnitSaude.Services
 {
-    public class AuthService
+    public class AuthService(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration _configuration = configuration;
         private static byte[] _key;
 
-        public AuthService(IConfiguration configuration)
+        static AuthService()
         {
-            _configuration = configuration;
-            _key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"]);
+            Env.Load();
+            var envKey = Environment.GetEnvironmentVariable("JWT_KEY");
+            if (string.IsNullOrWhiteSpace(envKey))
+            {
+                throw new Exception("Chave JWT não encontrada no .env");
+            }
+
+            _key = Encoding.UTF8.GetBytes(envKey);
         }
+
         public static string GerarToken(Usuario usuario, IConfiguration configuration)
         {
-            
-
             var tokenHandler = new JwtSecurityTokenHandler();
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(
-                [
+                Subject = new ClaimsIdentity(new[]
+                {
                     new Claim(ClaimTypes.Name, usuario.nome),
                     new Claim(ClaimTypes.NameIdentifier, usuario.Id_Usuario.ToString()),
-                    new Claim(ClaimTypes.Role, usuario.TipoUsuario) 
-                ]),
+                    new Claim(ClaimTypes.Role, usuario.TipoUsuario)
+                }),
                 Expires = DateTime.UtcNow.AddHours(4),
-                Issuer = configuration["Jwt:Issuer"],
-                Audience = configuration["Jwt:Audience"],
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_key), SecurityAlgorithms.HmacSha256Signature)
+                Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(_key), SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -45,10 +52,10 @@ namespace UnitSaude.Services
             var tokenHandler = new JwtSecurityTokenHandler();
 
             var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, usuario.Id_Usuario.ToString()),
-            new Claim("tipo", "recuperacao")
-        };
+            {
+                new Claim(ClaimTypes.NameIdentifier, usuario.Id_Usuario.ToString()),
+                new Claim("tipo", "recuperacao")
+            };
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

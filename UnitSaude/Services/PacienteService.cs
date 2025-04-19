@@ -32,13 +32,12 @@ namespace UnitSaude.Services
                     dataNascimento = pacienteDTO.dataNascimento,
                     TipoUsuario = "Paciente",
                     ativo = true
-
                 };
 
                 _context.Pacientes.Add(paciente);
                 await _context.SaveChangesAsync();
 
-                var ReadPacienteDto = new ReadPacienteDto
+                var readPacienteDto = new ReadPacienteDto
                 {
                     id = paciente.Id_Usuario,
                     cpf = paciente.cpf,
@@ -46,17 +45,15 @@ namespace UnitSaude.Services
                     email = paciente.email,
                     telefone = paciente.telefone,
                     dataNascimento = paciente.dataNascimento
-
                 };
-                response.Data = ReadPacienteDto;
-                response.Message = "Paciente cadastrado com sucesso!";
 
-            } 
+                response.Data = readPacienteDto;
+                response.Message = "Paciente cadastrado com sucesso!";
+            }
             catch (Exception ex)
             {
                 response.Status = false;
                 response.Message = ex.Message;
-
             }
 
             return response;

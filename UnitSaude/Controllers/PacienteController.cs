@@ -17,7 +17,7 @@ namespace UnitSaude.Controllers
         {
             _pacienteService = pacienteService;
         }
-
+        [AllowAnonymous]
         [HttpPost("CreatePaciente")]
         public async Task<ActionResult<ResponseModel<ReadPacienteDto>>> CadastrarPaciente([FromBody] CreatePacienteDto paciente)
         {
@@ -25,7 +25,6 @@ namespace UnitSaude.Controllers
             if (!response.Status) return BadRequest(response);
             return Ok(response);
         }
-
         [HttpGet("{id}")]
         public async Task<ActionResult<ResponseModel<ReadPacienteDto>>> ListarPaciente(int id)
         {
@@ -33,14 +32,13 @@ namespace UnitSaude.Controllers
             if (response.Data == null) return NotFound(response);
             return Ok(response);
         }
-
         [HttpGet("ListarTodos")]
         public async Task<ActionResult<ResponseModel<List<ReadPacienteDto>>>> ListarTodos()
         {
             var response = await _pacienteService.ListarPacientes();
             return Ok(response);
         }
-
+        [Authorize(Policy="Paciente")]
         [HttpPatch("Update/{id}")]
         public async Task<ActionResult<ResponseModel<ReadPacienteDto>>> GerenciarPaciente(int id, [FromBody] UpdatePacienteDto paciente)
         {
@@ -48,7 +46,7 @@ namespace UnitSaude.Controllers
             if (!response.Status) return NotFound(response);
             return Ok(response);
         }
-
+        [Authorize(Policy="Administrador")]
         [HttpDelete("Delete/{id}")]
         public async Task<ActionResult<ResponseModel<Paciente>>> RemoverPaciente(int id)
         {
@@ -56,7 +54,7 @@ namespace UnitSaude.Controllers
             if (!response.Status) return NotFound(response);
             return Ok(response);
         }
-
+        [Authorize(Policy="Paciente")]
         [HttpPatch("AlterarSenha/{pacienteId}")]
         public async Task<ActionResult<ResponseModel<string>>> AlterarSenha(int pacienteId, [FromBody] UpdateSenhaPacienteDto dto)
         {

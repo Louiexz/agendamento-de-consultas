@@ -8,7 +8,6 @@ using UnitSaude.Data;
 using UnitSaude.Interfaces;
 using UnitSaude.Services;
 using UnitSaude.Utils;
-
 // Load environment variables from .env file
 Env.Load();
 var builder = WebApplication.CreateBuilder(args);
@@ -123,7 +122,6 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Configuration.AddEnvironmentVariables();
-
 
 builder.Services.AddAuthorization(options =>
 {
