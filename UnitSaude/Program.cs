@@ -126,13 +126,13 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Administrador", policy =>
-        policy.RequireClaim("TipoUsuario", "Administrador"));
+        policy.RequireRole("Administrador"));
 
     options.AddPolicy("Professor", policy =>
-        policy.RequireClaim("TipoUsuario", "Professor"));
+        policy.RequireRole("Professor"));
 
     options.AddPolicy("Paciente", policy =>
-        policy.RequireClaim("TipoUsuario", "Paciente"));
+        policy.RequireRole("Paciente"));
 });
 
 var app = builder.Build();
