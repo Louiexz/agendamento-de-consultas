@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UnitSaude.Dto.Consulta;
+using UnitSaude.Dtos.Consulta;
 using UnitSaude.Interfaces;
 using UnitSaude.Models;
 
@@ -50,13 +51,27 @@ namespace UnitSaude.Controllers
             return Ok(response);
         }
 
-        [HttpGet("GetConsultaPorStatus/{status}")]
-        public async Task<ActionResult<ResponseModel<List<ReadConsultaDto>>>> ListarConsultaPorStatus(string status)
+        /*  [HttpGet("GetConsultaPorStatus/{status}")]
+          public async Task<ActionResult<ResponseModel<List<ReadConsultaDto>>>> ListarConsultaPorStatus(
+              string status,
+              [FromQuery] string? area,
+              [FromQuery] string? especialidade,
+              [FromQuery] DateOnly? data)
+          {
+              var response = await _consultaService.ListarConsultaPorStatus(status, area, especialidade, data);
+              if (!response.Status) return NotFound(response);
+              return Ok(response);
+          }
+        */
+
+        [HttpGet("FiltrarConsultas")]
+        public async Task<ActionResult<ResponseModel<List<ReadConsultaDto>>>> FiltrarConsultas([FromQuery] FiltroConsultaDto filtro)
         {
-            var response = await _consultaService.ListarConsultaPorStatus(status);
+            var response = await _consultaService.ListarConsultaComFiltro(filtro);
             if (!response.Status) return NotFound(response);
             return Ok(response);
         }
+
 
         [HttpGet("GetConsultaPorNomeOuCpf/{valor}")]
         public async Task<ActionResult<ResponseModel<List<ReadConsultaDto>>>> ListarConsultaPorNomeOuCpf(string valor)
@@ -93,6 +108,13 @@ namespace UnitSaude.Controllers
                 return BadRequest(resultado);
 
             return Ok(resultado);
+        }
+
+        [HttpGet("resumo-fila-espera")]
+        public async Task<IActionResult> GetResumoFilaEspera()
+        {
+            var response = await _consultaService.ObterResumoConsultasEmEspera();
+            return response.Status ? Ok(response) : BadRequest(response);
         }
 
 

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using UnitSaude.Data;
 using UnitSaude.Dto.Consulta;
 using UnitSaude.Dto.Paciente;
+using UnitSaude.Dtos.Consulta;
 using UnitSaude.Interfaces;
 using UnitSaude.Models;
 
@@ -313,25 +314,95 @@ namespace UnitSaude.Services
             return response;
         }
 
-        public async Task<ResponseModel<List<ReadConsultaDto>>> ListarConsultaPorStatus(string status)
+        /*  public async Task<ResponseModel<List<ReadConsultaDto>>> ListarConsultaPorStatus(
+              string status,
+              string? area = null,
+              string? especialidade = null,
+              DateOnly? data = null)
+          {
+              var response = new ResponseModel<List<ReadConsultaDto>>();
+
+              try
+              {
+                  var query = _context.Consultas
+                      .Include(c => c.Paciente)
+                      .Include(c => c.Professor)
+                      .Where(c => c.Status == status)
+                      .AsQueryable();
+
+                  if (!string.IsNullOrEmpty(area))
+                      query = query.Where(c => c.Area == area);
+
+                  if (!string.IsNullOrEmpty(especialidade))
+                      query = query.Where(c => c.Especialidade == especialidade);
+
+                  if (data.HasValue)
+                      query = query.Where(c => c.Data == data.Value);
+
+                  var consultas = await query.ToListAsync();
+
+                  if (consultas == null || !consultas.Any())
+                  {
+                      response.Message = "Nenhuma consulta encontrada com esses filtros.";
+                      return response;
+                  }
+
+                  response.Data = consultas.Select(consulta => new ReadConsultaDto
+                  {
+                      id_Consulta = consulta.id_Consulta,
+                      Data = consulta.Data,
+                      Horario = consulta.Horario,
+                      Status = consulta.Status,
+                      Area = consulta.Area,
+                      Especialidade = consulta.Especialidade,
+                      PacienteId = consulta.PacienteId,
+                      ProfessorId = consulta.ProfessorId,
+                      NomePaciente = consulta.Paciente.nome,
+                      NomeProfessor = consulta.Professor.nome,
+                  }).ToList();
+
+                  response.Status = true;
+                  response.Message = "Consultas encontradas com sucesso!";
+              }
+              catch (Exception ex)
+              {
+                  response.Status = false;
+                  response.Message = ex.Message;
+              }
+
+              return response;
+          } */
+
+        public async Task<ResponseModel<List<ReadConsultaDto>>> ListarConsultaComFiltro(FiltroConsultaDto filtro)
         {
-            ResponseModel<List<ReadConsultaDto>> response = new();
+            var response = new ResponseModel<List<ReadConsultaDto>>();
 
             try
             {
-                var consultas = await _context.Consultas
+                var query = _context.Consultas
                     .Include(c => c.Paciente)
                     .Include(c => c.Professor)
-                    .Where(c => c.Status == status)
-                    .ToListAsync();
+                    .Where(c => c.Status == filtro.Status)
+                    .AsQueryable();
 
-                if (consultas == null || !consultas.Any())
+                if (!string.IsNullOrEmpty(filtro.Area))
+                    query = query.Where(c => c.Area == filtro.Area);
+
+                if (!string.IsNullOrEmpty(filtro.Especialidade))
+                    query = query.Where(c => c.Especialidade == filtro.Especialidade);
+
+                if (filtro.Data.HasValue)
+                    query = query.Where(c => c.Data == filtro.Data.Value);
+
+                var consultas = await query.ToListAsync();
+
+                if (!consultas.Any())
                 {
-                    response.Message = "Nenhuma consulta com esse status.";
+                    response.Message = "Nenhuma consulta encontrada com os filtros fornecidos.";
                     return response;
                 }
 
-                var consultaDTOs = consultas.Select(consulta => new ReadConsultaDto
+                response.Data = consultas.Select(consulta => new ReadConsultaDto
                 {
                     id_Consulta = consulta.id_Consulta,
                     Data = consulta.Data,
@@ -345,7 +416,7 @@ namespace UnitSaude.Services
                     NomeProfessor = consulta.Professor.nome,
                 }).ToList();
 
-                response.Data = consultaDTOs;
+                response.Status = true;
                 response.Message = "Consultas encontradas com sucesso!";
             }
             catch (Exception ex)
@@ -356,6 +427,7 @@ namespace UnitSaude.Services
 
             return response;
         }
+
 
 
         public async Task<ResponseModel<List<ReadConsultaDto>>> ListarConsultas()
@@ -585,6 +657,39 @@ horariosDisponiveis.Add(horarioAtual.ToString("HH:mm"));
 
             return response;
         }
+
+        public async Task<ResponseModel<List<ConsultasEmEsperaResumoDto>>> ObterResumoConsultasEmEspera()
+        {
+            var response = new ResponseModel<List<ConsultasEmEsperaResumoDto>>();
+
+            try
+            {
+                var resumo = await _context.Consultas
+                    .Where(c => c.Status == "Em Espera")
+                    .GroupBy(c => new { c.Area, c.Especialidade, c.Data })
+                    .Select(g => new ConsultasEmEsperaResumoDto
+                    {
+                        Area = g.Key.Area,
+                        Especialidade = g.Key.Especialidade,
+                        Data = (DateOnly)g.Key.Data,
+                        TotalEmEspera = g.Count()
+                    })
+                    .ToListAsync();
+
+                response.Status = true;
+                response.Message = "Resumo da fila de espera obtido com sucesso.";
+                response.Data = resumo;
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = $"Erro ao obter resumo: {ex.Message}";
+            }
+
+            return response;
+        }
+
+
 
 
 
