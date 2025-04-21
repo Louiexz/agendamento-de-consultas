@@ -10,9 +10,12 @@ namespace UnitSaude.Services
     public class ConsultaService : ConsultaInterface
     {
         private readonly ClinicaDbContext _context;
-        public ConsultaService(ClinicaDbContext context)
+        private readonly EmailService _emailService;  // Incluir o serviço de e-mail
+
+        public ConsultaService(ClinicaDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;  // Inicializando o serviço de e-mail
         }
 
         public async Task<ResponseModel<ReadConsultaDto>> CadastrarConsulta(CreateConsultaDto consultaDTO)
@@ -28,7 +31,7 @@ namespace UnitSaude.Services
                 if (paciente == null)
                 {
                     response.Status = false;
-                    response.Message = "Paciente n�o encontrado.";
+                    response.Message = "Paciente não encontrado.";
                     return response;
                 }
 
@@ -39,93 +42,89 @@ namespace UnitSaude.Services
                 if (professor == null)
                 {
                     response.Status = false;
-                    response.Message = "Professor n�o encontrado.";
+                    response.Message = "Professor não encontrado.";
                     return response;
                 }
 
-                // Valida��o de �rea
+                // Verifica se a data é um domingo
+                if (consultaDTO.Data.HasValue &&
+                    consultaDTO.Data.Value.ToDateTime(TimeOnly.MinValue).DayOfWeek == DayOfWeek.Sunday)
+                {
+                    response.Status = false;
+                    response.Message = "Não é possível agendar consultas aos domingos.";
+                    return response;
+                }
+
+                // Validação de área e especialidade
                 if (!DadosFixosConsulta.EspecialidadesPorArea.ContainsKey(consultaDTO.Area))
                 {
                     response.Status = false;
-                    response.Message = "�rea inv�lida.";
+                    response.Message = "Área inválida.";
                     return response;
                 }
 
-                // Valida��o de Especialidade para a �rea
                 var especialidadesPermitidas = DadosFixosConsulta.EspecialidadesPorArea[consultaDTO.Area];
                 if (!especialidadesPermitidas.Contains(consultaDTO.Especialidade))
                 {
                     response.Status = false;
-                    response.Message = "Especialidade inv�lida para a �rea selecionada.";
+                    response.Message = "Especialidade inválida para a área selecionada.";
                     return response;
                 }
 
-                // Valida��o de Status
-                if (!DadosFixosConsulta.Status.Contains(consultaDTO.Status))
-                {
-                    response.Status = false;
-                    response.Message = "Status inv�lido.";
-                    return response;
-                }
+                // Verifica se a data está dentro de alguma disponibilidade
+                var disponibilidade = await _context.Disponibilidades
+                    .Where(d => d.Area == consultaDTO.Area &&
+                                d.Especialidade == consultaDTO.Especialidade &&
+                                d.DataInicio <= consultaDTO.Data &&
+                                d.DataFim >= consultaDTO.Data &&
+                                d.Ativo)
+                    .FirstOrDefaultAsync();
 
-                // Verifica se o hor�rio est� dentro dos hor�rios v�lidos (multiplo de 40 minutos + 15 minutos de intervalo)
-                TimeOnly horarioInicial = new(8, 0); // In�cio das consultas
-                TimeSpan duracaoComIntervalo = TimeSpan.FromMinutes(55); // 40 minutos + 15 minutos
-
-                bool horarioValido = false;
-
-                // Verifica se o hor�rio solicitado � um m�ltiplo de 55 minutos ap�s o hor�rio inicial
-                while (horarioInicial.Add(duracaoComIntervalo) <= new TimeOnly(21, 0)) // Fim das consultas
-                {
-                    if (horarioInicial == consultaDTO.Horario)
-                    {
-                        horarioValido = true;
-                        break;
-                    }
-                    horarioInicial = horarioInicial.Add(duracaoComIntervalo);
-                }
-
-                if (!horarioValido)
-                {
-                    response.Status = false;
-                    response.Message = "Hor�rio inv�lido. Escolha um hor�rio dispon�vel.";
-                    return response;
-                }
-
-                // Verifica se j� existe alguma consulta marcada para o mesmo hor�rio
+                // Verifica se já existe alguma consulta marcada para o mesmo horário
                 var conflito = await _context.Consultas
                     .AnyAsync(c =>
-                        c.Area == consultaDTO.Area && // Verifica a �rea
-                        c.Especialidade == consultaDTO.Especialidade && // Verifica a especialidade
-                        c.Status != "Conclu�da" && // Verifica se o status n�o � Conclu�da
-                        c.Status != "Cancelada" && // Verifica se o status n�o � Cancelada
-                        c.Data == consultaDTO.Data && // Verifica se a data � a mesma
-                        c.Horario == consultaDTO.Horario); // Verifica se o hor�rio � o mesmo
+                        c.Area == consultaDTO.Area &&
+                        c.Especialidade == consultaDTO.Especialidade &&
+                        c.Status != "Concluída" &&
+                        c.Status != "Cancelada" &&
+                        c.Data == consultaDTO.Data &&
+                        c.Horario == consultaDTO.Horario);
 
-                if (conflito)
+                // Define o status com base nas condições
+                string status;
+                if (disponibilidade == null || conflito)
+                {
+                    status = "Em Espera";
+                }
+                else
+                {
+                    status = "Agendada";
+                }
+
+                if (!DadosFixosConsulta.Status.Contains(status))
                 {
                     response.Status = false;
-                    response.Message = "Este hor�rio j� est� reservado.";
+                    response.Message = "Status da consulta inválido.";
                     return response;
                 }
 
-                // Cria��o da consulta
+                // Criação da consulta
                 var consulta = new Consulta
                 {
                     Data = consultaDTO.Data,
                     Horario = consultaDTO.Horario,
-                    Status = consultaDTO.Status,
+                    Status = status,
                     Area = consultaDTO.Area,
                     Especialidade = consultaDTO.Especialidade,
                     PacienteId = consultaDTO.PacienteId,
                     ProfessorId = consultaDTO.ProfessorId,
                     Professor = professor,
-                    Paciente = paciente, // Assign the full Paciente entity
+                    Paciente = paciente,
                 };
+
                 _context.Consultas.Add(consulta);
                 await _context.SaveChangesAsync();
 
-                // Prepara DTO de retorno
                 var readConsultaDto = new ReadConsultaDto
                 {
                     id_Consulta = consulta.id_Consulta,
@@ -142,7 +141,20 @@ namespace UnitSaude.Services
 
                 response.Status = true;
                 response.Data = readConsultaDto;
-                response.Message = "Consulta cadastrada com sucesso!";
+                response.Message = status == "Agendada"
+                    ? "Consulta agendada com sucesso!"
+                    : "Sem horários disponíveis. Consulta cadastrada como 'Em Espera'.";
+
+                // Enviar notificação de e-mail para o paciente e professor
+                if (status == "Agendada")
+                {
+                    await _emailService.EnviarAsync(paciente.email, "Consulta Agendada", $"Sua consulta com o professor {professor.nome} foi agendada para {consulta.Data} às {consulta.Horario}.");
+                    await _emailService.EnviarAsync(professor.email, "Consulta Agendada", $"Você tem uma nova consulta agendada com o paciente {paciente.nome} para {consulta.Data} às {consulta.Horario}.");
+                }
+                else
+                {
+                    await _emailService.EnviarAsync(paciente.email, "Consulta em Espera", "Sua consulta foi cadastrada e está aguardando disponibilidade. Você será notificado quando ela for confirmada.");
+                }
             }
             catch (Exception ex)
             {
@@ -152,7 +164,6 @@ namespace UnitSaude.Services
 
             return response;
         }
-
 
 
 
@@ -430,44 +441,45 @@ namespace UnitSaude.Services
 
         public async Task<ResponseModel<List<string>>> ObterHorariosDisponiveis(DateOnly data, string area, string especialidade)
         {
-            TimeOnly inicio = new(8, 0);  // In�cio das consultas
-            TimeOnly fim = new(21, 0);    // Fim das consultas
-            TimeSpan duracao = TimeSpan.FromMinutes(40);  // Dura��o de cada consulta
-            TimeSpan intervalo = TimeSpan.FromMinutes(15); // Intervalo entre as consultas
-
-            // Obter os hor�rios ocupados considerando o status diferente de "Cancelada" ou "Conclu�da"
-            var horariosOcupados = await _context.Consultas
-                .Where(c => c.Data == data &&
-                            c.Area == area &&
-                            c.Especialidade == especialidade &&
-                            (c.Status != "Cancelada" && c.Status != "Conclu�da")) // Garantir que o status n�o seja "Cancelada" ou "Conclu�da"
-                .Select(c => c.Horario)
+            // Busca as disponibilidades para a área e especialidade
+            var disponibilidades = await _context.Disponibilidades
+                .Where(d => d.Area == area && d.Especialidade == especialidade
+                            && d.DataInicio <= data && d.DataFim >= data)
                 .ToListAsync();
 
-            List<string> horariosDisponiveis = new();
-            TimeOnly horarioAtual = inicio;
-
-            // Loop para verificar todos os hor�rios poss�veis dentro do intervalo permitido
-            while (horarioAtual.Add(duracao) <= fim)
+            if (disponibilidades.Count == 0)
             {
-                // Verifica se o hor�rio atual n�o est� na lista de hor�rios ocupados
-                if (!horariosOcupados.Contains(horarioAtual))
+                return new ResponseModel<List<string>>
                 {
-                    horariosDisponiveis.Add(horarioAtual.ToString("HH:mm"));
-                }
-
-                // Incrementa o hor�rio pelo tempo de dura��o mais o intervalo (55 minutos no total)
-                horarioAtual = horarioAtual.Add(duracao + intervalo);
+                    Status = false,
+                    Message = "Não há disponibilidade para a data e especialidade informadas.",
+                    Data = new List<string>()
+                };
             }
 
-            // Retorna os hor�rios dispon�veis encontrados
+            List<string> horariosDisponiveis = new();
+
+            // Para cada disponibilidade encontrada, adiciona os horários válidos
+            foreach (var disponibilidade in disponibilidades)
+            {
+                TimeOnly horarioAtual = disponibilidade.HorarioInicio;
+
+                while (horarioAtual.Add(TimeSpan.FromMinutes(55)) <= disponibilidade.HorarioFim)
+                {
+horariosDisponiveis.Add(horarioAtual.ToString("HH:mm"));
+
+                    horarioAtual = horarioAtual.Add(TimeSpan.FromMinutes(55));
+                }
+            }
+
             return new ResponseModel<List<string>>
             {
                 Status = true,
-                Message = "Hor�rios dispon�veis encontrados.",
+                Message = "Horários disponíveis encontrados.",
                 Data = horariosDisponiveis
             };
         }
+
 
 
 
@@ -477,24 +489,89 @@ namespace UnitSaude.Services
 
             try
             {
+                // Verifica se o novo status é válido
                 if (!DadosFixosConsulta.Status.Contains(dto.NovoStatus))
                 {
                     response.Status = false;
-                    response.Message = "Status inv�lido.";
+                    response.Message = "Status inválido.";
                     return response;
                 }
 
+                // Encontra a consulta pelo ID
                 var consulta = await _context.Consultas.FindAsync(id);
 
                 if (consulta == null)
                 {
                     response.Status = false;
-                    response.Message = "Consulta n�o encontrada.";
+                    response.Message = "Consulta não encontrada.";
                     return response;
                 }
 
-                consulta.Status = dto.NovoStatus;
+                // Caso a consulta esteja em "Em Espera", realiza a verificação de disponibilidade
+                if (consulta.Status == "Em Espera" && dto.NovoStatus == "Agendada")
+                {
+                    var disponibilidade = await _context.Disponibilidades
+                        .Where(d => d.Area == consulta.Area &&
+                                    d.Especialidade == consulta.Especialidade &&
+                                    d.DataInicio <= consulta.Data &&
+                                    d.DataFim >= consulta.Data &&
+                                    d.Ativo)
+                        .FirstOrDefaultAsync();
+
+                    // Verifica se o horário está disponível para a consulta
+                    var conflito = await _context.Consultas
+                        .AnyAsync(c => c.Area == consulta.Area &&
+                                       c.Especialidade == consulta.Especialidade &&
+                                       c.Status != "Concluída" &&
+                                       c.Status != "Cancelada" &&
+                                       c.Data == consulta.Data &&
+                                       c.Horario == consulta.Horario);
+
+                    // Se não houver conflito e houver disponibilidade, muda o status para "Agendada"
+                    if (disponibilidade != null && !conflito)
+                    {
+                        consulta.Status = "Agendada";
+                    }
+                    else
+                    {
+                        response.Status = false;
+                        response.Message = "Não há disponibilidade para agendar essa consulta.";
+                        return response;
+                    }
+                }
+                else
+                {
+                    // Caso contrário, apenas atualiza o status normalmente
+                    consulta.Status = dto.NovoStatus;
+                }
+
                 await _context.SaveChangesAsync();
+
+                // Busca os dados do paciente e do professor para envio de e-mails
+                var paciente = await _context.Pacientes.FindAsync(consulta.PacienteId);
+                var professor = await _context.Professores.FindAsync(consulta.ProfessorId);
+
+                if (consulta.Status == "Agendada")
+                {
+                    await _emailService.EnviarAsync(paciente.email, "Consulta Agendada",
+                        $"Sua consulta foi agendada para o dia {consulta.Data} às {consulta.Horario} com o professor {professor.nome}.");
+
+                    await _emailService.EnviarAsync(professor.email, "Nova Consulta Agendada",
+                        $"Você tem uma nova consulta agendada com o paciente {paciente.nome} para {consulta.Data} às {consulta.Horario}.");
+                }
+                else if (consulta.Status == "Cancelada")
+                {
+                    await _emailService.EnviarAsync(paciente.email, "Consulta Cancelada",
+                        $"Sua consulta com o professor {professor.nome} no dia {consulta.Data} às {consulta.Horario} foi cancelada.");
+
+                    await _emailService.EnviarAsync(professor.email, "Consulta Cancelada",
+                        $"A consulta com o paciente {paciente.nome} marcada para o dia {consulta.Data} às {consulta.Horario} foi cancelada.");
+                }
+                else if (consulta.Status == "Concluída")
+                {
+                    await _emailService.EnviarAsync(paciente.email, "Consulta Concluída",
+                        $"Sua consulta com o professor {professor.nome} no dia {consulta.Data} às {consulta.Horario} foi concluída com sucesso.");
+                }
 
                 response.Status = true;
                 response.Message = "Status atualizado com sucesso!";
@@ -508,6 +585,7 @@ namespace UnitSaude.Services
 
             return response;
         }
+
 
 
     }

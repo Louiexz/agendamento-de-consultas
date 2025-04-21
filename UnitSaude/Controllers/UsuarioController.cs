@@ -65,15 +65,15 @@ namespace UnitSaude.Controllers
         [HttpPost("recuperar-senha")]
         public async Task<IActionResult> RecuperarSenha([FromBody] RecuperarSenhaDto dto)
         {
-            Usuario? usuario =
-               await _context.Professores.FirstOrDefaultAsync(p => p.email == dto.Email) as Usuario
-               ?? await _context.Pacientes.FirstOrDefaultAsync(p => p.email == dto.Email) as Usuario
-               ?? await _context.Administradores.FirstOrDefaultAsync(a => a.email == dto.Email) as Usuario;
+            var usuarioExiste =
+                await _context.Professores.AnyAsync(p => p.email == dto.Email) ||
+                await _context.Pacientes.AnyAsync(p => p.email == dto.Email) ||
+                await _context.Administradores.AnyAsync(a => a.email == dto.Email);
 
-            if (usuario == null)
+            if (!usuarioExiste)
                 return NotFound("Usuário não encontrado.");
 
-            var token = AuthService.GerarTokenRecuperacao(usuario, _configuration);
+            var token = AuthService.GerarTokenRecuperacao(dto.Email, _configuration);
             var baseUrl = _configuration["EmailSettings:UrlRedefinicaoSenha"];
             var link = $"{baseUrl}?token={token}";
 
@@ -82,6 +82,8 @@ namespace UnitSaude.Controllers
 
             return Ok("E-mail de recuperação enviado com sucesso.");
         }
+
+
 
         [HttpPost("redefinir-senha")]
         public async Task<IActionResult> RedefinirSenha([FromBody] RedefinirSenhaDto dto)
@@ -104,25 +106,44 @@ namespace UnitSaude.Controllers
                 if (tipo != "recuperacao")
                     return BadRequest("Token inválido.");
 
-                var idUsuario = int.Parse(principal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value);
+                var email = principal.Claims.First(c => c.Type == ClaimTypes.Email).Value;
                 var senhaHash = PasswordHasher.HashPassword(dto.NovaSenha);
 
+                var senhaAlterada = false;
 
-                var senhaAlterada =
+                var professor = await _context.Professores.FirstOrDefaultAsync(p => p.email == email);
+                if (professor != null)
+                {
+                    professor.senhaHash = senhaHash;
+                    senhaAlterada = true;
+                }
 
-                    await _professorInterface.ResetarSenhaProfessor(idUsuario, senhaHash) ||
-                    await _pacienteInterface.ResetarSenhaPaciente(idUsuario, senhaHash) ||
-                    await _administradorInterface.ResetarSenhaAdministrador(idUsuario, senhaHash);
+                var paciente = await _context.Pacientes.FirstOrDefaultAsync(p => p.email == email);
+                if (paciente != null)
+                {
+                    paciente.senhaHash = senhaHash;
+                    senhaAlterada = true;
+                }
+
+                var admin = await _context.Administradores.FirstOrDefaultAsync(a => a.email == email);
+                if (admin != null)
+                {
+                    admin.senhaHash = senhaHash;
+                    senhaAlterada = true;
+                }
 
                 if (!senhaAlterada)
                     return NotFound("Usuário não encontrado.");
 
+                await _context.SaveChangesAsync();
                 return Ok("Senha redefinida com sucesso.");
             }
             catch
             {
                 return BadRequest("Token inválido ou expirado.");
             }
-            }
         }
+
+
+    }
 }

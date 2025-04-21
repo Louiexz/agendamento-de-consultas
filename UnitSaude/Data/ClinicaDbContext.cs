@@ -14,6 +14,8 @@ namespace UnitSaude.Data
         public DbSet<Paciente> Pacientes { get; set; }
         public DbSet<Professor> Professores { get; set; }
         public DbSet<Consulta> Consultas { get; set; }
+        public DbSet<Disponibilidade> Disponibilidades { get; set; }
+
 
         //public DbSet<Prontuario> Prontuarios { get; set; }
         // public DbSet<Anexo> Anexos { get; set; }

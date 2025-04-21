@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using UnitSaude.Models;
 using DotNetEnv;
+using UnitSaude.Dto.Usuario;
 
 namespace UnitSaude.Services
 {
@@ -47,26 +48,30 @@ namespace UnitSaude.Services
             return tokenHandler.WriteToken(token);
         }
 
-        public static string GerarTokenRecuperacao(Usuario usuario, IConfiguration config)
+        public static string GerarTokenRecuperacao(string email, IConfiguration config)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(config["Jwt:Key"]);
 
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, usuario.Id_Usuario.ToString()),
-                new Claim("tipo", "recuperacao")
-            };
+    {
+        new Claim(ClaimTypes.Email, email),
+        new Claim("tipo", "recuperacao")
+    };
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(5),
+                Expires = DateTime.UtcNow.AddMinutes(10),
                 SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(_key), SecurityAlgorithms.HmacSha256Signature)
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+
     }
 }

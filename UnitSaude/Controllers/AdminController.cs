@@ -58,10 +58,10 @@ namespace UnitSaude.Controllers
             return Ok(response);
         }
 
-        [HttpPatch("AlterarSenha/{pacienteId}")]
-        public async Task<ActionResult<ResponseModel<string>>> AlterarSenha(int pacienteId, [FromBody] UpdateSenhaAdminDto dto)
+        [HttpPatch("AlterarSenha/{adminId}")]
+        public async Task<ActionResult<ResponseModel<string>>> AlterarSenha(int adminId, [FromBody] UpdateSenhaAdminDto dto)
         {
-            var resultado = await _adminService.AlterarSenhaAdmin(pacienteId, dto);
+            var resultado = await _adminService.AlterarSenhaAdmin(adminId, dto);
 
             if (!resultado.Status) return BadRequest(resultado);
 

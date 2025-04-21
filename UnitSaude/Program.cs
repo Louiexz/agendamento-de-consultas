@@ -53,6 +53,10 @@ builder.Services.AddScoped<PacienteInterface, PacienteService>();
 builder.Services.AddScoped<ProfessorInterface, ProfessorService>();
 builder.Services.AddScoped<ProntuarioInterface, ProntuarioService>();
 builder.Services.AddScoped<UsuarioInterface, UsuarioService>();
+builder.Services.AddScoped<DisponibilidadeInterface, DisponibilidadeService>();
+builder.Services.AddScoped<EmailService>();
+
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers()
