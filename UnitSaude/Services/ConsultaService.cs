@@ -689,6 +689,103 @@ horariosDisponiveis.Add(horarioAtual.ToString("HH:mm"));
             return response;
         }
 
+        public async Task<ResponseModel<string>> ReagendarConsulta(int id, ReagendarConsultaDto dto)
+        {
+            var response = new ResponseModel<string>();
+
+            try
+            {
+                var consulta = await _context.Consultas.FindAsync(id);
+
+                if (consulta == null)
+                {
+                    response.Status = false;
+                    response.Message = "Consulta não encontrada.";
+                    return response;
+                }
+
+                if (consulta.Status == "Concluída" || consulta.Status == "Cancelada")
+                {
+                    response.Status = false;
+                    response.Message = "Não é possível reagendar uma consulta concluída ou cancelada.";
+                    return response;
+                }
+
+                var conflito = await _context.Consultas.AnyAsync(c =>
+                    c.id_Consulta != consulta.id_Consulta &&
+                    c.Data == dto.NovaData &&
+                    c.Horario == dto.NovoHorario &&
+                    c.Area == consulta.Area &&
+                    c.Especialidade == consulta.Especialidade &&
+                    c.Status != "Cancelada" && c.Status != "Concluída");
+
+                if (conflito)
+                {
+                    response.Status = false;
+                    response.Message = "Já existe uma consulta nesse horário.";
+                    return response;
+                }
+
+                consulta.Data = dto.NovaData;
+                consulta.Horario = dto.NovoHorario;
+
+                await _context.SaveChangesAsync();
+
+                response.Message = "Consulta reagendada com sucesso!";
+                response.Data = $"{consulta.Data} às {consulta.Horario}";
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseModel<List<ReadConsultaDto>>> ListarHistoricoPaciente(int pacienteId)
+        {
+            var response = new ResponseModel<List<ReadConsultaDto>>();
+
+            try
+            {
+                var consultas = await _context.Consultas
+                    .Include(c => c.Professor)
+                    .Where(c => c.PacienteId == pacienteId &&
+                                (c.Status == "Concluída" || c.Status == "Cancelada"))
+                    .OrderByDescending(c => c.Data)
+                    .ToListAsync();
+
+                if (!consultas.Any())
+                {
+                    response.Message = "Nenhuma consulta encontrada no histórico.";
+                    return response;  // Retorna se não houver consultas
+                }
+
+                var consultaDTOs = consultas.Select(c => new ReadConsultaDto
+                {
+                    id_Consulta = c.id_Consulta,
+                    Data = c.Data,
+                    Horario = c.Horario,
+                    Status = c.Status,
+                    Area = c.Area,
+                    Especialidade = c.Especialidade,
+                    NomeProfessor = c.Professor?.nome,  // Se houver professor, coloca o nome
+                     NomePaciente= c.Paciente?.nome  // Se houver professor, coloca o nome
+
+                }).ToList();
+
+                response.Data = consultaDTOs;
+                response.Message = "Histórico carregado com sucesso.";
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = $"Erro ao carregar o histórico: {ex.Message}";
+            }
+
+            return response;  // Retorna a resposta com sucesso ou falha
+        }
 
 
 

@@ -117,6 +117,26 @@ namespace UnitSaude.Controllers
             return response.Status ? Ok(response) : BadRequest(response);
         }
 
+        [HttpPatch("ReagendarConsulta/{id}")]
+        public async Task<ActionResult<ResponseModel<string>>> ReagendarConsulta(int id, [FromBody] ReagendarConsultaDto dto)
+        {
+            var response = await _consultaService.ReagendarConsulta(id, dto);
+            if (!response.Status) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpGet("HistoricoPaciente/{pacienteId}")]
+        public async Task<ActionResult<ResponseModel<List<ReadConsultaDto>>>> ListarHistoricoPaciente(int pacienteId)
+        {
+            var response = await _consultaService.ListarHistoricoPaciente(pacienteId);
+
+            if (!response.Status)
+            {
+                return NotFound(response);  // Retorna 404 se não encontrar histórico
+            }
+
+            return Ok(response);  // Retorna 200 com o histórico
+        }
 
 
     }
