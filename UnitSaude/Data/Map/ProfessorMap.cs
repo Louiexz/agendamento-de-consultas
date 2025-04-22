@@ -22,6 +22,8 @@ namespace UnitSaude.Data.Map
             builder.Property(u => u.especialidade).HasMaxLength(255);
             builder.Property(u => u.codigoProfissional).HasMaxLength(255);
 
+            builder.HasIndex(u => u.cpf).IsUnique();
+
 
         }
     }

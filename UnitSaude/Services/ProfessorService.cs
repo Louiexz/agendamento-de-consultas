@@ -23,6 +23,13 @@ namespace UnitSaude.Services
 
             try
             {
+                var cpfExiste = await _context.Pacientes.AnyAsync(p => p.cpf == professorDto.cpf);
+                if (cpfExiste)
+                {
+                    response.Status = false;
+                    response.Message = "Já existe um paciente cadastrado com esse CPF.";
+                    return response;
+                }
 
                 // Valida��o da �rea
                 if (!DadosFixosConsulta.ObterAreas().Contains(professorDto.area))
@@ -43,7 +50,7 @@ namespace UnitSaude.Services
 
                 var professor = new Professor
                 {
-                    cpf = professorDto.cpf,
+                    cpf = professorDto.cpf.Trim(),
                     nome = professorDto.nome,
                     email = professorDto.email,
                     senhaHash = PasswordHasher.HashPassword(professorDto.senhaHash),

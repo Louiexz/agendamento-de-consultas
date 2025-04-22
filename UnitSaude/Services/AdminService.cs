@@ -22,9 +22,16 @@ namespace UnitSaude.Services
 
             try
             {
+                var cpfExiste = await _context.Pacientes.AnyAsync(p => p.cpf == adminDTO.cpf);
+                if (cpfExiste)
+                {
+                    response.Status = false;
+                    response.Message = "Já existe um paciente cadastrado com esse CPF.";
+                    return response;
+                }
                 var admin = new Administrador
                 {
-                    cpf = adminDTO.cpf,
+                    cpf = adminDTO.cpf.Trim(),
                     nome = adminDTO.nome,
                     email = adminDTO.email,
                     senhaHash = PasswordHasher.HashPassword(adminDTO.senhaHash),

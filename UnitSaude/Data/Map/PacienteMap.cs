@@ -18,6 +18,8 @@ namespace UnitSaude.Data.Map
             builder.Property(u => u.dataNascimento).IsRequired(false).HasColumnType("date");
             builder.Property(u => u.TipoUsuario).HasMaxLength(50);
             builder.Property(u => u.ativo).HasDefaultValue(true);
+
+            builder.HasIndex(u => u.cpf).IsUnique();
         }
     }
 }
