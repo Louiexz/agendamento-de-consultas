@@ -1,4 +1,4 @@
-# Compilação
+# Compilaï¿½ï¿½o
 bin/
 obj/
 out/
@@ -10,7 +10,7 @@ packages/
 project.lock.json
 project.assets.json
 
-# Configurações do Visual Studio
+# Configuraï¿½ï¿½es do Visual Studio
 .vscode/
 .vs/
 *.suo
@@ -19,19 +19,19 @@ project.assets.json
 *.sln.cache
 *.csproj.user
 
-# Logs e depuração
+# Logs e depuraï¿½ï¿½o
 *.log
 *.tlog
 *.bak
 *.swp
 
-# Configuração do ambiente
+# Configuraï¿½ï¿½o do ambiente
 .env
 secrets.json
 appsettings.json
 appsettings.Development.json
 
-# Publicação
+# Publicaï¿½ï¿½o
 wwwroot/
 node_modules/
 dist/
@@ -39,4 +39,3 @@ publish/
 
 # Arquivos do Docker (caso utilize)
 docker-compose.override.yml
-**/Dockerfile
