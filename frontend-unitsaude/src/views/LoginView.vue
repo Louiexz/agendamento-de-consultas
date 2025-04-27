@@ -1,6 +1,7 @@
 <template>
   <div id="app">
-    <Login />  <!-- Componente Login renderizado diretamente aqui -->
+    <Login />
+    <!-- Componente Login renderizado diretamente aqui -->
   </div>
 </template>
 
@@ -11,6 +12,6 @@ export default {
   name: "App",
   components: {
     Login,  // Registre o componente com a inicial maiúscula
-  },
-};
+  }
+}
 </script>

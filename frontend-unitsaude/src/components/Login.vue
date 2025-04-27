@@ -37,14 +37,28 @@
               placeholder="Digite sua senha"
               required
             />
-            <span><RouterLink to="/recuperarSenha" class="link recuperar">Esqueceu sua senha ?</RouterLink></span>
+            <span>
+              <RouterLink to="/recuperarSenha" class="link recuperar">
+                Esqueceu sua senha ?</RouterLink></span>
           </div>
           <div class="text-center">
-            <button type="submit" class="btn btn-primary w-50">Entrar</button>
+            <!-- reCAPTCHA v2 Checkbox -->
+            <div v-if="checkCaptcha" class="g-recaptcha" 
+              data-sitekey="6LeuuyUrAAAAAHmODUu5BVBsIxdTyraPlmuOtB4G"
+              data-callback="onCaptchaVerified"
+              data-expired-callback="onCaptchaExpired"></div>
+            <button
+              :disabled="!captchaVerified"
+              type="submit"
+              class="btn btn-primary w-50"
+            >Entrar</button>
           </div>
         </form>
-
-        <span><RouterLink to="/cadastroPaciente" class="link">Registre-se</RouterLink></span>
+        <span>
+          <RouterLink to="/cadastroPaciente" class="link">
+            Registre-se
+          </RouterLink>
+        </span>
       </div>
     </div>
   </div>
@@ -53,18 +67,49 @@
 <script>
 import api from "@/services/api";
 import { useAuthStore } from "@/store/auth";
-
 export default {
   data() {
     return {
       email: "",
       senha: "",
       erro: null,
+      checkCaptcha: false,
+      captchaVerified: true,
+      userAttempts: 0
     };
   },
   methods: {
+    onCaptchaVerified() {
+      this.captchaVerified = true;
+    },
+    onCaptchaExpired() {
+      this.captchaVerified = false;
+      grecaptcha.reset();
+    },
+    loadRecaptchaScript(){
+      // Load reCAPTCHA script
+      const script = document.createElement('script');
+      script.src = 'https://www.google.com/recaptcha/api.js';
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    },
     async fazerLogin() {
       try {
+        if (this.checkCaptcha) {
+          if (!this.captchaVerified) {
+            alert('Por favor, confirme que você não é um robô.');
+            return;
+          }
+          const captchaToken = grecaptcha.getResponse();
+  
+          const tokenResponse = await api.post("/api/Usuario/Login", {
+            captchaToken: captchaToken
+          });
+  
+          if (tokenResponse.status == false) return alert("Verificação de captcha falhou.");
+        }
+
         const response = await api.post("/api/Usuario/Login", {
           credential: this.email,
           password: this.senha,
@@ -100,8 +145,20 @@ export default {
           console.error("Erro desconhecido:", error);
           this.erro = "Erro inesperado ao tentar logar.";
         }
+        this.userAttempts += 1;
+        
+        if (this.userAttempts >= 3){
+          this.checkCaptcha = true;
+          this.captchaVerified = false;
+          if (this.userAttempts === 3) this.loadRecaptchaScript();
+        }
       }
     },
+  },
+  mounted() {
+    // Adicione isso para tornar os callbacks acessíveis globalmente
+    window.onCaptchaVerified = () => this.onCaptchaVerified();
+    window.onCaptchaExpired = () => this.onCaptchaExpired();
   },
 };
 </script>
