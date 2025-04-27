@@ -138,6 +138,22 @@ namespace UnitSaude.Controllers
             return Ok(response);  // Retorna 200 com o histórico
         }
 
+        [HttpGet("areas")]
+        public ActionResult<List<string>> ObterAreas()
+        {
+            var areas = DadosFixosConsulta.ObterAreas();
+            return Ok(areas);
+        }
+
+        [HttpGet("especialidades/{area}")]
+        public ActionResult<List<string>> ObterEspecialidadesPorArea(string area)
+        {
+            var especialidades = DadosFixosConsulta.ObterEspecialidadesPorArea(area);
+            if (especialidades == null || !especialidades.Any())
+                return NotFound($"Nenhuma especialidade encontrada para a área '{area}'.");
+
+            return Ok(especialidades);
+        }
 
     }
 }
