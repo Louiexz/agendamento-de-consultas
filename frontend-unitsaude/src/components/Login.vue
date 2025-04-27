@@ -86,13 +86,19 @@ export default {
       this.captchaVerified = false;
       grecaptcha.reset();
     },
-    loadRecaptchaScript(){
-      // Load reCAPTCHA script
-      const script = document.createElement('script');
-      script.src = 'https://www.google.com/recaptcha/api.js';
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
+    loadRecaptchaScript() {
+      let actualScript = document.querySelector('#recaptcha-script');
+      if (actualScript) {
+        grecaptcha.reset();  
+      } else {
+        //document.head.removeChild(actualScript);
+        const script = document.createElement('script');
+        script.id = 'recaptcha-script';
+        script.src = 'https://www.google.com/recaptcha/api.js';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
     },
     async fazerLogin() {
       try {
@@ -103,7 +109,7 @@ export default {
           }
           const captchaToken = grecaptcha.getResponse();
   
-          const tokenResponse = await api.post("/api/Usuario/Login", {
+          const tokenResponse = await api.post("/api/Usuario/CheckCaptcha", {
             captchaToken: captchaToken
           });
   
@@ -148,9 +154,9 @@ export default {
         this.userAttempts += 1;
         
         if (this.userAttempts >= 3){
-          this.checkCaptcha = true;
+          if (this.userAttempts === 3) this.checkCaptcha = true;
           this.captchaVerified = false;
-          if (this.userAttempts === 3) this.loadRecaptchaScript();
+          this.loadRecaptchaScript();
         }
       }
     },
