@@ -67,6 +67,7 @@
 <script>
 import { useRoute, useRouter } from "vue-router";
 import api from "@/services/api";
+import Swal from "sweetalert2";
 
 export default {
   data() {
@@ -116,9 +117,19 @@ export default {
         console.log("Resposta completa da API:", response.data);
         this.sucesso = true; // Exibe a mensagem de sucesso
 
-        setTimeout(() => {
-          this.$router.push("/");
-        }, 3000);
+        await Swal.fire({
+          icon: "success",
+          title: "Senha redefinida!",
+          text: "Você será redirecionado em instantes...",
+          background: "#ffffff", // fundo branco
+          color: "#186fc0", // cor do texto principal (azul do seu tema)
+          confirmButtonColor: "#d8bd2c", // botão (amarelo do seu tema)
+          timer: 3000, // fecha sozinho em 3 segundos
+          timerProgressBar: true, // barra de tempo animada
+          showConfirmButton: false, // sem botão de "Ok"
+        });
+
+        this.$router.push("/");
       } catch (error) {
         if (
           error.response &&

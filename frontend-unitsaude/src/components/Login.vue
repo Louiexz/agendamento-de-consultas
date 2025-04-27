@@ -124,9 +124,11 @@ export default {
         // Se a resposta for bem-sucedida, pega o token
         const token = response.data.token;
         const tipoUsuario = response.data.usuario.tipoUsuario;
+        const nomeUsuario = response.data.usuario.nome;
 
         const auth = useAuthStore();
         auth.setToken(token);
+        auth.setNomeUsuario(nomeUsuario)
         auth.setTipoUsuario(tipoUsuario);
 
         console.log("Resposta completa da API:", response.data);

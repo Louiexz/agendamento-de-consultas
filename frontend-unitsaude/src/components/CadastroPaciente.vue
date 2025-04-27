@@ -130,6 +130,7 @@
 import api from "@/services/api";
 import { useAuthStore } from "@/store/auth";
 import BackButton from "@/components/btnVoltar.vue";
+import Swal from "sweetalert2";
 
 export default {
   components: {
@@ -162,8 +163,7 @@ export default {
       }
 
       try {
-        const partesData = this.dataNascimento.split("-");
-        const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]}`;
+
 
         const response = await api.post("/api/Paciente/CreatePaciente", {
           cpf: this.cpf,
@@ -171,17 +171,27 @@ export default {
           email: this.email,
           senhaHash: this.senha,
           telefone: this.telefone,
-          dataNascimento: dataFormatada,
+          dataNascimento: this.dataNascimento,
         });
 
         console.log("Resposta completa da API:", response.data);
 
         const auth = useAuthStore();
 
+        await Swal.fire({
+          icon: "success",
+          title: "Cadastro realizado com sucesso!",
+          text: "Você será redirecionado em instantes...",
+          background: "#ffffff", // fundo branco
+          color: "#186fc0", // cor do texto principal (azul do seu tema)
+          confirmButtonColor: "#d8bd2c", // botão (amarelo do seu tema)
+          timer: 3000, // fecha sozinho em 3 segundos
+          timerProgressBar: true, // barra de tempo animada
+          showConfirmButton: false, // sem botão de "Ok"
+        });
+
         if (!auth.token) {
           // Exibe o alerta primeiro
-          alert("Cadastro realizado com sucesso! Faça login.");
-          // Depois redireciona
           this.$router.push("/");
         } else if (auth.usuario?.tipoUsuario === "Administrador") {
           this.$router.push("/paginaX"); // Substitua "/paginaX" pela página que você deseja para o Administrador

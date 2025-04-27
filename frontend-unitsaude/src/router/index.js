@@ -6,16 +6,27 @@ import TelaPaciente from '@/views/TelaPaciente.vue'
 import CadastroPaciente from '@/views/CadastroPacienteView.vue'
 import RecuperarSenha from '@/views/RecuperarSenhaView.vue'
 import RedefinirSenha from '@/views/RedefinirSenhaView.vue'
+import DisponibilizarHorarios from '@/views/DisponibilizarHorariosView.vue';
 
 import { useAuthStore } from '@/store/auth'
-import { storeToRefs } from 'pinia'
-import { createPinia } from 'pinia'
 
-const pinia = createPinia()
+const getAuth = () => useAuthStore()
+
 
 const routes = [
+
+  {
+    path: '/disponibilizar-horarios',
+    name: 'disponibilizar-horarios',
+    component: DisponibilizarHorarios,
+    meta: { requiresAuth: true, allowedRoles: ['Administrador'] },
+  },
   {
     path: '/',
+    redirect: '/login',
+  },
+  {
+    path: '/login',
     name: 'Login',
     component: LoginView,
   },
@@ -54,26 +65,36 @@ const routes = [
   },
 ]
 
-
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
+  routes,
 })
 
 router.beforeEach((to, from, next) => {
-  const auth = useAuthStore(pinia)
+  const auth = getAuth()
+
+  if (auth.token && to.path === '/login') {
+    if (auth.tipoUsuario === 'Administrador') {
+      return next('/admin')
+    } else if (auth.tipoUsuario === 'Professor') {
+      return next('/professor')
+    } else if (auth.tipoUsuario === 'Paciente') {
+      return next('/paciente')
+    }
+  }
 
   if (to.meta.requiresAuth) {
     if (!auth.token) {
-      return next('/')
+      return next('/login')
     }
 
     if (to.meta.allowedRoles && !to.meta.allowedRoles.includes(auth.tipoUsuario)) {
-      return next('/')
+      return next('/login')
     }
   }
 
   next()
 })
+
 
 export default router
