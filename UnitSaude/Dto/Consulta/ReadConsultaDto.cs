@@ -7,7 +7,6 @@ namespace UnitSaude.Dto.Consulta
     {
         public int id_Consulta { get; set; }
 
-        [JsonConverter(typeof(DateOnlyConverter))]
         public DateOnly? Data { get; set; }
 
         public TimeOnly? Horario { get; set; }

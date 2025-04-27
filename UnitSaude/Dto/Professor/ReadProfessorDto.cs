@@ -10,7 +10,6 @@ namespace UnitSaude.Dto.Professor
         public required string nome { get; set; }
         public required string email { get; set; }
         public required string telefone { get; set; }
-        [JsonConverter(typeof(DateOnlyConverter))]
         public DateOnly? dataNascimento { get; set; }
         public required string area { get; set; }
         public required string especialidade { get; set; }

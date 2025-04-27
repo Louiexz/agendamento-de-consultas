@@ -11,7 +11,6 @@ namespace UnitSaude.Dto.Admin
         public required string senhaHash { get;  set; }
         public required string telefone { get; set; }
 
-        [JsonConverter(typeof(DateOnlyConverter))]
         public DateOnly? dataNascimento { get; set; }
     }
 }

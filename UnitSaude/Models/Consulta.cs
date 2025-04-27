@@ -6,7 +6,6 @@ namespace UnitSaude.Models
     public class Consulta
     {
         public int id_Consulta { get; set; }
-        [JsonConverter(typeof(DateOnlyConverter))]
         public DateOnly? Data { get; set; }
         public TimeOnly? Horario { get; set; }
         public required string Status { get; set; }

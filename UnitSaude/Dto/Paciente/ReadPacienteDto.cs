@@ -11,8 +11,6 @@ namespace UnitSaude.Dto.Paciente
         public required string nome { get; set; }
         public required string email { get; set; }
         public string? telefone { get; set; }
-
-        [JsonConverter(typeof(DateOnlyConverter))]
         public DateOnly? dataNascimento { get; set; }
 
     }

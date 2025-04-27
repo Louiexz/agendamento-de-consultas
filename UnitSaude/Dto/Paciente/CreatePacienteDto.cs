@@ -10,8 +10,6 @@ namespace UnitSaude.Dto.Paciente
         public required string email { get; set; }
         public required string senhaHash { get; set; }
         public required string telefone { get; set; }
-
-        [JsonConverter(typeof(DateOnlyConverter))]
         public DateOnly? dataNascimento { get; set; }
     }
 }

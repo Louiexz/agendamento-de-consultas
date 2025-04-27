@@ -15,10 +15,8 @@ namespace UnitSaude.Models
         public required string senhaHash { get; set; }
         public required string telefone { get; set; }
 
-        [JsonConverter(typeof(DateOnlyConverter))]
         public DateOnly dataCadastro { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
-        [JsonConverter(typeof(DateOnlyConverter))]
         public DateOnly? dataNascimento { get; set; }
         public required string TipoUsuario { get; set; }
         public bool ativo { get; set; } = true;
