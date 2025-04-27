@@ -7,7 +7,7 @@ using UnitSaude.Models;
 
 namespace UnitSaude.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ConsultaController : ControllerBase
