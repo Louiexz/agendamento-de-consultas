@@ -7,7 +7,7 @@ using UnitSaude.Models;
 
 namespace UnitSaude.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ConsultaController : ControllerBase
@@ -139,20 +139,50 @@ namespace UnitSaude.Controllers
         }
 
         [HttpGet("areas")]
-        public ActionResult<List<string>> ObterAreas()
+        public ActionResult<ResponseModel<List<string>>> ObterAreas()
         {
-            var areas = DadosFixosConsulta.ObterAreas();
-            return Ok(areas);
+            var response = new ResponseModel<List<string>>();
+
+            try
+            {
+                var areas = DadosFixosConsulta.ObterAreas();
+                response.Data = areas;
+                response.Message = "Áreas obtidas com sucesso!";
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = $"Erro ao obter áreas: {ex.Message}";
+                return StatusCode(500, response);
+            }
         }
 
         [HttpGet("especialidades/{area}")]
-        public ActionResult<List<string>> ObterEspecialidadesPorArea(string area)
+        public ActionResult<ResponseModel<List<string>>> ObterEspecialidadesPorArea(string area)
         {
-            var especialidades = DadosFixosConsulta.ObterEspecialidadesPorArea(area);
-            if (especialidades == null || !especialidades.Any())
-                return NotFound($"Nenhuma especialidade encontrada para a área '{area}'.");
+            var response = new ResponseModel<List<string>>();
 
-            return Ok(especialidades);
+            try
+            {
+                var especialidades = DadosFixosConsulta.ObterEspecialidadesPorArea(area);
+                if (especialidades == null || !especialidades.Any())
+                {
+                    response.Status = false;
+                    response.Message = $"Nenhuma especialidade encontrada para a área '{area}'.";
+                    return NotFound(response);
+                }
+
+                response.Data = especialidades;
+                response.Message = "Especialidades obtidas com sucesso!";
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = $"Erro ao obter especialidades: {ex.Message}";
+                return StatusCode(500, response);
+            }
         }
 
     }
