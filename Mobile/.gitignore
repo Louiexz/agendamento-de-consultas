@@ -1,0 +1,61 @@
+*.iml
+../.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Android Studio
+/.idea/
+/.gradle/
+/.cxx/
+/build/
+/captures/
+
+# Gradle files
+.gradle/
+
+# User-specific configuration files
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/.name
+
+# OS-specific files
+Thumbs.db
+
+# Log files
+*.log
+
+# Android generated files
+app/build/
+.idea/libraries/
+
+# Firebase/Google Services
+google-services.json
+
+# Keystore files (se houver)
+*.jks
+*.keystore
+
+# IntelliJ
+out/
+
+# Android Studio's cache and index files
+*.hprof
+
+# JetBrains metadata
+.idea/
+
+# Gradle wrapper
+gradle-wrapper.jar
+gradle-wrapper.properties
