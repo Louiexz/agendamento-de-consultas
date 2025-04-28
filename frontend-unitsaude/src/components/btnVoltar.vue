@@ -15,9 +15,9 @@ export default {
       if (!auth.token) {
         // Se o usuário não estiver logado, redireciona para a página inicial
         this.$router.push("/");
-      } else if (auth.usuario?.tipoUsuario === "Administrador") {
+      } else if (auth.tipoUsuario === "Administrador") {
         // Se o usuário for um administrador, redireciona para uma página específica
-        this.$router.push("/paginaX"); // Substitua '/paginaX' pela página do administrador
+        this.$router.push("/admin"); // Substitua '/paginaX' pela página do administrador
       }
     },
   },

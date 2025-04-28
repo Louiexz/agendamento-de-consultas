@@ -1,21 +1,40 @@
 <template>
   <div>
     <!-- Componente Header -->
-    <Header /> 
+    <Header />
 
-    <div class="main d-flex min-vh-100 justify-content-center align-items-center">
+    <div
+      class="main d-flex min-vh-100 justify-content-center align-items-center"
+    >
       <div class="funcoes d-flex flex-column gap-3">
-        <router-link to="/disponibilizar-horarios" class="card align-items-center p-4 no-underline">
-          <i class="bi bi-calendar-plus-fill"></i>
-          <span>Disponibilizar Horários</span>
-        </router-link>
-
-        <router-link to="/pacientes" class="card align-items-center p-4 no-underline">
+        <div class="horarios d-flex gap-3 justify-content-center">
+          <router-link
+            to="/disponibilizar-horarios"
+            class="card align-items-center p-4 no-underline w-50"
+          >
+            <i class="bi bi-calendar-plus-fill"></i>
+            <span>Disponibilizar Horários</span>
+          </router-link>
+          <router-link
+            to="/cadastrar-consultas"
+            class="card align-items-center p-4 no-underline w-50"
+          >
+            <i class="bi bi-calendar2-week-fill"></i>
+            <span>Cadastrar Consulta</span>
+          </router-link>
+        </div>
+        <router-link
+          to="/pacientes"
+          class="card align-items-center p-4 no-underline"
+        >
           <i class="bi bi-heart-pulse-fill"></i>
           <span>Pacientes</span>
         </router-link>
 
-        <router-link to="/professores" class="card align-items-center p-4 no-underline">
+        <router-link
+          to="/professores"
+          class="card align-items-center p-4 no-underline"
+        >
           <i class="bi bi-bandaid-fill"></i>
           <span>Professores</span>
         </router-link>
@@ -101,5 +120,4 @@ span {
 .card:hover {
   transform: scale(1.05);
 }
-
 </style>

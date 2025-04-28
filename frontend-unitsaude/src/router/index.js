@@ -7,6 +7,7 @@ import CadastroPaciente from '@/views/CadastroPacienteView.vue'
 import RecuperarSenha from '@/views/RecuperarSenhaView.vue'
 import RedefinirSenha from '@/views/RedefinirSenhaView.vue'
 import DisponibilizarHorarios from '@/views/DisponibilizarHorariosView.vue';
+import CadastrarConsulta from '@/views/CadastrarConsultaView.vue';
 
 import { useAuthStore } from '@/store/auth'
 
@@ -14,7 +15,12 @@ const getAuth = () => useAuthStore()
 
 
 const routes = [
-
+  {
+    path: '/cadastrar-consultas',
+    name: 'cadastrar-consultas',
+    component: CadastrarConsulta,
+    meta: { requiresAuth: true, allowedRoles: ['Administrador'] },
+  },
   {
     path: '/disponibilizar-horarios',
     name: 'disponibilizar-horarios',

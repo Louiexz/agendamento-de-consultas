@@ -1,5 +1,6 @@
 <template>
   <Header />
+  <BackButton class="voltar"/>
   <div class="main d-flex justify-content-center align-items-center">
     <div class="form card">
       <div class="Title">
@@ -89,7 +90,7 @@
             />
           </div>
         </div>
-        <div class="form-group">
+        <div class="form-group botaocentro">
           <button type="submit" class="btn btn-primary">
             Disponibilizar Horários
           </button>
@@ -102,11 +103,13 @@
 <script>
 import api from "@/services/api"; // Importando o serviço de API
 import Header from "@/components/Header.vue";
+import BackButton from "@/components/btnVoltar.vue";
 import Swal from "sweetalert2";
 
 export default {
   components: {
     Header,
+    BackButton,
   },
   data() {
     return {
@@ -182,6 +185,8 @@ export default {
           ativo: true,
         };
 
+        console.log(disponibilidade);
+
         const response = await api.post(
           "/api/Disponibilidade/CreateDisponibilidade",
           disponibilidade
@@ -189,7 +194,6 @@ export default {
         await Swal.fire({
           icon: "success",
           title: "Horários disponibilizados com sucesso!",
-          text: "Você será redirecionado em instantes...",
           background: "#ffffff",
           color: "#186fc0",
           confirmButtonColor: "#d8bd2c",
@@ -238,6 +242,13 @@ export default {
   margin-top: 20vh;
 }
 
+.voltar {
+  position: relative;
+  top: 7rem;
+  left: 1vw;
+  z-index: 100000;
+}
+
 .form-group {
   margin-bottom: 1.5rem;
 }
@@ -265,4 +276,16 @@ select.form-control:hover {
   background-color: #f1f1f1;
 }
 
+.btn-primary {
+  background-color: #d8bd2c;
+  border: none;
+  transition:  0.3s ease;
+}
+.btn-primary:hover {
+  background-color: #186fc0;
+}
+
+.botaocentro {
+  text-align: center;
+}
 </style>
