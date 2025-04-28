@@ -224,7 +224,12 @@ export default {
         const response = await api.get(
           `/api/Paciente/ListarComFiltro?filtro=${this.searchPaciente}`
         );
-        this.pacientes = response.data.data;
+        this.pacientes = response.data.data.filter((paciente) => {
+          const nomeCpf = `${paciente.nome} ${paciente.cpf}`;
+          return nomeCpf
+            .toLowerCase()
+            .includes(this.searchPaciente.toLowerCase());
+        });
       } catch (error) {
         console.error("Erro ao carregar pacientes:", error);
         this.erro = "Erro ao carregar pacientes. Tente novamente mais tarde.";
@@ -254,7 +259,7 @@ export default {
           text: "Não é possível agendar uma consulta para domingos.",
           confirmButtonColor: "#d8bd2c",
         });
-        
+
         return;
       }
 
@@ -441,7 +446,7 @@ export default {
   text-align: center;
 }
 
-.Title h2{
+.Title h2 {
   text-align: center;
   font-weight: 400;
 }
@@ -494,7 +499,6 @@ select.form-control:hover {
   font-weight: bold;
 }
 
-
 /* Estilo de hover para as células */
 :deep(.vuecal__cell:hover) {
   background-color: #f0f8ff;
@@ -509,16 +513,13 @@ select.form-control:hover {
 
 /* Estilo visual para desabilitar os domingos */
 :deep(.vuecal__cell--sun) {
-  pointer-events: none;  /* Desativa qualquer evento de clique */
+  pointer-events: none; /* Desativa qualquer evento de clique */
   background-color: #f1f1f100; /* Muda a cor de fundo para indicar que está desabilitado */
   color: #cdc3c3; /* Altera a cor do texto para dar um visual "desabilitado" */
   cursor: not-allowed; /* Muda o cursor para indicar que não é interativo */
 }
 
-
-
 :deep(.vuecal__cell-date) {
-  
   font-size: 0.9rem !important; /* Aumenta o tamanho do número do dia */
   text-align: center;
 }
@@ -541,6 +542,4 @@ select.form-control:hover {
 :deep(.vuecal__nav--today) {
   display: none !important; /* Esconde o botão 'Hoje' */
 }
-
-
 </style>
