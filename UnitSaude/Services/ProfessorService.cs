@@ -330,5 +330,49 @@ namespace UnitSaude.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<ResponseModel<List<ReadProfessorDto>>> ListarProfessoresPorEspecialidade(string especialidade)
+        {
+            ResponseModel<List<ReadProfessorDto>> response = new();
+
+            try
+            {
+                // Filtra os professores pela especialidade
+                var professores = await _context.Professores
+                    .Where(x => x.especialidade == especialidade)
+                    .Select(x => new ReadProfessorDto
+                    {
+                        id = x.Id_Usuario,
+                        cpf = x.cpf,
+                        nome = x.nome,
+                        email = x.email,
+                        telefone = x.telefone,
+                        dataNascimento = x.dataNascimento,
+                        area = x.area,
+                        especialidade = x.especialidade,
+                        codigoProfissional = x.codigoProfissional,
+                    })
+                    .ToListAsync();
+
+                if (professores.Count == 0)
+                {
+                    response.Status = false;
+                    response.Message = "Nenhum professor encontrado para esta especialidade.";
+                }
+                else
+                {
+                    response.Data = professores;
+                    response.Message = "Professores listados com sucesso!";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+
     }
 }

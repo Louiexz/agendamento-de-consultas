@@ -13,5 +13,7 @@ namespace UnitSaude.Interfaces
         public Task<ResponseModel<Professor>> RemoverProfessor(int ProfessorId);
 
         public Task<bool> ResetarSenhaProfessor(int id, string novaSenhaHash);
+
+        public Task<ResponseModel<List<ReadProfessorDto>>> ListarProfessoresPorEspecialidade(string especialidade);
     }
 }

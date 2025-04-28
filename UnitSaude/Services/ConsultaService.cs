@@ -91,6 +91,24 @@ namespace UnitSaude.Services
                         c.Data == consultaDTO.Data &&
                         c.Horario == consultaDTO.Horario);
 
+
+                // Verifica se o paciente já possui uma consulta no mesmo dia e horário
+                var pacienteConflito = await _context.Consultas
+                    .AnyAsync(c =>
+                        c.PacienteId == consultaDTO.PacienteId &&
+                        c.Data == consultaDTO.Data &&
+                        c.Horario == consultaDTO.Horario &&
+                        c.Status != "Concluída" &&
+                        c.Status != "Cancelada");
+
+                if (pacienteConflito)
+                {
+                    response.Status = false;
+                    response.Message = "O paciente já possui uma consulta marcada nesse horário.";
+                    return response;
+                }
+
+
                 // Define o status com base nas condições
                 string status;
                 if (disponibilidade == null || conflito)
@@ -382,8 +400,10 @@ namespace UnitSaude.Services
                 var query = _context.Consultas
                     .Include(c => c.Paciente)
                     .Include(c => c.Professor)
-                    .Where(c => c.Status == filtro.Status)
                     .AsQueryable();
+
+                if (!string.IsNullOrEmpty(filtro.Status))
+                    query = query.Where(c => c.Status == filtro.Status);
 
                 if (!string.IsNullOrEmpty(filtro.Area))
                     query = query.Where(c => c.Area == filtro.Area);
@@ -511,46 +531,69 @@ namespace UnitSaude.Services
             return response;
         }
 
-        public async Task<ResponseModel<List<string>>> ObterHorariosDisponiveis(DateOnly data, string area, string especialidade)
+        public async Task<ResponseModel<List<HorarioDisponivelDto>>> ObterHorariosDisponiveis(DateOnly data, string area, string especialidade)
         {
-            // Busca as disponibilidades para a área e especialidade
-            var disponibilidades = await _context.Disponibilidades
-                .Where(d => d.Area == area && d.Especialidade == especialidade
-                            && d.DataInicio <= data && d.DataFim >= data)
-                .ToListAsync();
+            var response = new ResponseModel<List<HorarioDisponivelDto>>();
 
-            if (disponibilidades.Count == 0)
+            try
             {
-                return new ResponseModel<List<string>>
+                // Busca as disponibilidades para a área e especialidade
+                var disponibilidades = await _context.Disponibilidades
+                    .Where(d => d.Area == area && d.Especialidade == especialidade
+                                && d.DataInicio <= data && d.DataFim >= data)
+                    .ToListAsync();
+
+                if (disponibilidades.Count == 0)
                 {
-                    Status = false,
-                    Message = "Não há disponibilidade para a data e especialidade informadas.",
-                    Data = new List<string>()
-                };
-            }
-
-            List<string> horariosDisponiveis = new();
-
-            // Para cada disponibilidade encontrada, adiciona os horários válidos
-            foreach (var disponibilidade in disponibilidades)
-            {
-                TimeOnly horarioAtual = disponibilidade.HorarioInicio;
-
-                while (horarioAtual.Add(TimeSpan.FromMinutes(55)) <= disponibilidade.HorarioFim)
-                {
-horariosDisponiveis.Add(horarioAtual.ToString("HH:mm"));
-
-                    horarioAtual = horarioAtual.Add(TimeSpan.FromMinutes(55));
+                    response.Status = false;
+                    response.Message = "Não há disponibilidade para a data e especialidade informadas.";
+                    response.Data = new List<HorarioDisponivelDto>();
+                    return response;
                 }
+
+                List<HorarioDisponivelDto> horariosDisponiveis = new();
+
+                // Para cada disponibilidade encontrada, adiciona os horários válidos
+                foreach (var disponibilidade in disponibilidades)
+                {
+                    TimeOnly horarioAtual = disponibilidade.HorarioInicio;
+
+                    while (horarioAtual.Add(TimeSpan.FromMinutes(55)) <= disponibilidade.HorarioFim)
+                    {
+                        // Verifica se esse horário está ocupado por uma consulta
+                        var consultaExistente = await _context.Consultas
+                            .AnyAsync(c => c.Area == area && c.Especialidade == especialidade
+                                           && c.Data == data && c.Horario == horarioAtual);
+
+                        // Se não houver consulta nesse horário, marca como "Disponível"
+                        var status = !consultaExistente ? "Disponível" : "Indisponível, entrar na fila de espera";
+
+                        // Adiciona o horário e seu status na lista de horários
+                        horariosDisponiveis.Add(new HorarioDisponivelDto
+                        {
+                            Horario = horarioAtual.ToString("HH:mm"),
+                            Status = status
+                        });
+
+                        horarioAtual = horarioAtual.Add(TimeSpan.FromMinutes(55));
+                    }
+                }
+
+                response.Status = true;
+                response.Message = "Horários disponíveis encontrados.";
+                response.Data = horariosDisponiveis;
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+                response.Data = new List<HorarioDisponivelDto>();
             }
 
-            return new ResponseModel<List<string>>
-            {
-                Status = true,
-                Message = "Horários disponíveis encontrados.",
-                Data = horariosDisponiveis
-            };
+            return response;
         }
+
+
 
 
 

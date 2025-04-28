@@ -272,6 +272,54 @@ namespace UnitSaude.Services
             return true;
         }
 
+        public async Task<ResponseModel<List<ReadPacienteDto>>> ListarPacientesComFiltro(FiltroPacienteDto filtro)
+        {
+            var response = new ResponseModel<List<ReadPacienteDto>>();
+
+            try
+            {
+                var query = _context.Pacientes.AsQueryable();
+
+                if (!string.IsNullOrEmpty(filtro.Nome) || !string.IsNullOrEmpty(filtro.CPF))
+                {
+                    query = query.Where(p =>
+                        (!string.IsNullOrEmpty(filtro.Nome) && p.nome.Contains(filtro.Nome)) ||
+                        (!string.IsNullOrEmpty(filtro.CPF) && p.cpf == filtro.CPF)
+                    );
+                }
+
+
+                var pacientes = await query.ToListAsync();
+
+                if (!pacientes.Any())
+                {
+                    response.Message = "Nenhum paciente encontrado com os filtros fornecidos.";
+                    return response;
+                }
+
+                response.Data = pacientes.Select(paciente => new ReadPacienteDto
+                {
+                    id = paciente.Id_Usuario,
+                    cpf = paciente.cpf,
+                    nome = paciente.nome,
+                    email = paciente.email,
+                    telefone = paciente.telefone,
+                    dataNascimento = paciente.dataNascimento
+                }).ToList();
+
+                response.Status = true;
+                response.Message = "Pacientes encontrados com sucesso!";
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+
+
 
     }
 }

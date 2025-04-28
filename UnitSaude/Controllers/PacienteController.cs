@@ -65,5 +65,16 @@ namespace UnitSaude.Controllers
             return Ok(resultado);
         }
 
+        [HttpGet("ListarComFiltro")]
+        public async Task<IActionResult> ListarPacientesComFiltro([FromQuery] FiltroPacienteDto filtro)
+        {
+            var response = await _pacienteService.ListarPacientesComFiltro(filtro);
+
+            if (!response.Status)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
     }
 }

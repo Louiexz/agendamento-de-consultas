@@ -15,7 +15,7 @@ namespace UnitSaude.Interfaces
         public Task<ResponseModel<List<ReadConsultaDto>>> ListarConsultasPorNomeOuCpf(string valor);
 
         public Task<ResponseModel<List<ReadConsultaDto>>> ListarConsultaPorProfessor(int professorID);
-        public Task<ResponseModel<List<string>>> ObterHorariosDisponiveis(DateOnly data, string area, string especialidade);
+        public Task<ResponseModel<List<HorarioDisponivelDto>>> ObterHorariosDisponiveis(DateOnly data, string area, string especialidade);
 
         public Task<ResponseModel<string>> AtualizarStatusConsulta(int id, UpdateStatusConsultaDto dto);
         public  Task<ResponseModel<string>> ReagendarConsulta(int id, ReagendarConsultaDto dto);

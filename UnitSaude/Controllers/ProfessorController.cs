@@ -68,5 +68,16 @@ namespace UnitSaude.Controllers
 
             return Ok(resultado);
         }
+
+        [HttpGet("listar-professores-especialidade")]
+        public async Task<ActionResult<ResponseModel<List<ReadProfessorDto>>>> ListarProfessoresPorEspecialidade([FromQuery] string especialidade)
+        {
+            var result = await _professorService.ListarProfessoresPorEspecialidade(especialidade);
+            if (result.Status)
+                return Ok(result);
+            else
+                return BadRequest(result);
+        }
+
     }
 }
