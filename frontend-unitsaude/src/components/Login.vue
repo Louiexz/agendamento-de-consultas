@@ -44,7 +44,7 @@
           <div class="text-center">
             <!-- reCAPTCHA v2 Checkbox -->
             <div v-if="checkCaptcha" class="g-recaptcha" 
-              data-sitekey="6LekpygrAAAAAOvsnQT0VW6WidnbKsv_ag7COhCw"
+              data-sitekey="6Lc6yigrAAAAAG3SV8WLTI-Aj9KZ5YonZh_7dpUr"
               data-callback="onCaptchaVerified"
               data-expired-callback="onCaptchaExpired"></div>
             <button
