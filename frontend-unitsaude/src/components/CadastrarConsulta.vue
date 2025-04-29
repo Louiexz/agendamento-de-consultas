@@ -353,7 +353,7 @@ export default {
         );
         await Swal.fire({
           icon: "success",
-          title: "Consulta criada com sucesso!",
+          title: "Consulta agendada com sucesso!",
           background: "#ffffff",
           color: "#186fc0",
           confirmButtonColor: "#d8bd2c",
@@ -495,7 +495,7 @@ select.form-control:hover {
   background-color: #186fc0;
   color: #ffffff;
   padding: 0.75rem 1rem;
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
@@ -516,6 +516,10 @@ select.form-control:hover {
   pointer-events: none; /* Desativa qualquer evento de clique */
   background-color: #f1f1f100; /* Muda a cor de fundo para indicar que está desabilitado */
   color: #cdc3c3; /* Altera a cor do texto para dar um visual "desabilitado" */
+  cursor: not-allowed; /* Muda o cursor para indicar que não é interativo */
+}
+:deep(.vuecal__cell--disabled:hover) {
+  pointer-events: none; /* Desativa qualquer evento de clique */
   cursor: not-allowed; /* Muda o cursor para indicar que não é interativo */
 }
 

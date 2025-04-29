@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Cookies from 'js-cookie'; // Importa a biblioteca js-cookie
 
 // Definindo a URL base da API
 const api = axios.create({
@@ -8,10 +9,10 @@ const api = axios.create({
   },
 });
 
-// Você pode configurar interceptores, autenticação ou outros cabeçalhos aqui, se necessário
+// Configurando interceptores para adicionar o token nos cabeçalhos da requisição
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token'); // Ou do seu armazenamento preferido
+    const token = Cookies.get('token'); // Recupera o token do cookie
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
