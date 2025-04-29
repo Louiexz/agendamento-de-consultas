@@ -44,7 +44,7 @@
           <div class="text-center">
             <!-- reCAPTCHA v2 Checkbox -->
             <div v-if="checkCaptcha" class="g-recaptcha" 
-              data-sitekey="key"
+              data-sitekey="6LekpygrAAAAAOvsnQT0VW6WidnbKsv_ag7COhCw"
               data-callback="onCaptchaVerified"
               data-expired-callback="onCaptchaExpired"></div>
             <button
@@ -75,8 +75,7 @@ export default {
       erro: null,
       checkCaptcha: false,
       captchaVerified: true,
-      userAttempts: 0,
-      key: process.env.API_KEY_SITE
+      userAttempts: 0
     };
   },
   methods: {
