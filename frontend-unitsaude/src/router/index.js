@@ -1,18 +1,19 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '@/views/LoginView.vue'
-import TelaAdmin from '@/views/TelaAdmin.vue'
-import TelaProfessor from '@/views/TelaProfessor.vue'
-import TelaPaciente from '@/views/TelaPaciente.vue'
-import CadastroPaciente from '@/views/CadastroPacienteView.vue'
-import RecuperarSenha from '@/views/RecuperarSenhaView.vue'
-import RedefinirSenha from '@/views/RedefinirSenhaView.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import LoginView from '@/views/LoginView.vue';
+import TelaAdmin from '@/views/TelaAdmin.vue';
+import TelaProfessor from '@/views/TelaProfessor.vue';
+import TelaPaciente from '@/views/TelaPaciente.vue';
+import CadastroPaciente from '@/views/CadastroPacienteView.vue';
+import RecuperarSenha from '@/views/RecuperarSenhaView.vue';
+import RedefinirSenha from '@/views/RedefinirSenhaView.vue';
 import DisponibilizarHorarios from '@/views/DisponibilizarHorariosView.vue';
 import CadastrarConsulta from '@/views/CadastrarConsultaView.vue';
+import VisualizarPacientesView from '@/views/VisualizarPacientesView.vue';
+import VisualizarProfessoresView from '@/views/VisualizarProfessoresView.vue';
 
-import { useAuthStore } from '@/store/auth'
+import { useAuthStore } from '@/store/auth';
 
-const getAuth = () => useAuthStore()
-
+const getAuth = () => useAuthStore();
 
 const routes = [
   {
@@ -25,6 +26,18 @@ const routes = [
     path: '/disponibilizar-horarios',
     name: 'disponibilizar-horarios',
     component: DisponibilizarHorarios,
+    meta: { requiresAuth: true, allowedRoles: ['Administrador'] },
+  },
+  {
+    path: '/pacientes',
+    name: 'visualizar-pacientes',
+    component: VisualizarPacientesView,
+    meta: { requiresAuth: true, allowedRoles: ['Administrador', 'Professor'] },
+  },
+  {
+    path: '/professores',
+    name: 'visualizar-professores',
+    component: VisualizarProfessoresView,
     meta: { requiresAuth: true, allowedRoles: ['Administrador'] },
   },
   {
