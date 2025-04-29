@@ -374,5 +374,57 @@ namespace UnitSaude.Services
             return response;
         }
 
+
+        public async Task<ResponseModel<List<ReadProfessorDto>>> ListarProfessoresComFiltro(FiltroProfessorDto filtro)
+        {
+            var response = new ResponseModel<List<ReadProfessorDto>>();
+
+            try
+            {
+                var query = _context.Professores.AsQueryable();
+
+                if (!string.IsNullOrEmpty(filtro.Nome) || !string.IsNullOrEmpty(filtro.CodigoProfissional) || !string.IsNullOrEmpty(filtro.Especialidade))
+                {
+                    query = query.Where(p =>
+                        (!string.IsNullOrEmpty(filtro.Nome) && p.nome.Contains(filtro.Nome)) ||
+                        (!string.IsNullOrEmpty(filtro.CodigoProfissional) && p.codigoProfissional == filtro.CodigoProfissional) ||
+                        (!string.IsNullOrEmpty(filtro.Especialidade) && p.especialidade == filtro.Especialidade)
+                    );
+                }
+
+
+                var professores = await query.ToListAsync();
+
+                if (!professores.Any())
+                {
+                    response.Message = "Nenhum professor encontrado com os filtros fornecidos.";
+                    return response;
+                }
+
+                response.Data = professores.Select(professor => new ReadProfessorDto
+                {
+                    id = professor.Id_Usuario,
+                    cpf = professor.cpf,
+                    nome = professor.nome,
+                    email = professor.email,
+                    telefone = professor.telefone,
+                    dataNascimento = professor.dataNascimento,
+                    area = professor.area,
+                    especialidade = professor.especialidade,
+                    codigoProfissional = professor.codigoProfissional,
+                }).ToList();
+
+                response.Status = true;
+                response.Message = "Professores encontrados com sucesso!";
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+
     }
 }
