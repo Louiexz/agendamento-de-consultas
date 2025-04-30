@@ -1,149 +1,171 @@
 <template>
-    <Header/>
-    <div class="pacientes">
-        <BackButton class="voltar"/>
-        <div class=area-pacientes>
-            <h5 id=title><b>Cadastro de pacientes</b></h5>
-            <div id=form-paciente class=mb-3>
-                <label for="procura-paciente">
-                    <input
-                      type="search"
-                      class="form-label"
-                      id="procura-paciente"
-                      placeholder="Digite o nome ou CPF do paciente"
-                      v-model="paciente"
-                      @input="procurarPaciente"
-                    />
-                    <RouterLink
-                        to="/cadastroPaciente"
-                        class="btn btn--cadastrar"
-                        >
-                        <i class="bi bi-plus-lg"></i>
-                    </RouterLink>
-                </label>
-                <span
-                    v-if='error != ""'
-                    class="alert alert-danger"
-                >Erro: {{ error }}</span>
-            </div>
-            <div
-              id="pacientes-data"
-              v-if="response.data"
-              v-for="(pacienteData, idx) in response.data"
-              :key="pacienteData"
-            >
-              <div
-                v-for="pacienteInfo in pacienteData"
-                :key="pacienteInfo"
-              >
-                <div
-                    class="paciente"
-                    v-if="pacienteInfo.nome"
-                >
-                    {{ pacienteInfo.nome }}
-                </div>
-               </div>
-            </div>
+  <Header />
+  <BackButton class="voltar" />
+  <div class="d-flex justify-content-center align-items-center min-vh-100">
+    <div class="form">
+      <div class="title mb-4">
+        <h1>Listagem de Pacientes</h1>
+      </div>
+
+      <div id="form-paciente" class="d-flex gap-3 align-items-center mb-3">
+        <input
+          type="search"
+          class="form-control"
+          id="procura-paciente"
+          placeholder="Digite o nome ou CPF do paciente"
+          v-model="paciente"
+          @input="procurarPaciente"
+        />
+        <RouterLink
+          to="/cadastroPaciente"
+          class="btn btn-primary d-flex align-items-center gap-2"
+        >
+          <i class="bi bi-plus-lg"></i>
+        </RouterLink>
+      </div>
+
+      <span v-if="error !== ''" class="alert alert-danger d-block">{{
+        error
+      }}</span>
+
+      <div
+        id="pacientes-data"
+        v-if="pacientes.length"
+        class="d-flex flex-column gap-1"
+      >
+        <div
+          v-for="(pacienteInfo, idx) in pacientes"
+          :key="pacienteInfo.id || idx"
+          class="paciente card p-2 align-items-start shadow-sm"
+        >
+          <span>{{ pacienteInfo.nome }}</span>
         </div>
+      </div>
     </div>
+  </div>
 </template>
+
 <script>
-import BackButton from '@/components/btnVoltar.vue';
-import Header from '@/components/Header.vue';
+import BackButton from "@/components/btnVoltar.vue";
+import Header from "@/components/Header.vue";
 import api from "@/services/api";
 
 export default {
-    name: "VisualizarPacientes",
-    data() {
-        return {
-            paciente: "",
-            pacientes: [],
-            error: "",
-            response: {}
+  name: "VisualizarPacientes",
+  data() {
+    return {
+      paciente: "",
+      pacientes: [],
+      error: "",
+    };
+  },
+  components: {
+    Header,
+    BackButton,
+  },
+  methods: {
+    capitalizar(str) {
+      if (!str) return "";
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    },
+    async procurarPaciente() {
+      this.error = "";
+
+      try {
+        const onlyNumbers = this.paciente.replace(/\D/g, "");
+        const isCpf = onlyNumbers.length === 11;
+
+        // Se campo está vazio, lista todos
+        if (this.paciente === "") {
+          const res = await api.get("/api/Paciente/ListarTodos");
+          this.pacientes = res.data.data || [];
+          return;
         }
-    },
-    components: {
-        Header,
-        BackButton,
-    },
-    setup() {
 
-    },
-    methods: {
-      capitalizar(str) {
-        if (!str) return "";
-        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-      },
-      async procurarPaciente() {
-        this.error = "";
-
-        try {
-          const isCpf = /^\d+$/.test(this.paciente);
-
-          if (this.paciente === "") {
-            this.response = await api.get("/api/Paciente/ListarTodos");
-            return;
-          }
-
-          this.response = await api.get("/api/Paciente/ListarComFiltro", {
-            params: {
-              nome: isCpf ? "" : this.capitalizar(this.paciente),
-              cpf: isCpf ? this.paciente : "",
-            },
-          });
-          if (this.response.data === null) {
-            this.error = "Pacientes não encontrados.";
-          }
-        } catch (error) {
-          this.error = "Paciente não foi encontrado.";
+        // CPF incompleto → não busca e não mostra erro
+        if (
+          onlyNumbers.length > 0 &&
+          onlyNumbers.length < 11 &&
+          /^\d+$/.test(this.paciente)
+        ) {
+          this.pacientes = [];
+          return;
         }
+
+        // Chama API com filtro
+        const res = await api.get("/api/Paciente/ListarComFiltro", {
+          params: {
+            nome: isCpf ? "" : this.capitalizar(this.paciente),
+            cpf: isCpf ? onlyNumbers : "",
+          },
+        });
+
+        this.pacientes = res.data.data || [];
+
+        // Só mostra erro se busca foi realmente feita e não encontrou ninguém
+        if (!this.pacientes.length && (isCpf || !/^\d+$/.test(this.paciente))) {
+          this.error = "Pacientes não encontrados.";
+        }
+      } catch (error) {
+        this.error = "Erro ao buscar pacientes.";
+        this.pacientes = [];
       }
     },
-    mounted() {
-        this.procurarPaciente();
-    }
-}
+  },
+  mounted() {
+    this.procurarPaciente();
+  },
+};
 </script>
-<style>
-.pacientes {
-    padding: 120px 20px;
-    display: flex;
-    justify-content: flex-start;
+
+<style scoped>
+.title {
+  text-align: center;
 }
-.area-pacientes {
-    padding-left: 5dvw;
+
+.title h1 {
+  font-size: 1.5rem;
 }
+
 #form-paciente {
-    display: flex;
-    flex-direction: column;
-    gap: 20px
+  width: 100%;
+  padding: 10px;
 }
-#title {
-    padding-bottom: 20px
+
+.paciente {
+  transition: transform 0.3s ease;
+  cursor: pointer;
 }
-#procura-paciente {
-    min-width: 35dvw;
-    padding: 3px
+
+.paciente:hover {
+  transform: scale(1.01);
+  background-color: #f0f8ff;
 }
-.btn--cadastrar {
-    position: relative;
-    left: 50px;
-    background-color: #186fc0;
-    color: white;
+.voltar {
+  position: absolute;
+  top: 7rem;
+  left: 1vw;
+}
+
+.form {
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 50%;
+  height: 60vh;
+  gap: 1rem;
 }
 #pacientes-data {
-    display: flex;
-    flex-direction: column;
-    gap: 15px
+  overflow-y: auto;
+  padding: 10px; /* para evitar que o conteúdo fique colado com a barra de rolagem */
 }
-.paciente {
-    width: 60dvw;
-    box-shadow: 1px 1px 1px 1px;
-    border-radius: 9px;
-    padding: 15px
+
+/* Estilizar a barra de rolagem, opcional */
+#pacientes-data::-webkit-scrollbar {
+  width: 5px;
 }
-.paciente:hover {
-    background-color: #ddd;
-    cursor: pointer
+#pacientes-data::-webkit-scrollbar-thumb {
+  background-color: #186fc0;
+  border-radius: 10px;
 }
 </style>
