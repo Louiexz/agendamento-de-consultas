@@ -1,10 +1,10 @@
 <template>
-  <div class="main d-flex">
-    <div class="container logo">
+  <div class="main min-vh-100">
+    <div class="container logoL">
       <img src="../assets/Logo.svg" alt="" />
     </div>
     <div
-      class="container d-flex justify-content-center align-items-center min-vh-100"
+      class="container d-flex justify-content-center align-items-center "
     >
       <div class="card p-4 shadow" style="width: 100%; max-width: 400px">
         <h2 class="text-center mb-4">Login</h2>
@@ -39,19 +39,26 @@
             />
             <span>
               <RouterLink to="/recuperarSenha" class="link recuperar">
-                Esqueceu sua senha ?</RouterLink></span>
+                Esqueceu sua senha ?</RouterLink
+              ></span
+            >
           </div>
           <div class="text-center">
             <!-- reCAPTCHA v2 Checkbox -->
-            <div v-if="checkCaptcha" class="g-recaptcha" 
+            <div
+              v-if="checkCaptcha"
+              class="g-recaptcha"
               data-sitekey="6Lc6yigrAAAAAG3SV8WLTI-Aj9KZ5YonZh_7dpUr"
               data-callback="onCaptchaVerified"
-              data-expired-callback="onCaptchaExpired"></div>
+              data-expired-callback="onCaptchaExpired"
+            ></div>
             <button
               :disabled="!captchaVerified"
               type="submit"
               class="btn btn-primary w-50"
-            >Entrar</button>
+            >
+              Entrar
+            </button>
           </div>
         </form>
         <span>
@@ -75,7 +82,7 @@ export default {
       erro: null,
       checkCaptcha: false,
       captchaVerified: true,
-      userAttempts: 0
+      userAttempts: 0,
     };
   },
   methods: {
@@ -87,14 +94,14 @@ export default {
       grecaptcha.reset();
     },
     loadRecaptchaScript() {
-      let actualScript = document.querySelector('#recaptcha-script');
+      let actualScript = document.querySelector("#recaptcha-script");
       if (actualScript) {
-        grecaptcha.reset();  
+        grecaptcha.reset();
       } else {
         //document.head.removeChild(actualScript);
-        const script = document.createElement('script');
-        script.id = 'recaptcha-script';
-        script.src = 'https://www.google.com/recaptcha/api.js';
+        const script = document.createElement("script");
+        script.id = "recaptcha-script";
+        script.src = "https://www.google.com/recaptcha/api.js";
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
@@ -104,16 +111,17 @@ export default {
       try {
         if (this.checkCaptcha) {
           if (!this.captchaVerified) {
-            alert('Por favor, confirme que você não é um robô.');
+            alert("Por favor, confirme que você não é um robô.");
             return;
           }
           const captchaToken = grecaptcha.getResponse();
-  
+
           const tokenResponse = await api.post("/api/Usuario/CheckCaptcha", {
-            captchaToken: captchaToken
+            captchaToken: captchaToken,
           });
-  
-          if (tokenResponse.status == false) return alert("Verificação de captcha falhou.");
+
+          if (tokenResponse.status == false)
+            return alert("Verificação de captcha falhou.");
         }
 
         const response = await api.post("/api/Usuario/Login", {
@@ -128,7 +136,7 @@ export default {
 
         const auth = useAuthStore();
         auth.setToken(token);
-        auth.setNomeUsuario(nomeUsuario)
+        auth.setNomeUsuario(nomeUsuario);
         auth.setTipoUsuario(tipoUsuario);
 
         console.log("Resposta completa da API:", response.data);
@@ -154,8 +162,8 @@ export default {
           this.erro = "Erro inesperado ao tentar logar.";
         }
         this.userAttempts += 1;
-        
-        if (this.userAttempts >= 3){
+
+        if (this.userAttempts >= 3) {
           if (this.userAttempts === 3) this.checkCaptcha = true;
           this.captchaVerified = false;
           this.loadRecaptchaScript();
@@ -175,31 +183,33 @@ export default {
 .main {
   background-color: #186fc0;
   padding: 0 15vw;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 colunas com largura igual */
+
 }
-.logo {
+.logoL {
   align-content: center;
   justify-self: center;
   text-align: center;
 }
 
-.logo img {
+.logoL img {
   width: 80%;
 }
 .btn {
   background-color: #d8bd2c;
   border: #d8bd2c;
-  transition:  0.3s ease;
+  transition: 0.3s ease;
 }
 
 .btn:hover {
-  background-color:#186fc0;
+  background-color: #186fc0;
 }
-
 
 .link {
   text-align: center;
   text-decoration: none;
-  transition:  0.3s ease;
+  transition: 0.3s ease;
   color: black;
 }
 
@@ -215,5 +225,25 @@ export default {
 span {
   text-align: center;
   padding-top: 7px;
+}
+
+@media (max-width: 690px) {
+  .main {
+    display: grid;
+    grid-template-columns: 1fr; /* 2 colunas com largura igual */
+    justify-content: center;
+    align-content: center;
+   gap: 1rem;
+  }
+
+  .logoL {
+
+  }
+
+  .logoL img {
+    width:230px;
+  }
+
+
 }
 </style>

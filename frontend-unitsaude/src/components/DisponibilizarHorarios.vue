@@ -1,6 +1,6 @@
 <template>
   <Header />
-  <BackButton class="voltar"/>
+  <BackButton class="voltar" />
   <div class="main d-flex justify-content-center align-items-center">
     <div class="form card">
       <div class="Title">
@@ -235,7 +235,9 @@ export default {
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 30%;
+  width: 100%;
+  max-width: 500px;
+  background-color: #fff;
 }
 
 .main {
@@ -243,7 +245,7 @@ export default {
 }
 
 .voltar {
-  position: relative;
+  position: absolute;
   top: 7rem;
   left: 1vw;
   z-index: 100000;
@@ -279,7 +281,7 @@ select.form-control:hover {
 .btn-primary {
   background-color: #d8bd2c;
   border: none;
-  transition:  0.3s ease;
+  transition: 0.3s ease;
 }
 .btn-primary:hover {
   background-color: #186fc0;
@@ -287,5 +289,34 @@ select.form-control:hover {
 
 .botaocentro {
   text-align: center;
+}
+
+
+/* Responsividade geral */
+@media (max-width: 768px) {
+  .form {
+    padding: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .agroup {
+    grid-template-columns: 1fr; /* Uma coluna em telas menores */
+  }
+
+.voltar {display: none;}
+  .main {
+    margin-top: 15vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    margin-top: 15vh;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
 }
 </style>

@@ -8,7 +8,7 @@
       </div>
       <!-- Formulário -->
       <form @submit.prevent="criarConsulta">
-        <div class="consulta d-flex justify-content-center">
+        <div class="consulta justify-content-center">
           <div class="align-content-center">
             <div class="form-group">
               <label for="area">Área</label>
@@ -421,18 +421,21 @@ export default {
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 50%;
+  width: 100%;
+  max-width: 900px;
   gap: 1rem;
 }
 .consulta {
-  gap: 3rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 colunas com largura igual */
+  gap: 1rem; /* Espaçamento entre os itens */
 }
 .main {
   margin-top: 15vh;
 }
 
 .voltar {
-  position: relative;
+  position: absolute;
   top: 7rem;
   left: 1vw;
   z-index: 100000;
@@ -442,6 +445,10 @@ export default {
   margin-bottom: 1.5rem;
 }
 
+.botaocentro {
+  margin-bottom: 0px;
+}
+
 .Title {
   text-align: center;
 }
@@ -449,11 +456,6 @@ export default {
 .Title h2 {
   text-align: center;
   font-weight: 400;
-}
-.agroup {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 colunas com largura igual */
-  gap: 1rem; /* Espaçamento entre os itens */
 }
 
 select.form-control {
@@ -480,6 +482,12 @@ select.form-control:hover {
 
 .botaocentro {
   text-align: center;
+}
+
+.calendario-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Estiliza o contêiner principal do calendário */
@@ -536,7 +544,7 @@ select.form-control:hover {
 
 /* Aumenta largura e altura do calendário */
 :deep(.calendario-wrapper .vuecal) {
-  width: 20vw;
+  width: 400px;
   height: 43vh;
 }
 :deep(.vuecal__views-bar) {
@@ -545,5 +553,32 @@ select.form-control:hover {
 
 :deep(.vuecal__nav--today) {
   display: none !important; /* Esconde o botão 'Hoje' */
+}
+
+@media (max-width: 1000px) {
+  :deep(.calendario-wrapper .vuecal) {
+    width: 40vw;
+  }
+}
+
+@media (max-width: 400px) {
+  .consulta {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr); /* 2 colunas com largura igual */
+    gap: 1rem; /* Espaçamento entre os itens */
+  }
+
+  :deep(.calendario-wrapper .vuecal) {
+    width: 80vw;
+  }
+
+  .voltar {
+    display: none;
+
+
+  }
+  .main {
+      margin-top: 10vh;
+    }
 }
 </style>

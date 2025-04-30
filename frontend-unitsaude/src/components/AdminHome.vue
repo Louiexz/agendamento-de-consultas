@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Componente Header -->
-    <Header />
+    <Header/>
 
     <div
       class="main d-flex min-vh-100 justify-content-center align-items-center"
@@ -86,11 +86,12 @@ span {
 }
 
 .main {
-  gap: 10rem;
+  gap: 10%;
 }
 
 .funcoes {
   width: 40%;
+  text-align: center;
 }
 
 .consultas {
@@ -119,5 +120,29 @@ span {
 
 .card:hover {
   transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .main {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .funcoes {
+    width: 70%;
+  }
+
+  .consultas {
+    width: 70%;
+  }
+
+  .main {
+    margin-top: 15vh;
+    margin-bottom: 25px;
+  }
+  span {
+    font-size: small;
+  }
+  
 }
 </style>
