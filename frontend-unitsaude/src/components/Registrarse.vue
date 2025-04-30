@@ -1,8 +1,9 @@
 <template>
-  <Header />
-  <BackButton class="voltar" />
   <div class="main d-flex justify-content-center align-items-center">
-    <PacieteForm />
+    <div class="container logoL">
+      <RouterLink to="/"><img src="../assets/Logo.svg" alt="" /></RouterLink>
+    </div>
+    <PacienteForm/>
   </div>
 </template>
 
@@ -10,15 +11,14 @@
 import api from "@/services/api";
 import { useAuthStore } from "@/store/auth";
 import BackButton from "@/components/btnVoltar.vue";
+import PacienteForm from "@/components/PacienteForms.vue";
 import Swal from "sweetalert2";
-import Header from "@/components/Header.vue";
-import PacieteForm from "@/components/PacienteForms.vue";
 
 export default {
   components: {
     BackButton,
-    Header,
-    PacieteForm,
+    PacienteForm, // Registre o componente com a inicial maiúscula
+    // BtnVoltar,
   },
   data() {
     return {
@@ -75,7 +75,7 @@ export default {
           // Exibe o alerta primeiro
           this.$router.push("/");
         } else if (auth.usuario?.tipoUsuario === "Administrador") {
-          this.$router.push("/paginaX"); // Substitua "/paginaX" pela página que você deseja para o Administrador
+          this.$router.push("/admin"); // Substitua "/paginaX" pela página que você deseja para o Administrador
         }
       } catch (error) {
         if (
@@ -96,29 +96,10 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos para o formulário */
-.form {
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 900px;
-  gap: 1rem;
-}
-
-.voltar {
-  position: absolute;
-  top: 7rem;
-  left: 1vw;
-  z-index: 100000;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
 .main {
+  background-color: #186fc0;
   padding: 0 15vw;
+  padding-bottom: 5%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -127,7 +108,9 @@ export default {
 }
 
 .top {
-  text-align: center;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
 }
 
 .btn {
@@ -139,10 +122,19 @@ export default {
 .btn:hover {
   background-color: #186fc0;
 }
+.logoL {
+  align-content: center;
+  justify-self: center;
+  text-align: center;
+}
+.logoL img {
+  width: 15%;
+}
 
-@media (max-width: 400px) {
-  .voltar {
-    display: none;
+@media (max-width: 690px) {
+
+  .logoL img {
+    width: 230px;
   }
 }
 </style>

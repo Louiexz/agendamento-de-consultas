@@ -168,4 +168,30 @@ export default {
   background-color: #186fc0;
   border-radius: 10px;
 }
+
+.btn-primary {
+  background-color: #d8bd2c;
+  transition: 0.3s ease;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #186fc0;
+}
+
+@media (max-width: 850px) {
+  .form {
+    width: 80%;
+  }
+
+  span {
+    font-size: smaller;
+  }
+}
+
+@media (max-width: 768px) {
+  .voltar {
+    display: none;
+  }
+}
 </style>

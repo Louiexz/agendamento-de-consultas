@@ -62,7 +62,7 @@
           </div>
         </form>
         <span>
-          <RouterLink to="/cadastroPaciente" class="link">
+          <RouterLink to="/Registrar-se" class="link">
             Registre-se
           </RouterLink>
         </span>
@@ -236,9 +236,6 @@ span {
    gap: 1rem;
   }
 
-  .logoL {
-
-  }
 
   .logoL img {
     width:230px;

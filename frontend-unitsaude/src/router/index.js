@@ -4,6 +4,7 @@ import TelaAdmin from '@/views/TelaAdmin.vue';
 import TelaProfessor from '@/views/TelaProfessor.vue';
 import TelaPaciente from '@/views/TelaPaciente.vue';
 import CadastroPaciente from '@/views/CadastroPacienteView.vue';
+import Registrarse from '@/views/RegistrarseView.vue';
 import RecuperarSenha from '@/views/RecuperarSenhaView.vue';
 import RedefinirSenha from '@/views/RedefinirSenhaView.vue';
 import DisponibilizarHorarios from '@/views/DisponibilizarHorariosView.vue';
@@ -16,6 +17,12 @@ import { useAuthStore } from '@/store/auth';
 const getAuth = () => useAuthStore();
 
 const routes = [
+
+  {
+    path: '/Registrar-se',
+    name: 'Registrarse',
+    component: Registrarse,
+  },
   {
     path: '/cadastrar-consultas',
     name: 'cadastrar-consultas',

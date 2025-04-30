@@ -28,7 +28,7 @@ export default {
 
 .bi-arrow-left {
   color: #d8bd2c;
-  font-size: 30px;
+  font-size: 40px;
   cursor: pointer;
   transition: color 0.3s ease;
 }

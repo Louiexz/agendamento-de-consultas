@@ -446,7 +446,7 @@ export default {
 }
 
 .botaocentro {
-  margin-bottom: 0px;
+  margin-bottom: 1rem;
 }
 
 .Title {
