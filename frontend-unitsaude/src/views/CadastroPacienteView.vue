@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import CadastroPaciente from "@/components/CadastroPaciente.vue"; // Importe o componente Login
+import CadastroPaciente from "@/components/Cadastro/CadastroPaciente.vue"; // Importe o componente Login
 //import BtnVoltar from "@/components/btnVoltar.vue"; // Importe o componente Login
 
 export default {

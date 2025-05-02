@@ -2,7 +2,7 @@
     <VisualizarProfessores/>
 </template>
 <script>
-import VisualizarProfessores from '@/components/VisualizarProfessores.vue';
+import VisualizarProfessores from '@/components/Visualizar/VisualizarProfessores.vue';
 export default {
     components: {
         VisualizarProfessores

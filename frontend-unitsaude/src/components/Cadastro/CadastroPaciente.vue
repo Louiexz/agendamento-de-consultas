@@ -1,8 +1,8 @@
 <template>
   <Header />
   <BackButton class="voltar" />
-  <div class="main d-flex justify-content-center align-items-center">
-    <PacieteForm />
+  <div class="main cadastro-paciente d-flex justify-content-center align-items-center">
+    <PacienteForm />
   </div>
 </template>
 
@@ -12,13 +12,13 @@ import { useAuthStore } from "@/store/auth";
 import BackButton from "@/components/btnVoltar.vue";
 import Swal from "sweetalert2";
 import Header from "@/components/Header.vue";
-import PacieteForm from "@/components/PacienteForms.vue";
+import PacienteForm from "@/components/Cadastro/CadastroForms.vue";
 
 export default {
   components: {
     BackButton,
     Header,
-    PacieteForm,
+    PacienteForm,
   },
   data() {
     return {
@@ -94,55 +94,13 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-/* Estilos para o formulário */
-.form {
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 900px;
-  gap: 1rem;
-}
-
-.voltar {
-  position: absolute;
-  top: 7rem;
-  left: 1vw;
-  z-index: 100000;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.main {
-  padding: 0 15vw;
+<style>
+.cadastro-paciente {
+  padding: 3rem 15vw;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 30px;
-}
-
-.top {
-  text-align: center;
-}
-
-.btn {
-  background-color: #d8bd2c;
-  border: #d8bd2c;
-  transition: 0.3s ease;
-}
-
-.btn:hover {
-  background-color: #186fc0;
-}
-
-@media (max-width: 400px) {
-  .voltar {
-    display: none;
-  }
 }
 </style>

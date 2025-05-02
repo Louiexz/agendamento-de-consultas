@@ -1,15 +1,15 @@
 <template>
-
     <div class="card p-4 shadow">
       <div class="top">
-        <h2 class="text-center mb-4">Cadastro Paciente</h2>
+        <h2 v-if='this.user === "paciente"' class="text-center mb-4">Cadastro Paciente</h2>
+        <h2 v-if='this.user === "professor"' class="text-center mb-4">Cadastro Professor</h2>
       </div>
       <!-- Exibição de erros -->
       <div v-if="erro" class="alert alert-danger">
         {{ erro }}
       </div>
 
-      <form @submit.prevent="cadastrarPaciente">
+      <form @submit.prevent="cadastrar">
         <div class="grid">
           <div class="leftCad p-2">
             <div class="mb-3">
@@ -34,6 +34,32 @@
                 placeholder="Digite seu nome"
                 required
               />
+            </div>
+
+            <div v-if="user === 'professor'">
+              <div class="mb-3">
+                <label for="area">Área</label>
+                <input
+                  type="text"
+                  id="area"
+                  class="form-control"
+                  v-model="area"
+                  placeholder="Área do professor"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="codigo-profissional">Código profissional</label>
+                <input
+                  type="text"
+                  id="codigo-profissional"
+                  class="form-control"
+                  v-model="codigoProfissional"
+                  placeholder="CRM-PE 123456"
+                  required
+                />
+              </div>
             </div>
 
             <div class="mb-3">
@@ -74,32 +100,61 @@
               />
             </div>
 
-            <div class="mb-3">
-              <label for="senha" class="form-label">Senha</label>
-              <input
-                type="password"
-                id="senha"
-                class="form-control"
-                v-model="senha"
-                placeholder="Digite sua senha"
-                required
-              />
+            <div v-if="user === 'professor'">
+              <div class="mb-3">
+                <label for="especialidade">Especialidade</label>
+                <input
+                  type="text"
+                  id="especialidade"
+                  class="form-control"
+                  v-model="especialidade"
+                  placeholder="Especialidade do professor"
+                  required
+                />
+              </div>
             </div>
+            <div class="mb-3">
+            <label for="senha" class="form-label">Senha</label>
+            <input
+              type="password"
+              id="senha"
+              class="form-control"
+              :class="{ 'is-invalid': this.senhaNaoConfere }"s
+              v-model="senha"
+              placeholder="Digite sua senha"
+              required
+            />
+          </div>
+          <div class="mb-3" v-if="this.user === 'professor'">
+            <label for="confirmarSenha" class="form-label">Confirmar Senha</label>
+            <input
+              type="password"
+              id="confirmarSenha"
+              class="form-control"
+              v-model="confirmarSenha"
+              :class="{ 'is-invalid': this.senhaNaoConfere }"s
+              placeholder="Confirme sua senha"
+              required
+            />
+          </div>
           </div>
         </div>
-        <div class="mb-3">
-          <label for="confirmarSenha" class="form-label">Confirmar Senha</label>
-          <input
-            type="password"
-            id="confirmarSenha"
-            class="form-control"
-            v-model="confirmarSenha"
-            placeholder="Confirme sua senha"
-            required
-          />
-        </div>
-        <div v-if="senhaNaoConfere" class="alert alert-danger">
-          As senhas não coincidem.
+        <div>
+          <div class="mb-3" v-if="this.user != 'professor'">
+            <label for="confirmarSenha" class="form-label">Confirmar Senha</label>
+            <input
+              type="password"
+              id="confirmarSenha"
+              class="form-control"
+              :class="{ 'is-invalid': this.senhaNaoConfere }"
+              v-model="confirmarSenha"
+              placeholder="Confirme sua senha"
+              required
+            />
+          </div>
+          <div v-if="senhaNaoConfere" class="alert alert-danger">
+            As senhas não coincidem.
+          </div>
         </div>
 
         <!-- Botão centralizado abaixo -->
@@ -123,6 +178,12 @@ import { useAuthStore } from "@/store/auth";
 import Swal from "sweetalert2";
 
 export default {
+  props: {
+    user: {
+      type: String,
+      default: "paciente"
+    }
+  },
   components: {},
   data() {
     return {
@@ -135,6 +196,9 @@ export default {
       cpf: "",
       erro: null,
       senhaNaoConfere: false, // Adiciona variável de erro de senha
+      codigoProfissional: "",
+      area: "",
+      especialidade: ""
     };
   },
   watch: {
@@ -143,24 +207,49 @@ export default {
     },
   },
   methods: {
+    handleHome(auth) {
+      if (!auth.token) {
+        // Exibe o alerta primeiro
+        this.$router.push("/");
+      } else if (auth.usuario?.tipoUsuario === "Administrador") {
+        this.$router.push("/admin"); // Substitua "/paginaX" pela página que você deseja para o Administrador
+      }
+    },
     async cadastrarPaciente() {
+      const response = await api.post("/api/Paciente/CreatePaciente", {
+        cpf: this.cpf,
+        nome: this.nome,
+        email: this.email,
+        senhaHash: this.senha,
+        telefone: this.telefone,
+        dataNascimento: this.dataNascimento,
+      });
+    },
+    async cadastrarProfessor() {
+      const response = await api.post("/api/Professor/CreateProfessor", {
+        cpf: this.cpf,
+        nome: this.nome,
+        email: this.email,
+        senhaHash: this.senha,
+        telefone: this.telefone,
+        dataNascimento: this.dataNascimento,
+        area: this.area,
+        especialidade: this.especialidade,
+        codigoProfissional: this.codigoProfissional
+      });
+    },
+    async cadastrar() {
       if (this.senha !== this.confirmarSenha) {
         this.erro = "As senhas não coincidem!";
         return;
       }
 
       try {
-        const response = await api.post("/api/Paciente/CreatePaciente", {
-          cpf: this.cpf,
-          nome: this.nome,
-          email: this.email,
-          senhaHash: this.senha,
-          telefone: this.telefone,
-          dataNascimento: this.dataNascimento,
-        });
-
-        console.log("Resposta completa da API:", response.data);
-
+        if (this.user === "paciente") {
+          await this.cadastrarPaciente();
+        } else if(this.user === "professor") {
+          await this.cadastrarProfessor();
+        }
         const auth = useAuthStore();
 
         await Swal.fire({
@@ -175,12 +264,7 @@ export default {
           showConfirmButton: false, // sem botão de "Ok"
         });
 
-        if (!auth.token) {
-          // Exibe o alerta primeiro
-          this.$router.push("/");
-        } else if (auth.usuario?.tipoUsuario === "Administrador") {
-          this.$router.push("/paginaX"); // Substitua "/paginaX" pela página que você deseja para o Administrador
-        }
+        this.handleHome(auth);
       } catch (error) {
         if (
           error.response &&
@@ -209,24 +293,16 @@ export default {
   max-width: 900px;
   gap: 1rem;
 }
+
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 2 colunas com largura igual */
   gap: 1rem; /* Espaçamento entre os itens */
+  align-items: center
 }
-
 
 .form-group {
   margin-bottom: 1.5rem;
-}
-
-.main {
-  padding: 0 15vw;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 30px;
 }
 
 .top {
@@ -248,4 +324,7 @@ export default {
   width: 100%;
 }
 
+.is-invalid {
+  border-color: red;
+}
 </style>

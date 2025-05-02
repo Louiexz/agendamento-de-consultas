@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import CadastroConsulta from '@/components/CadastrarConsulta.vue';
+import CadastroConsulta from '@/components/Cadastro/CadastrarConsulta.vue';
 
 export default {
   components: {

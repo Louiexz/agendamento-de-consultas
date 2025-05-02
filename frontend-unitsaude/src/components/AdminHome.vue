@@ -76,6 +76,9 @@ export default {
 </script>
 
 <style scoped>
+.main {
+  padding-top: 4rem;
+}
 .bi {
   color: #186fc0;
   font-size: 40px;

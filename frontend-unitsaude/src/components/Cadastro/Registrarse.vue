@@ -1,7 +1,7 @@
 <template>
   <div class="main d-flex justify-content-center align-items-center">
     <div class="container logoL">
-      <RouterLink to="/"><img src="../assets/Logo.svg" alt="" /></RouterLink>
+      <RouterLink to="/"><img src="../../assets/Logo.svg" alt="" /></RouterLink>
     </div>
     <PacienteForm/>
   </div>
@@ -11,7 +11,7 @@
 import api from "@/services/api";
 import { useAuthStore } from "@/store/auth";
 import BackButton from "@/components/btnVoltar.vue";
-import PacienteForm from "@/components/PacienteForms.vue";
+import PacienteForm from "@/components/Cadastro/CadastroForms.vue";
 import Swal from "sweetalert2";
 
 export default {

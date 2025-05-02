@@ -138,8 +138,7 @@ export default {
         auth.setToken(token);
         auth.setNomeUsuario(nomeUsuario);
         auth.setTipoUsuario(tipoUsuario);
-
-        console.log("Resposta completa da API:", response.data);
+        
         if (tipoUsuario === "Administrador") {
           this.$router.push("/admin");
         } else if (tipoUsuario === "Professor") {

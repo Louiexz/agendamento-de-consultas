@@ -4,6 +4,7 @@ import TelaAdmin from '@/views/TelaAdmin.vue';
 import TelaProfessor from '@/views/TelaProfessor.vue';
 import TelaPaciente from '@/views/TelaPaciente.vue';
 import CadastroPaciente from '@/views/CadastroPacienteView.vue';
+import CadastroProfessor from '@/views/CadastroProfessorView.vue';
 import Registrarse from '@/views/RegistrarseView.vue';
 import RecuperarSenha from '@/views/RecuperarSenhaView.vue';
 import RedefinirSenha from '@/views/RedefinirSenhaView.vue';
@@ -60,6 +61,11 @@ const routes = [
     path: '/cadastroPaciente',
     name: 'CadastroPaciente',
     component: CadastroPaciente,
+  },
+  {
+    path: '/cadastroProfessor',
+    name: 'CadastroProfessor',
+    component: CadastroProfessor,
   },
   {
     path: '/recuperarSenha',
