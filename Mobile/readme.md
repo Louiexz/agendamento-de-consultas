@@ -51,17 +51,7 @@ integrada.
       │   │   ├── local/             # Dados locais (cache, banco de dados)
       │   │   └── repositorio/       # Interação com dados, combinando APIs e fontes locais
       │   │
-      │   ├── fragments/         # Telas do app, organizadas por funcionalidade
-      │   │   ├── admin/             # Telas de administração
-      │   │   ├── auth/              # Telas de autenticação
-      │   │   ├── consultation/      # Telas de consulta
-      │   │   ├── patient/           # Telas de pacientes
-      │   │   └── professor/         # Telas de professores
-      │   │
-      │   ├── ui/                # Componentes visuais reutilizáveis e adaptação de dados para exibição
-      │   │   ├── adapters/          # Adapta dados para exibição
-      │   │   └── components/        # Componentes visuais (botões, campos de texto, etc.)
-      │   │
+      │   ├── activities/                # Componentes visuais reutilizáveis e adaptação de dados para exibição
       │   ├── utils/             # Funções auxiliares (validações, checagem de internet, manipulação de API)
       │   │
       │   ├── viewmodel/         # Lógica de negócios, integrando repositórios e telas
