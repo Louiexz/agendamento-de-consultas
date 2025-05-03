@@ -1,5 +1,7 @@
 package com.example.unitsaude.activities;
 
+import android.content.Intent; // Importação necessária para usar a classe Intent
+
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -63,6 +65,10 @@ public class RedefinirSenhaActivity extends AppCompatActivity {
             sucessoText.setVisibility(View.VISIBLE);
             erroText.setVisibility(View.GONE);
             Toast.makeText(this, successMessage, Toast.LENGTH_LONG).show();
+
+            Intent intent = new Intent(RedefinirSenhaActivity.this, LoginActivity.class);
+            startActivity(intent);
+
             finish(); // ou redirecionar para login, se preferir
         });
 
