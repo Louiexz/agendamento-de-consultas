@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#186FC0">
@@ -9,17 +10,17 @@
         android:id="@+id/logoContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="48dp">
+        android:layout_marginTop="48dp"
+        android:gravity="center"
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/logoImageView"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:src="@drawable/logo"
-            android:contentDescription="Logo" />
+            android:contentDescription="Logo"
+            android:src="@drawable/logo" />
     </LinearLayout>
 
     <!-- Card de login centralizado verticalmente -->
@@ -28,76 +29,78 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:orientation="vertical"
-        android:background="@android:color/white"
-        android:padding="24dp"
         android:layout_marginHorizontal="32dp"
+        android:background="@android:color/white"
         android:elevation="6dp"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="24dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:text="Login"
             android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp" />
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/emailEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Digite seu e-mail"
-            android:inputType="textEmailAddress"
+            android:layout_marginBottom="16dp"
             android:backgroundTint="@android:color/black"
-            android:layout_marginBottom="16dp" />
+            android:hint="Digite seu e-mail"
+            android:inputType="textEmailAddress" />
 
         <EditText
             android:id="@+id/senhaEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Digite sua senha"
-            android:inputType="textPassword"
+            android:layout_marginBottom="8dp"
             android:backgroundTint="@android:color/black"
-            android:layout_marginBottom="8dp" />
+            android:hint="Digite sua senha"
+            android:inputType="textPassword" />
 
         <TextView
             android:id="@+id/esqueciSenhaText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Esqueceu sua senha?"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray"
             android:layout_gravity="end"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:text="Esqueceu sua senha?"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp"
+            android:clickable="true"
+            android:focusable="true"/>
 
         <Button
             android:id="@+id/loginButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Entrar"
-            android:textColor="@android:color/white"
+            android:layout_marginBottom="12dp"
             android:backgroundTint="#D8BD2C"
-            android:layout_marginBottom="12dp" />
+            android:text="Entrar"
+            android:textColor="@android:color/white" />
 
         <TextView
             android:id="@+id/registrarText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
             android:text="Registre-se"
             android:textColor="@android:color/black"
-            android:textStyle="bold"
-            android:clickable="true"
-            android:focusable="true" />
+            android:textStyle="bold" />
 
         <ProgressBar
             android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:layout_centerInParent="true"
             android:layout_gravity="center"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_centerInParent="true" />
+            android:visibility="gone" />
     </LinearLayout>
 
 </RelativeLayout>

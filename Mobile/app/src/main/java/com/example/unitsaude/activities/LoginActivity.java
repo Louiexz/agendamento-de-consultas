@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,10 +32,12 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+
         emailEditText = findViewById(R.id.emailEditText);
         senhaEditText = findViewById(R.id.senhaEditText);
         loginButton = findViewById(R.id.loginButton);
         progressBar = findViewById(R.id.progressBar);
+        TextView esqueciSenhaText = findViewById(R.id.esqueciSenhaText);
 
 
         // Inicializa a ViewModel corretamente
@@ -108,6 +111,14 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 loginViewModel.login(credential, password);
+            }
+        });
+
+        esqueciSenhaText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, RecuperarSenhaActivity.class);
+                startActivity(intent);
             }
         });
     }

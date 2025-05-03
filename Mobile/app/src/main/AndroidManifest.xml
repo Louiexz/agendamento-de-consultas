@@ -14,20 +14,38 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UnitSaude"
         tools:targetApi="31">
+        <activity
+            android:name=".activities.RedefinirSenhaActivity"
+            android:exported="true"> <!-- PRECISA estar como true para aceitar links externos -->
 
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="agendamento-de-consultas-psi.vercel.app"
+                    android:pathPrefix="/redefinirSenha" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.RecuperarSenhaActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".MainActivity"
             android:exported="false" />
     </application>
-
 
 </manifest>
