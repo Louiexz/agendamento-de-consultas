@@ -78,7 +78,8 @@ namespace UnitSaude.Controllers
             var link = $"{baseUrl}?token={token}";
 
             var emailService = new EmailService(_configuration);
-            await emailService.EnviarAsync(dto.Email, "Recuperação de Senha", $"Clique aqui para redefinir sua senha: <a href='{link}'>Redefinir Senha</a>");
+            //await emailService.EnviarAsync(dto.Email, "Recuperação de Senha", $"Clique aqui para redefinir sua senha: <a href='{link}'>Redefinir Senha</a>");
+            await emailService.EnviarAsync(dto.Email,"Recuperação de Senha", $"Clique aqui para redefinir sua senha: <a href='{link}' target='_blank' rel='noopener'>Redefinir Senha</a>");
 
             return Ok("E-mail de recuperação enviado com sucesso.");
         }
