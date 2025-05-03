@@ -146,7 +146,6 @@ export default {
   top: 7rem;
   left: 1vw;
 }
-
 .form {
   padding: 1rem;
   border-radius: 8px;

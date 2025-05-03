@@ -45,19 +45,19 @@
           <h1>Consultas Agendadas</h1>
         </div>
 
-        <router-link to="/consulta/estetica" class="card p-3 no-underline">
+        <router-link to="/consultas/Estetica" class="card p-3 no-underline">
           <span>Estética e Saúde</span>
         </router-link>
-        <router-link to="/consulta/fisioterapia" class="card p-3 no-underline">
+        <router-link to="/consultas/Fisioterapia" class="card p-3 no-underline">
           <span>Fisioterapia</span>
         </router-link>
-        <router-link to="/consulta/nutricao" class="card p-3 no-underline">
+        <router-link to="/consultas/Nutricao" class="card p-3 no-underline">
           <span>Nutrição</span>
         </router-link>
-        <router-link to="/consulta/odontologia" class="card p-3 no-underline">
+        <router-link to="/consultas/Odontologia" class="card p-3 no-underline">
           <span>Odontologia</span>
         </router-link>
-        <router-link to="/consulta/psicologia" class="card p-3 no-underline">
+        <router-link to="/consultas/Psicologia" class="card p-3 no-underline">
           <span>Psicologia</span>
         </router-link>
       </div>

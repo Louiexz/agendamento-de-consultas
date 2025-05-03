@@ -4,6 +4,7 @@ import CadastroPaciente from '@/views/Cadastro/CadastroPacienteView.vue';
 import CadastroProfessor from '@/views/Cadastro/CadastroProfessorView.vue';
 import DisponibilizarHorarios from '@/views/Cadastro/DisponibilizarHorariosView.vue';
 import VisualizarProfessoresView from '@/views/Visualizar/VisualizarProfessoresView.vue';
+import VisualizarConsultas from '@/views/Visualizar/VisualizarConsultasView.vue';
 
 export default [
   {
@@ -22,6 +23,12 @@ export default [
     path: '/admin',
     name: 'admin',
     component: TelaAdmin,
+    meta: { requiresAuth: true, allowedRoles: ['Administrador'] },
+  },
+  {
+    path: '/consultas/:area',
+    name: 'VisualizarConsultas',
+    component: VisualizarConsultas,
     meta: { requiresAuth: true, allowedRoles: ['Administrador'] },
   },
   {
