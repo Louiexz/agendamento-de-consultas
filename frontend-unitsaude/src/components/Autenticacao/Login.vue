@@ -1,7 +1,7 @@
 <template>
   <div class="main min-vh-100">
     <div class="container logoL">
-      <img src="../assets/Logo.svg" alt="" />
+      <img src="../../assets/Logo.svg" alt="" />
     </div>
     <div
       class="container d-flex justify-content-center align-items-center "
@@ -62,7 +62,7 @@
           </div>
         </form>
         <span>
-          <RouterLink to="/Registrar-se" class="link">
+          <RouterLink to="/registrar" class="link">
             Registre-se
           </RouterLink>
         </span>
@@ -74,6 +74,7 @@
 <script>
 import api from "@/services/api";
 import { useAuthStore } from "@/store/auth";
+
 export default {
   data() {
     return {

@@ -184,9 +184,7 @@ export default {
           especialidade: this.selectedEspecialidade,
           ativo: true,
         };
-
-        console.log(disponibilidade);
-
+        
         const response = await api.post(
           "/api/Disponibilidade/CreateDisponibilidade",
           disponibilidade

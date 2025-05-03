@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import Login from "@/components/Login.vue";  // Importe o componente Login
+import Login from "@/components/Autenticacao/Login.vue";  // Importe o componente Login
 
 export default {
   name: "App",

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import RedefinirSenha from "@/components/RedefinirSenha.vue";  // Importe o componente Login
+import RedefinirSenha from "@/components/Autenticacao/RedefinirSenha.vue";  // Importe o componente Login
 
 
 export default {

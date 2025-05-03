@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <div class="container logo">
-      <RouterLink to="/"><img src="../assets/Logo.svg" alt="" /></RouterLink>
+      <RouterLink to="/"><img src="../../assets/Logo.svg" alt="" /></RouterLink>
     </div>
     <div class="container d-flex justify-content-center align-items-center">
       <div class="card p-4 shadow">

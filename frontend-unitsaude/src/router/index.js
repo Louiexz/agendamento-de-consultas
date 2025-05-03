@@ -1,87 +1,41 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import LoginView from '@/views/LoginView.vue';
-import TelaAdmin from '@/views/TelaAdmin.vue';
+
+//Todos os usuários
+import usual_routes from "./usuarios.js";
+
+//Admin
+import admin_routes from "./admin.js";
+
+//Admin e Paciente
+import CadastrarConsulta from '@/views/Cadastro/CadastrarConsultaView.vue';
+
+// Admin e Professor
+import VisualizarPacientesView from '@/views/Visualizar/VisualizarPacientesView.vue';
+
+// Professor
 import TelaProfessor from '@/views/TelaProfessor.vue';
+
+// Paciente
 import TelaPaciente from '@/views/TelaPaciente.vue';
-import CadastroPaciente from '@/views/CadastroPacienteView.vue';
-import CadastroProfessor from '@/views/CadastroProfessorView.vue';
-import Registrarse from '@/views/RegistrarseView.vue';
-import RecuperarSenha from '@/views/RecuperarSenhaView.vue';
-import RedefinirSenha from '@/views/RedefinirSenhaView.vue';
-import DisponibilizarHorarios from '@/views/DisponibilizarHorariosView.vue';
-import CadastrarConsulta from '@/views/CadastrarConsultaView.vue';
-import VisualizarPacientesView from '@/views/VisualizarPacientesView.vue';
-import VisualizarProfessoresView from '@/views/VisualizarProfessoresView.vue';
 
 import { useAuthStore } from '@/store/auth';
 
 const getAuth = () => useAuthStore();
 
 const routes = [
-
-  {
-    path: '/Registrar-se',
-    name: 'Registrarse',
-    component: Registrarse,
-  },
+  ...usual_routes,
+  ...admin_routes,
   {
     path: '/cadastrar-consultas',
     name: 'cadastrar-consultas',
     component: CadastrarConsulta,
-    meta: { requiresAuth: true, allowedRoles: ['Administrador'] },
-  },
-  {
-    path: '/disponibilizar-horarios',
-    name: 'disponibilizar-horarios',
-    component: DisponibilizarHorarios,
-    meta: { requiresAuth: true, allowedRoles: ['Administrador'] },
+    meta: { requiresAuth: true, allowedRoles: ['Administrador', 'Paciente'] },
   },
   {
     path: '/pacientes',
     name: 'visualizar-pacientes',
     component: VisualizarPacientesView,
     meta: { requiresAuth: true, allowedRoles: ['Administrador', 'Professor'] },
-  },
-  {
-    path: '/professores',
-    name: 'visualizar-professores',
-    component: VisualizarProfessoresView,
-    meta: { requiresAuth: true, allowedRoles: ['Administrador'] },
-  },
-  {
-    path: '/',
-    redirect: '/login',
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: LoginView,
-  },
-  {
-    path: '/cadastroPaciente',
-    name: 'CadastroPaciente',
-    component: CadastroPaciente,
-  },
-  {
-    path: '/cadastroProfessor',
-    name: 'CadastroProfessor',
-    component: CadastroProfessor,
-  },
-  {
-    path: '/recuperarSenha',
-    name: 'RecuperarSenha',
-    component: RecuperarSenha,
-  },
-  {
-    path: '/redefinirSenha',
-    name: 'RedefinirSenha',
-    component: RedefinirSenha,
-  },
-  {
-    path: '/admin',
-    name: 'admin',
-    component: TelaAdmin,
-    meta: { requiresAuth: true, allowedRoles: ['Administrador'] },
   },
   {
     path: '/professor',

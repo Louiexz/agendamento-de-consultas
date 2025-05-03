@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import RecuperarSenha from "@/components/RecuperarSenha.vue";  // Importe o componente Login
+import RecuperarSenha from "@/components/Autenticacao/RecuperarSenha.vue";  // Importe o componente Login
 
 export default {
   components: {

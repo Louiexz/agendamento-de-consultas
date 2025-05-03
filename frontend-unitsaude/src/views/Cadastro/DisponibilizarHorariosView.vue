@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Horarios from '@/components/DisponibilizarHorarios.vue';
+import Horarios from '@/components/Cadastro/DisponibilizarHorarios.vue';
 
 export default {
   components: {

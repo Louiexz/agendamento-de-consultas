@@ -34,7 +34,7 @@
 <script>
 import { ref } from "vue";
 import { useAuthStore } from "@/store/auth";
-import LogoutButton from "@/components/Logout.vue";
+import LogoutButton from "@/components/Autenticacao/Logout.vue";
 
 export default {
   components: {
