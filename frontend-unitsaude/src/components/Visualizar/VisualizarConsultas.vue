@@ -2,16 +2,17 @@
   <div>
     <!-- Componente Header -->
     <Header />
+    <div v-if="isConsultaAtiva">
+      <VisualizarConsultaView />
+      <button id="fechar-consulta" @click="isConsultaAtiva = false">X</button>
+    </div>
     <div class="main-title">
       <BackButton class="voltar"/>
       <h3>Agendamentos {{area}}</h3>
     </div>
     <div class="main d-flex justify-content-center consultas">
       <div id="consultas-em-espera">
-        <div
-          class="title">
-          <h4>Consultas em espera</h4>
-        </div>
+        <h4 class="title">Consultas em espera</h4>
 
         <div
           v-if="temConsultas('Em Espera')"
@@ -21,18 +22,16 @@
           <span><b>{{ consulta.data }} às {{ consulta.horario }}</b></span>
           <span><i class="bi bi-clipboard2-pulse-fill"></i> {{ consulta.area }}</span>
           <span><i class="bi bi-geo-alt-fill"></i> Centro Universitário Tiradentes - UNIT PE</span>
-          <RouterLink :to="`/consulta/${consulta.id_Consulta}`" class="consulta-detalhes">Ver detalhes</RouterLink>
+          <button class="consulta-detalhes" @click="verDetalhes(consulta)">Ver detalhes</button>
         </div>
 
         <span
           v-else
           class="aviso"
-          >Sem consultas, por favor, volte em outro momento.</span>
+          >Sem consultas no momento.</span>
       </div>
       <div id="consultas-agendadas">
-        <div class="title">
-          <h4>Consultas agendadas</h4>
-        </div>
+        <h4 class="title">Consultas agendadas</h4>
         <span v-if="erro" class="alert alert-danger d-block">{{ erro }}</span>
 
         <div
@@ -43,13 +42,13 @@
           <span><b>{{ consulta.data }} às {{ consulta.horario }}</b></span>
           <span><i class="bi bi-clipboard2-pulse-fill"></i> {{ consulta.area }}</span>
           <span><i class="bi bi-geo-alt-fill"></i> Centro Universitário Tiradentes - UNIT PE</span>
-          <RouterLink :to="`/consulta/${consulta.id_Consulta}`" class="consulta-detalhes">Ver detalhes</RouterLink>
+          <button class="consulta-detalhes" @click="verDetalhes(consulta)">Ver detalhes</button>
         </div>
 
         <span
           v-else
           class="aviso"
-          >Sem consultas, por favor, volte em outro momento.</span>
+          >Sem consultas, no momento.</span>
       </div>
     </div>
   </div>
@@ -59,6 +58,8 @@
 import api from "@/services/api";
 import BackButton from "@/components/btnVoltar.vue";
 import Header from "@/components/Header.vue";
+import { useConsultaStore } from "@/store/consulta";
+import VisualizarConsultaView from '@/views/Visualizar/VisualizarConsultaView.vue';
 
 export default {
   props: {
@@ -69,15 +70,24 @@ export default {
   },
   components: {
     Header,
-    BackButton
+    BackButton,
+    VisualizarConsultaView
   },
   data() {
     return {
       erro: "",
-      consultas: []
+      consultas: [],
+      isConsultaAtiva: false
     };
   },
-  methods: {      
+  methods: {
+    verDetalhes(consultaSelecionada) {
+      const consultaStore = useConsultaStore();
+
+      consultaStore.setConsulta(consultaSelecionada);
+
+      this.isConsultaAtiva = true;
+    },
     consultasFiltradas(status) {
       if (this.consultas != null){
         return this.consultas.filter(
@@ -155,6 +165,13 @@ export default {
   padding: 20px;
   gap: 20px;
   min-width: 90%
+}
+#fechar-consulta {
+  z-index: 99;
+  color: red;
+  position: absolute;
+  right: 7%;
+  top: 13rem
 }
 @media screen and (max-width: 700px) {
   .consultas {

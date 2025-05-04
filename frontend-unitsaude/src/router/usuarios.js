@@ -28,5 +28,5 @@ export default [
     path: '/redefinirSenha',
     name: 'RedefinirSenha',
     component: RedefinirSenha,
-  },
+  }
 ]

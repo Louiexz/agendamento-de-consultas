@@ -1,4 +1,8 @@
 <template>
+    <div class="main-title">
+      <BackButton class="voltar"/>
+      <h3>Agendamentos {{area}}</h3>
+    </div>
     <div class="card p-4 shadow">
       <div class="top">
         <h2 v-if='this.user === "paciente"' class="text-center mb-4">Cadastro Paciente</h2>
@@ -176,6 +180,7 @@
 import api from "@/services/api";
 import { useAuthStore } from "@/store/auth";
 import Swal from "sweetalert2";
+import BackButton from "@/components/btnVoltar.vue";
 
 export default {
   props: {
@@ -184,7 +189,9 @@ export default {
       default: "paciente"
     }
   },
-  components: {},
+  components: {
+    BackButton
+  },
   data() {
     return {
       email: "",
