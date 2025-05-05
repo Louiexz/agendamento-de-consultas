@@ -55,7 +55,3 @@ out/
 
 # JetBrains metadata
 .idea/
-
-# Gradle wrapper
-gradle-wrapper.jar
-gradle-wrapper.properties
