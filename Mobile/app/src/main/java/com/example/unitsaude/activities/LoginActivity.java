@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.unitsaude.R;
 import com.example.unitsaude.MainActivity;
+import com.example.unitsaude.activities.RegisterActivity;
 import com.example.unitsaude.utils.SharedPreferencesManager;
 import com.example.unitsaude.viewmodel.LoginViewModel;
 
@@ -118,6 +119,16 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, RecuperarSenhaActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        Button registerButton = findViewById(R.id.registrarButton);
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
             }
         });

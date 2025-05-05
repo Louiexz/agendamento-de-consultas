@@ -83,14 +83,15 @@
             android:text="Entrar"
             android:textColor="@android:color/white" />
 
-        <TextView
-            android:id="@+id/registrarText"
+        <Button
+            android:id="@+id/registrarButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true"
             android:text="Registre-se"
             android:textColor="@android:color/black"
+            android:background="@android:color/transparent"
             android:textStyle="bold" />
 
         <ProgressBar

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/register"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#186FC0">
+
+    <!-- Logo no topo centralizada -->
+    <LinearLayout
+        android:id="@+id/logoContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="48dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/logoImageView"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="Logo"
+            android:src="@drawable/logo" />
+    </LinearLayout>
+
+    <!-- Conteúdo com ScrollView abaixo da logo -->
+    <ScrollView
+        android:id="@+id/formScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:layout_marginHorizontal="32dp"
+        android:layout_below="@id/logoContainer"
+        android:layout_marginTop="16dp"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- CPF -->
+            <TextView
+                android:id="@+id/cpfText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:textColor="@android:color/white"
+                android:textSize="18dp"
+                android:text="CPF" />
+
+            <EditText
+                android:id="@+id/cpfEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_background"
+                android:textSize="16sp"
+                android:hint="Digite seu CPF"
+                android:padding="10dp"
+                android:paddingLeft="20dp" />
+
+            <!-- Nome -->
+            <TextView
+                android:id="@+id/nomeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:textSize="18dp"
+                android:textColor="@android:color/white"
+                android:text="Nome" />
+
+            <EditText
+                android:id="@+id/nomeEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_background"
+                android:textSize="16sp"
+                android:hint="Digite seu nome completo"
+                android:padding="10dp"
+                android:paddingLeft="20dp" />
+
+            <!-- Data de nascimento -->
+            <TextView
+                android:id="@+id/nascimentoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:textSize="18dp"
+                android:textColor="@android:color/white"
+                android:text="Data de nascimento" />
+
+            <EditText
+                android:id="@+id/nascimentoEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_background"
+                android:textSize="16sp"
+                android:hint="Digite sua data de nascimento"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none"
+                android:padding="10dp"
+                android:paddingLeft="20dp" />
+
+            <!-- Email -->
+            <TextView
+                android:id="@+id/emailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:textSize="18dp"
+                android:textColor="@android:color/white"
+                android:text="E-mail" />
+
+            <EditText
+                android:id="@+id/emailEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_background"
+                android:textSize="16sp"
+                android:hint="Digite seu e-mail"
+                android:inputType="textEmailAddress"
+                android:padding="10dp"
+                android:paddingLeft="20dp" />
+
+            <!-- Telefone -->
+            <TextView
+                android:id="@+id/telefoneText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:textSize="18dp"
+                android:textColor="@android:color/white"
+                android:text="Telefone" />
+
+            <EditText
+                android:id="@+id/telefoneEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_background"
+                android:textSize="16sp"
+                android:hint="Digite seu telefone"
+                android:inputType="phone"
+                android:padding="10dp"
+                android:paddingLeft="20dp" />
+
+            <!-- Senha -->
+            <TextView
+                android:id="@+id/senhaText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:textSize="18dp"
+                android:textColor="@android:color/white"
+                android:text="Senha" />
+
+            <EditText
+                android:id="@+id/senhaEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_background"
+                android:textSize="16sp"
+                android:hint="Digite sua senha"
+                android:inputType="textPassword"
+                android:padding="10dp"
+                android:paddingLeft="20dp" />
+
+            <!-- Confirmar senha -->
+            <TextView
+                android:id="@+id/confirmaSenhaText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:textSize="18dp"
+                android:textColor="@android:color/white"
+                android:text="Confirmar senha" />
+
+            <EditText
+                android:id="@+id/confirmaSenhaEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_background"
+                android:textSize="16sp"
+                android:hint="Confirme sua senha"
+                android:inputType="textPassword"
+                android:padding="10dp"
+                android:paddingLeft="20dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:weightSum="2">
+
+                <Button
+                    android:id="@+id/voltarButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:backgroundTint="#D8BD2C"
+                    android:text="Voltar"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/registrarButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="#D8BD2C"
+                    android:text="Registrar"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>
