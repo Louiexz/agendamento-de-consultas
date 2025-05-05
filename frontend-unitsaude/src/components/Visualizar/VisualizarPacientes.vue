@@ -36,9 +36,15 @@
         <div
           v-for="(pacienteInfo, idx) in pacientes"
           :key="pacienteInfo.id || idx"
-          class="paciente card p-2 align-items-start shadow-sm"
+          class="paciente card p-2 align-items-start shadow-sm"          
         >
-          <span>{{ pacienteInfo.nome }}</span>
+          <RouterLink
+            @click="verPerfilPaciente(pacienteInfo)"
+            to="/perfilPaciente"
+            class="paciente-info"
+          >
+            {{ pacienteInfo.nome }}
+          </RouterLink>
         </div>
       </div>
     </div>
@@ -47,6 +53,7 @@
 
 <script>
 import BackButton from "@/components/btnVoltar.vue";
+import { useUsuarioStore } from "@/store/usuario";
 import Header from "@/components/Header.vue";
 import api from "@/services/api";
 
@@ -64,6 +71,11 @@ export default {
     BackButton,
   },
   methods: {
+    verPerfilPaciente(usuarioSelecionado) {
+      const usuarioStore = useUsuarioStore();
+
+      usuarioStore.setUsuario(usuarioSelecionado);
+    },
     capitalizar(str) {
       if (!str) return "";
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -122,24 +134,24 @@ export default {
 .title {
   text-align: center;
 }
-
 .title h1 {
   font-size: 1.5rem;
 }
-
 #form-paciente {
   width: 100%;
   padding: 10px;
 }
-
 .paciente {
   transition: transform 0.3s ease;
   cursor: pointer;
 }
-
 .paciente:hover {
   transform: scale(1.01);
   background-color: #f0f8ff;
+}
+.paciente-info {
+  width: 100%;
+  height: 100%;
 }
 .voltar {
   position: absolute;
@@ -158,7 +170,6 @@ export default {
   overflow-y: auto;
   padding: 10px; /* para evitar que o conteúdo fique colado com a barra de rolagem */
 }
-
 /* Estilizar a barra de rolagem, opcional */
 #pacientes-data::-webkit-scrollbar {
   width: 5px;
@@ -167,27 +178,22 @@ export default {
   background-color: #186fc0;
   border-radius: 10px;
 }
-
 .btn-primary {
   background-color: #d8bd2c;
   transition: 0.3s ease;
   border: none;
 }
-
 .btn-primary:hover {
   background-color: #186fc0;
 }
-
 @media (max-width: 850px) {
   .form {
     width: 80%;
   }
-
   span {
     font-size: smaller;
   }
 }
-
 @media (max-width: 768px) {
   .voltar {
     display: none;

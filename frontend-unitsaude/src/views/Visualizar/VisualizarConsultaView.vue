@@ -21,6 +21,8 @@ export default {
 .main {
     position: absolute;
     z-index: 99;
+    left: 0px;
+    top: 0px;
     padding: 11.5rem 5%;
     background-color: rgba(0, 0, 0, 0.5);
     height: -webkit-fill-available;

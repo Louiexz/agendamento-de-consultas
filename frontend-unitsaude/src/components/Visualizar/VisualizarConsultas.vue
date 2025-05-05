@@ -2,10 +2,6 @@
   <div>
     <!-- Componente Header -->
     <Header />
-    <div v-if="isConsultaAtiva">
-      <VisualizarConsultaView />
-      <button id="fechar-consulta" @click="isConsultaAtiva = false">X</button>
-    </div>
     <div class="main-title">
       <BackButton class="voltar"/>
       <h3>Agendamentos {{area}}</h3>
@@ -19,10 +15,7 @@
           v-for="consulta in consultasFiltradas('Em Espera')"
           :key="consulta.id_Consultas"
           class="consulta">
-          <span><b>{{ consulta.data }} às {{ consulta.horario }}</b></span>
-          <span><i class="bi bi-clipboard2-pulse-fill"></i> {{ consulta.area }}</span>
-          <span><i class="bi bi-geo-alt-fill"></i> Centro Universitário Tiradentes - UNIT PE</span>
-          <button class="consulta-detalhes" @click="verDetalhes(consulta)">Ver detalhes</button>
+          <ConsultaView :consulta="consulta"/>
         </div>
 
         <span
@@ -37,12 +30,8 @@
         <div
           v-if="temConsultas('Agendada')"
           v-for="consulta in consultasFiltradas('Agendada')"
-          :key="consulta.id_Consultas"
-          class="consulta">
-          <span><b>{{ consulta.data }} às {{ consulta.horario }}</b></span>
-          <span><i class="bi bi-clipboard2-pulse-fill"></i> {{ consulta.area }}</span>
-          <span><i class="bi bi-geo-alt-fill"></i> Centro Universitário Tiradentes - UNIT PE</span>
-          <button class="consulta-detalhes" @click="verDetalhes(consulta)">Ver detalhes</button>
+          :key="consulta.id_Consultas">
+          <ConsultaView :consulta="consulta"/>
         </div>
 
         <span
@@ -58,8 +47,7 @@
 import api from "@/services/api";
 import BackButton from "@/components/btnVoltar.vue";
 import Header from "@/components/Header.vue";
-import { useConsultaStore } from "@/store/consulta";
-import VisualizarConsultaView from '@/views/Visualizar/VisualizarConsultaView.vue';
+import ConsultaView from "@/components/Consulta";
 
 export default {
   props: {
@@ -71,23 +59,15 @@ export default {
   components: {
     Header,
     BackButton,
-    VisualizarConsultaView
+    ConsultaView
   },
   data() {
     return {
       erro: "",
       consultas: [],
-      isConsultaAtiva: false
     };
   },
   methods: {
-    verDetalhes(consultaSelecionada) {
-      const consultaStore = useConsultaStore();
-
-      consultaStore.setConsulta(consultaSelecionada);
-
-      this.isConsultaAtiva = true;
-    },
     consultasFiltradas(status) {
       if (this.consultas != null){
         return this.consultas.filter(
@@ -149,29 +129,9 @@ export default {
   gap: 12%;
   padding: 0rem 1rem;
 }
-.consulta-detalhes {
-  text-align: center;
-  min-width: 100%
-}
 .aviso {
   text-align: center;
   padding: 10px
-}
-.consulta {
-  display: flex;
-  flex-direction: column;
-  box-shadow: 1px 1px 1px 1px;
-  align-items: flex-start;
-  padding: 20px;
-  gap: 20px;
-  min-width: 90%
-}
-#fechar-consulta {
-  z-index: 99;
-  color: red;
-  position: absolute;
-  right: 7%;
-  top: 13rem
 }
 @media screen and (max-width: 700px) {
   .consultas {
