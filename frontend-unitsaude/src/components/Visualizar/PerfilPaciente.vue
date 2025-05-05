@@ -81,6 +81,8 @@ export default {
                 if(!response.status) {
                     this.erro = response.message;
                 }
+            } else {
+              this.$router.go(-1);
             }
         } catch (error) {
             this.erro = error;
