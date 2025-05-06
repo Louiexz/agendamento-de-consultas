@@ -754,6 +754,14 @@ namespace UnitSaude.Services
                     return response;
                 }
 
+                // NOVA VALIDAÇÃO: Verifica se a data é domingo
+                if (dto.NovaData.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    response.Status = false;
+                    response.Message = "Não é possível reagendar consultas para domingos.";
+                    return response;
+                }
+
                 var conflito = await _context.Consultas.AnyAsync(c =>
                     c.id_Consulta != consulta.id_Consulta &&
                     c.Data == dto.NovaData &&
