@@ -3,9 +3,7 @@
     <div class="container logoL">
       <img src="../../assets/Logo.svg" alt="" />
     </div>
-    <div
-      class="container d-flex justify-content-center align-items-center "
-    >
+    <div class="container d-flex justify-content-center align-items-center">
       <div class="card p-4 shadow" style="width: 100%; max-width: 400px">
         <h2 class="text-center mb-4">Login</h2>
 
@@ -53,18 +51,22 @@
               data-expired-callback="onCaptchaExpired"
             ></div>
             <button
-              :disabled="!captchaVerified"
+              :disabled="!captchaVerified || isLoading"
               type="submit"
               class="btn btn-primary w-50"
             >
-              Entrar
+              <span v-if="!isLoading">Entrar</span>
+              <span
+                v-else
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
             </button>
           </div>
         </form>
         <span>
-          <RouterLink to="/registrar" class="link">
-            Registre-se
-          </RouterLink>
+          <RouterLink to="/registrar" class="link"> Registre-se </RouterLink>
         </span>
       </div>
     </div>
@@ -84,6 +86,7 @@ export default {
       checkCaptcha: false,
       captchaVerified: true,
       userAttempts: 0,
+      isLoading: false,
     };
   },
   methods: {
@@ -109,6 +112,8 @@ export default {
       }
     },
     async fazerLogin() {
+      this.isLoading = true; // Ativa o spinner
+      this.erro = null; // Limpa erros anteriores
       try {
         if (this.checkCaptcha) {
           if (!this.captchaVerified) {
@@ -139,7 +144,7 @@ export default {
         auth.setToken(token);
         auth.setNomeUsuario(nomeUsuario);
         auth.setTipoUsuario(tipoUsuario);
-        
+
         if (tipoUsuario === "Administrador") {
           this.$router.push("/admin");
         } else if (tipoUsuario === "Professor") {
@@ -168,6 +173,8 @@ export default {
           this.captchaVerified = false;
           this.loadRecaptchaScript();
         }
+      } finally {
+        this.isLoading = false; // Desativa o spinner independente do resultado
       }
     },
   },
@@ -185,7 +192,6 @@ export default {
   padding: 0 15vw;
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 2 colunas com largura igual */
-
 }
 .logoL {
   align-content: center;
@@ -233,14 +239,11 @@ span {
     grid-template-columns: 1fr; /* 2 colunas com largura igual */
     justify-content: center;
     align-content: center;
-   gap: 1rem;
+    gap: 1rem;
   }
-
 
   .logoL img {
-    width:230px;
+    width: 230px;
   }
-
-
 }
 </style>

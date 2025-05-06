@@ -1,9 +1,10 @@
 <template>
   <Header />
-  <BackButton class="voltar" />
+
   <div class="main d-flex justify-content-center align-items-center">
     <div class="form card">
       <div class="Title">
+        <BackButton />
         <h2>Disponibilizar Horários</h2>
       </div>
       <!-- Formulário -->
@@ -90,9 +91,15 @@
             />
           </div>
         </div>
-        <div class="form-group botaocentro">
-          <button type="submit" class="btn btn-primary">
-            Disponibilizar Horários
+        <div class="botaocentro">
+          <button type="submit" class="btn btn-primary" :disabled="isLoading">
+            <span v-if="!isLoading">Disponibilizar Horários</span>
+            <span
+              v-else
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
           </button>
         </div>
       </form>
@@ -122,6 +129,7 @@ export default {
       horarioInicio: "",
       horarioFim: "",
       erro: null,
+      isLoading: false,
     };
   },
   methods: {
@@ -174,6 +182,9 @@ export default {
         return;
       }
 
+      this.isLoading = true; // Ativa o spinner
+      this.erro = null; // Limpa erros anteriores
+
       try {
         const disponibilidade = {
           dataInicio: this.dataInicio, // ← direto
@@ -184,7 +195,7 @@ export default {
           especialidade: this.selectedEspecialidade,
           ativo: true,
         };
-        
+
         const response = await api.post(
           "/api/Disponibilidade/CreateDisponibilidade",
           disponibilidade
@@ -209,14 +220,29 @@ export default {
         this.especialidades = [];
       } catch (error) {
         console.error("Erro ao disponibilizar horário:", error);
+
+        // Exibe o erro da API, se disponível
+        let errorMessage =
+          "Ocorreu um erro ao disponibilizar os horários. Tente novamente.";
+
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+        ) {
+          // Se a resposta da API tiver uma mensagem de erro, usamos ela
+          errorMessage = error.response.data.message;
+        }
         Swal.fire({
           icon: "error",
           title: "Erro",
-          text: "Ocorreu um erro ao disponibilizar os horários. Tente novamente.",
+          text: errorMessage,
           background: "#ffffff",
           color: "#186fc0",
           confirmButtonColor: "#d8bd2c",
         });
+      } finally {
+        this.isLoading = false; // Desativa o spinner independente do resultado
       }
     },
   },
@@ -242,19 +268,8 @@ export default {
   margin-top: 20vh;
 }
 
-.voltar {
-  position: absolute;
-  top: 7rem;
-  left: 1vw;
-  z-index: 100000;
-}
-
 .form-group {
   margin-bottom: 1.5rem;
-}
-
-.Title {
-  text-align: center;
 }
 
 .agroup {
@@ -285,11 +300,6 @@ select.form-control:hover {
   background-color: #186fc0;
 }
 
-.botaocentro {
-  text-align: center;
-}
-
-
 /* Responsividade geral */
 @media (max-width: 768px) {
   .form {
@@ -302,7 +312,9 @@ select.form-control:hover {
     grid-template-columns: 1fr; /* Uma coluna em telas menores */
   }
 
-.voltar {display: none;}
+  .voltar {
+    display: none;
+  }
   .main {
     margin-top: 15vh;
   }
@@ -316,5 +328,20 @@ select.form-control:hover {
   h2 {
     font-size: 1.3rem;
   }
+}
+</style>
+
+<style>
+.Title {
+  text-align: center;
+  display: grid;
+  grid-template-columns: auto 1fr; /* 2 colunas: uma para a seta e outra para o título */
+  align-items: center; /* Alinha os itens verticalmente */
+  margin-bottom: 3rem;
+}
+
+.botaocentro {
+  text-align: center;
+  margin-top: 2rem;
 }
 </style>

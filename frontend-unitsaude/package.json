@@ -13,6 +13,7 @@
     "js-cookie": "^3.0.5",
     "lodash.debounce": "^4.0.8",
     "pinia": "^3.0.2",
+    "pinia-plugin-persistedstate": "^4.2.0",
     "sweetalert2": "^11.19.1",
     "vue": "^3.5.13",
     "vue-cal": "^5.0.1-rc.19",

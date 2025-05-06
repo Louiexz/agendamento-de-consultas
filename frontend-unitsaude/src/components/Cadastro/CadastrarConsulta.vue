@@ -1,9 +1,10 @@
 <template>
   <Header />
-  <BackButton class="voltar" />
+
   <div class="main d-flex justify-content-center align-items-center">
     <div class="form card">
       <div class="Title">
+        <BackButton class="voltar" />
         <h2>Agendar Consulta</h2>
       </div>
       <!-- Formulário -->
@@ -151,7 +152,15 @@
           </div>
         </div>
         <div class="form-group botaocentro">
-          <button type="submit" class="btn btn-primary">Agendar</button>
+          <button type="submit" class="btn btn-primary" :disabled="isLoading">
+            <span v-if="!isLoading">Agendar</span>
+            <span
+              v-else
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          </button>
         </div>
       </form>
     </div>
@@ -189,6 +198,7 @@ export default {
       horarioConsulta: "",
       statusConsulta: "Agendada",
       erro: null,
+      isLoading: false,
     };
   },
   methods: {
@@ -336,6 +346,9 @@ export default {
         return;
       }
 
+      this.isLoading = true; // Ativa o spinner
+      this.erro = null; // Limpa erros anteriores
+
       const consulta = {
         data: this.dataConsulta,
         horario: this.horarioConsulta,
@@ -377,6 +390,8 @@ export default {
           color: "#186fc0",
           confirmButtonColor: "#d8bd2c",
         });
+      } finally {
+        this.isLoading = false; // Desativa o spinner independente do resultado
       }
     },
     resetForm() {
@@ -434,13 +449,6 @@ export default {
   margin-top: 15vh;
 }
 
-.voltar {
-  position: absolute;
-  top: 7rem;
-  left: 1vw;
-  z-index: 100000;
-}
-
 .form-group {
   margin-bottom: 1.5rem;
 }
@@ -451,6 +459,9 @@ export default {
 
 .Title {
   text-align: center;
+  display: grid;
+  grid-template-columns: auto 1fr; /* 2 colunas: uma para a seta e outra para o título */
+  align-items: center; /* Alinha os itens verticalmente */
 }
 
 .Title h2 {
@@ -574,11 +585,9 @@ select.form-control:hover {
 
   .voltar {
     display: none;
-
-
   }
   .main {
-      margin-top: 10vh;
-    }
+    margin-top: 10vh;
+  }
 }
 </style>

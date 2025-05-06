@@ -1,8 +1,9 @@
 <template>
   <Header />
-  <BackButton class="voltar" />
-  <div class="main cadastro-paciente d-flex justify-content-center align-items-center">
-    <PacienteForm />
+  <div
+    class="main cadastro-paciente d-flex justify-content-center align-items-center"
+  >
+    <PacienteForm user="paciente" />
   </div>
 </template>
 
@@ -94,7 +95,7 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 .cadastro-paciente {
   padding: 3rem 15vw;
   min-height: 100vh;

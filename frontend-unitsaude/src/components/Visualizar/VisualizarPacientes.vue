@@ -1,9 +1,10 @@
 <template>
   <Header />
-  <BackButton class="voltar" />
+
   <div class="d-flex justify-content-center align-items-center min-vh-100">
     <div class="form">
       <div class="title mb-4">
+        <BackButton />
         <h1>Listagem de Pacientes</h1>
       </div>
 
@@ -28,6 +29,14 @@
         error
       }}</span>
 
+      <!-- Loading inicial -->
+      <div v-if="isLoading && pacientes.length === 0" class="text-center my-3">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Carregando...</span>
+        </div>
+        <p>Carregando pacientes...</p>
+      </div>
+
       <div
         id="pacientes-data"
         v-if="pacientes.length"
@@ -36,7 +45,7 @@
         <div
           v-for="(pacienteInfo, idx) in pacientes"
           :key="pacienteInfo.id || idx"
-          class="paciente card p-2 align-items-start shadow-sm"          
+          class="paciente card p-2 align-items-start shadow-sm"
         >
           <RouterLink
             @click="verPerfilPaciente(pacienteInfo)"
@@ -64,6 +73,7 @@ export default {
       paciente: "",
       pacientes: [],
       error: "",
+      isLoading: false, // Adicione esta linha
     };
   },
   components: {
@@ -81,6 +91,7 @@ export default {
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     },
     async procurarPaciente() {
+      this.isLoading = true; // Ativa o loading
       this.error = "";
 
       try {
@@ -91,6 +102,7 @@ export default {
         if (this.paciente === "") {
           const res = await api.get("/api/Paciente/ListarTodos");
           this.pacientes = res.data.data || [];
+          this.error = ""; // limpa erro quando lista todos
           return;
         }
 
@@ -115,12 +127,17 @@ export default {
         this.pacientes = res.data.data || [];
 
         // Só mostra erro se busca foi realmente feita e não encontrou ninguém
-        if (!this.pacientes.length && (isCpf || !/^\d+$/.test(this.paciente))) {
+        if (this.pacientes.length) {
+          this.error = ""; // limpa erro ao encontrar resultados
+        } else if (isCpf || !/^\d+$/.test(this.paciente)) {
           this.error = "Pacientes não encontrados.";
         }
       } catch (error) {
         this.error = "Erro ao buscar pacientes.";
         this.pacientes = [];
+      }
+      {
+        this.isLoading = false; // Desativa o loading
       }
     },
   },
@@ -133,6 +150,9 @@ export default {
 <style scoped>
 .title {
   text-align: center;
+  display: grid;
+  grid-template-columns: auto 1fr; /* 2 colunas: uma para a seta e outra para o título */
+  align-items: center; /* Alinha os itens verticalmente */
 }
 .title h1 {
   font-size: 1.5rem;
@@ -152,12 +172,10 @@ export default {
 .paciente-info {
   width: 100%;
   height: 100%;
+  text-decoration: none;
+  color: black;
 }
-.voltar {
-  position: absolute;
-  top: 7rem;
-  left: 1vw;
-}
+
 .form {
   padding: 1rem;
   border-radius: 8px;

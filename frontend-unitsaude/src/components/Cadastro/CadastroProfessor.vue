@@ -1,6 +1,5 @@
 <template>
   <Header />
-  <BackButton class="voltar" />
   <div class="main cadastro-professor d-flex justify-content-center align-items-center">
     <CadastroForm user="professor" />
   </div>
@@ -22,7 +21,7 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 .cadastro-professor {
   padding: 3rem 15vw;
   min-height: 100vh;

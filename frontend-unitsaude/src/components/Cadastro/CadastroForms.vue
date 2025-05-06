@@ -1,179 +1,188 @@
 <template>
-    <div class="main-title">
-      <BackButton class="voltar"/>
-      <h3>Agendamentos {{area}}</h3>
+  <div class="main-title"></div>
+  <div class="card p-4 shadow">
+    <div class="top">
+      <BackButton class="voltar" />
+      <h2 class="tituloCadastro">
+        {{ user === "paciente" ? "Cadastro Paciente" : "Cadastro Professor" }}
+      </h2>
     </div>
-    <div class="card p-4 shadow">
-      <div class="top">
-        <h2 v-if='this.user === "paciente"' class="text-center mb-4">Cadastro Paciente</h2>
-        <h2 v-if='this.user === "professor"' class="text-center mb-4">Cadastro Professor</h2>
-      </div>
-      <!-- Exibição de erros -->
-      <div v-if="erro" class="alert alert-danger">
-        {{ erro }}
-      </div>
 
-      <form @submit.prevent="cadastrar">
-        <div class="grid">
-          <div class="leftCad p-2">
+    <!-- Exibição de erros -->
+    <div v-if="erro" class="alert alert-danger">
+      {{ erro }}
+    </div>
+
+    <form @submit.prevent="cadastrar">
+      <div class="grid">
+        <div class="leftCad p-2">
+          <div class="mb-3">
+            <label for="cpf" class="form-label">CPF</label>
+            <input
+              type="text"
+              id="cpf"
+              class="form-control"
+              v-model="cpf"
+              placeholder="Digite seu CPF"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="nome" class="form-label">Nome</label>
+            <input
+              type="text"
+              id="nome"
+              class="form-control"
+              v-model="nome"
+              placeholder="Digite seu nome"
+              required
+            />
+          </div>
+
+          <div v-if="user === 'professor'">
             <div class="mb-3">
-              <label for="cpf" class="form-label">CPF</label>
+              <label for="area">Área</label>
               <input
                 type="text"
-                id="cpf"
+                id="area"
                 class="form-control"
-                v-model="cpf"
-                placeholder="Digite seu CPF"
+                v-model="area"
+                placeholder="Área do professor"
                 required
               />
             </div>
 
             <div class="mb-3">
-              <label for="nome" class="form-label">Nome</label>
+              <label for="codigo-profissional">Código profissional</label>
               <input
                 type="text"
-                id="nome"
+                id="codigo-profissional"
                 class="form-control"
-                v-model="nome"
-                placeholder="Digite seu nome"
-                required
-              />
-            </div>
-
-            <div v-if="user === 'professor'">
-              <div class="mb-3">
-                <label for="area">Área</label>
-                <input
-                  type="text"
-                  id="area"
-                  class="form-control"
-                  v-model="area"
-                  placeholder="Área do professor"
-                  required
-                />
-              </div>
-
-              <div class="mb-3">
-                <label for="codigo-profissional">Código profissional</label>
-                <input
-                  type="text"
-                  id="codigo-profissional"
-                  class="form-control"
-                  v-model="codigoProfissional"
-                  placeholder="CRM-PE 123456"
-                  required
-                />
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label for="dataNascimento" class="form-label"
-                >Data de Nascimento</label
-              >
-              <input
-                type="date"
-                id="dataNascimento"
-                class="form-control"
-                v-model="dataNascimento"
+                v-model="codigoProfissional"
+                placeholder="CRM-PE 123456"
                 required
               />
             </div>
           </div>
-          <div class="RightCad p-2">
+
+          <div class="mb-3">
+            <label for="dataNascimento" class="form-label"
+              >Data de Nascimento</label
+            >
+            <input
+              type="date"
+              id="dataNascimento"
+              class="form-control"
+              v-model="dataNascimento"
+              required
+            />
+          </div>
+        </div>
+        <div class="RightCad p-2">
+          <div class="mb-3">
+            <label for="telefone" class="form-label">Telefone</label>
+            <input
+              type="text"
+              id="telefone"
+              class="form-control"
+              v-model="telefone"
+              placeholder="(00) 00000-0000"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label">E-mail</label>
+            <input
+              type="email"
+              id="email"
+              class="form-control"
+              v-model="email"
+              placeholder="Digite seu e-mail"
+              required
+            />
+          </div>
+
+          <div v-if="user === 'professor'">
             <div class="mb-3">
-              <label for="telefone" class="form-label">Telefone</label>
+              <label for="especialidade">Especialidade</label>
               <input
                 type="text"
-                id="telefone"
+                id="especialidade"
                 class="form-control"
-                v-model="telefone"
-                placeholder="(00) 00000-0000"
+                v-model="especialidade"
+                placeholder="Especialidade do professor"
                 required
               />
             </div>
-
-            <div class="mb-3">
-              <label for="email" class="form-label">E-mail</label>
-              <input
-                type="email"
-                id="email"
-                class="form-control"
-                v-model="email"
-                placeholder="Digite seu e-mail"
-                required
-              />
-            </div>
-
-            <div v-if="user === 'professor'">
-              <div class="mb-3">
-                <label for="especialidade">Especialidade</label>
-                <input
-                  type="text"
-                  id="especialidade"
-                  class="form-control"
-                  v-model="especialidade"
-                  placeholder="Especialidade do professor"
-                  required
-                />
-              </div>
-            </div>
-            <div class="mb-3">
+          </div>
+          <div class="mb-3">
             <label for="senha" class="form-label">Senha</label>
             <input
               type="password"
               id="senha"
               class="form-control"
-              :class="{ 'is-invalid': this.senhaNaoConfere }"s
+              :class="{ 'is-invalid': this.senhaNaoConfere }"
+              s
               v-model="senha"
               placeholder="Digite sua senha"
               required
             />
           </div>
           <div class="mb-3" v-if="this.user === 'professor'">
-            <label for="confirmarSenha" class="form-label">Confirmar Senha</label>
+            <label for="confirmarSenha" class="form-label"
+              >Confirmar Senha</label
+            >
             <input
               type="password"
               id="confirmarSenha"
               class="form-control"
               v-model="confirmarSenha"
-              :class="{ 'is-invalid': this.senhaNaoConfere }"s
-              placeholder="Confirme sua senha"
-              required
-            />
-          </div>
-          </div>
-        </div>
-        <div>
-          <div class="mb-3" v-if="this.user != 'professor'">
-            <label for="confirmarSenha" class="form-label">Confirmar Senha</label>
-            <input
-              type="password"
-              id="confirmarSenha"
-              class="form-control"
               :class="{ 'is-invalid': this.senhaNaoConfere }"
-              v-model="confirmarSenha"
+              s
               placeholder="Confirme sua senha"
               required
             />
           </div>
-          <div v-if="senhaNaoConfere" class="alert alert-danger">
-            As senhas não coincidem.
-          </div>
         </div>
-
-        <!-- Botão centralizado abaixo -->
-        <div class="text-center mt-4">
-          <button
-            type="submit"
-            class="btn btn-primary w-50"
-            :disabled="senhaNaoConfere"
-          >
-            Cadastrar
-          </button>
+      </div>
+      <div>
+        <div class="mb-3" v-if="this.user != 'professor'">
+          <label for="confirmarSenha" class="form-label">Confirmar Senha</label>
+          <input
+            type="password"
+            id="confirmarSenha"
+            class="form-control"
+            :class="{ 'is-invalid': this.senhaNaoConfere }"
+            v-model="confirmarSenha"
+            placeholder="Confirme sua senha"
+            required
+          />
         </div>
-      </form>
-    </div>
+        <div v-if="senhaNaoConfere" class="alert alert-danger">
+          As senhas não coincidem.
+        </div>
+      </div>
 
+      <!-- Botão centralizado abaixo -->
+      <div class="text-center mt-4">
+        <button
+          type="submit"
+          class="btn btn-primary w-50"
+          :disabled="senhaNaoConfere || isLoading"
+        >
+          <span v-if="!isLoading">Cadastrar</span>
+          <span
+            v-else
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
+        </button>
+      </div>
+    </form>
+  </div>
 </template>
 
 <script>
@@ -186,11 +195,11 @@ export default {
   props: {
     user: {
       type: String,
-      default: "paciente"
-    }
+      default: "admin",
+    },
   },
   components: {
-    BackButton
+    BackButton,
   },
   data() {
     return {
@@ -205,7 +214,8 @@ export default {
       senhaNaoConfere: false, // Adiciona variável de erro de senha
       codigoProfissional: "",
       area: "",
-      especialidade: ""
+      especialidade: "",
+      isLoading: false,
     };
   },
   watch: {
@@ -222,6 +232,21 @@ export default {
         this.$router.push("/admin"); // Substitua "/paginaX" pela página que você deseja para o Administrador
       }
     },
+
+    limparCampos() {
+      // Limpa todos os campos de input após o sucesso do cadastro
+      this.email = "";
+      this.senha = "";
+      this.confirmarSenha = "";
+      this.nome = "";
+      this.dataNascimento = "";
+      this.telefone = "";
+      this.cpf = "";
+      this.codigoProfissional = "";
+      this.area = "";
+      this.especialidade = "";
+    },
+
     async cadastrarPaciente() {
       const response = await api.post("/api/Paciente/CreatePaciente", {
         cpf: this.cpf,
@@ -242,7 +267,7 @@ export default {
         dataNascimento: this.dataNascimento,
         area: this.area,
         especialidade: this.especialidade,
-        codigoProfissional: this.codigoProfissional
+        codigoProfissional: this.codigoProfissional,
       });
     },
     async cadastrar() {
@@ -250,11 +275,12 @@ export default {
         this.erro = "As senhas não coincidem!";
         return;
       }
-
+      this.isLoading = true; // Ativa o spinner
+      this.erro = null; // Limpa erros anteriores
       try {
         if (this.user === "paciente") {
           await this.cadastrarPaciente();
-        } else if(this.user === "professor") {
+        } else if (this.user === "professor") {
           await this.cadastrarProfessor();
         }
         const auth = useAuthStore();
@@ -272,6 +298,7 @@ export default {
         });
 
         this.handleHome(auth);
+        this.limparCampos(); // Limpa os campos após o sucesso
       } catch (error) {
         if (
           error.response &&
@@ -284,6 +311,8 @@ export default {
           console.error("Erro desconhecido:", error);
           this.erro = "Erro inesperado ao tentar realizar cadastro.";
         }
+      } finally {
+        this.isLoading = false; // Desativa o spinner independente do resultado
       }
     },
   },
@@ -305,7 +334,7 @@ export default {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 2 colunas com largura igual */
   gap: 1rem; /* Espaçamento entre os itens */
-  align-items: center
+  align-items: center;
 }
 
 .form-group {
@@ -313,7 +342,19 @@ export default {
 }
 
 .top {
-  text-align: center;
+  display: grid;
+  grid-template-columns: auto 1fr; /* 2 colunas: uma para a seta e outra para o título */
+  align-items: center; /* Alinha os itens verticalmente */
+}
+
+.voltar {
+  grid-column: 1; /* Coloca a seta na primeira coluna */
+}
+
+.tituloCadastro {
+  grid-column: 2; /* Coloca o título na segunda coluna */
+  text-align: center; /* Centraliza o título na sua célula */
+  margin: 0; /* Remove a margem do título */
 }
 
 .btn {

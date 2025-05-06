@@ -1,9 +1,9 @@
 <template>
   <Header />
-  <BackButton class="voltar" />
   <div class="d-flex justify-content-center align-items-center min-vh-100">
     <div class="form">
       <div class="title mb-4">
+        <BackButton />
         <h1>Listagem de Professores</h1>
       </div>
 
@@ -33,15 +33,44 @@
         v-if="professores.length"
         class="d-flex flex-column gap-1"
       >
+        <!-- Spinner durante busca -->
+        <div v-if="isLoading" class="text-center my-3">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+          </div>
+        </div>
+
         <div
           v-for="(professorInfo, idx) in professores"
           :key="professorInfo.id || idx"
           class="professor card p-2 align-items-start shadow-sm"
         >
-          <span
-            >{{ professorInfo.nome }} {{ professorInfo.especialidade }}</span
+          <RouterLink
+            @click="verPerfilProfessor(professorInfo)"
+            to="/perfilProfessor"
+            class="professor-info"
           >
+            {{ professorInfo.nome }} {{ professorInfo.especialidade }}
+          </RouterLink>
         </div>
+      </div>
+      <!-- Spinner durante carregamento inicial -->
+      <div
+        v-if="isLoading && professores.length === 0"
+        class="text-center my-3"
+      >
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Carregando...</span>
+        </div>
+        <p>Carregando professores...</p>
+      </div>
+
+      <!-- Mensagem quando não há resultados -->
+      <div
+        v-if="!professores.length && !isLoading && !error"
+        class="text-center my-3"
+      >
+        Nenhum professor encontrado
       </div>
     </div>
   </div>
@@ -59,6 +88,7 @@ export default {
       professor: "",
       professores: [],
       error: "",
+      isLoading: false, // Adicione esta linha
     };
   },
   components: {
@@ -71,34 +101,41 @@ export default {
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     },
     async procurarProfessores() {
+      this.isLoading = true; // Ativa o spinner
       this.error = "";
-
       try {
-        // Filtra se é CPF ou nome, dependendo do input
-        const isEspecialidade = this.professor.includes(" "); // Verifica se tem espaço (assumindo que é especialidade)
+        const isEspecialidade = this.professor.includes(" ");
 
-        let res;
+        // Se campo está vazio, lista todos
         if (this.professor === "") {
-          res = await api.get("/api/Professor/ListarTodos");
-        } else {
-          res = await api.get("/api/Professor/ListarComFiltro", {
-            params: {
-              nome: isEspecialidade ? "" : this.capitalizar(this.professor),
-              especialidade: isEspecialidade
-                ? this.capitalizar(this.professor)
-                : "",
-            },
-          });
+          const res = await api.get("/api/Professor/ListarTodos");
+          this.professores = res.data.data || [];
+          this.error = ""; // limpa erro se campo está vazio
+          return;
         }
+
+        // Busca com filtro
+        const res = await api.get("/api/Professor/ListarComFiltro", {
+          params: {
+            nome: isEspecialidade ? "" : this.capitalizar(this.professor),
+            especialidade: isEspecialidade
+              ? this.capitalizar(this.professor)
+              : "",
+          },
+        });
 
         this.professores = res.data.data || [];
 
-        if (!this.professores.length) {
+        if (this.professores.length) {
+          this.error = ""; // limpa erro se encontrar resultados
+        } else {
           this.error = "Professores não encontrados.";
         }
       } catch (error) {
         this.error = "Erro ao buscar professores.";
         this.professores = [];
+      } finally {
+        this.isLoading = false; // Desativa o spinner independente do resultado
       }
     },
   },
@@ -111,6 +148,9 @@ export default {
 <style scoped>
 .title {
   text-align: center;
+  display: grid;
+  grid-template-columns: auto 1fr; /* 2 colunas: uma para a seta e outra para o título */
+  align-items: center; /* Alinha os itens verticalmente */
 }
 
 .title h1 {
@@ -127,15 +167,16 @@ export default {
   cursor: pointer;
 }
 
+.professor-info {
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  color: black;
+}
+
 .professor:hover {
   transform: scale(1.01);
   background-color: #f0f8ff;
-}
-
-.voltar {
-  position: absolute;
-  top: 7rem;
-  left: 1vw;
 }
 
 .form {
@@ -160,7 +201,6 @@ export default {
   background-color: #186fc0;
   border-radius: 10px;
 }
-
 
 .btn-primary {
   background-color: #d8bd2c;

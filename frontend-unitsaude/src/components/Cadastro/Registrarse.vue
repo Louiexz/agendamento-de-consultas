@@ -3,7 +3,7 @@
     <div class="container logoL">
       <RouterLink to="/"><img src="../../assets/Logo.svg" alt="" /></RouterLink>
     </div>
-    <PacienteForm/>
+    <PacienteForm view = "registrar-se" user="paciente"/>
   </div>
 </template>
 
@@ -128,7 +128,7 @@ export default {
   text-align: center;
 }
 .logoL img {
-  width: 15%;
+  width: 25%;
 }
 
 @media (max-width: 690px) {

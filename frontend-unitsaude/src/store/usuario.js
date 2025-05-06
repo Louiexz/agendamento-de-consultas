@@ -13,5 +13,7 @@ export const useUsuarioStore = defineStore('usuario', {
     getUsuario() {
       return this.usuario;
     }
-  }
+  },
+
+  persist: true
 })

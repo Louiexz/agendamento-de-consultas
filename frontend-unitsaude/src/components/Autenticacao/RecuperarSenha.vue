@@ -5,9 +5,9 @@
     </div>
     <div class="container d-flex justify-content-center align-items-center">
       <div class="card p-4 shadow">
-        <div class="top">
+        <div class="top align-items-center">
           <BackButton />
-          <h2 class="text-center mb-4">Recuperar Senha</h2>
+          <h2 class="text-center ">Recuperar Senha</h2>
         </div>
         <!-- Exibição de erros -->
         <div v-if="erro" class="alert alert-danger">
@@ -121,7 +121,12 @@ p {
 .top {
   position: relative;
   display: grid;
-  grid-template-columns: auto 1fr;        
+  grid-template-columns: auto 1fr;
+  justify-items: center;
+}
+
+h2 {
+  margin: 0;
 }
 
 .btn:hover {
@@ -133,7 +138,7 @@ p {
   text-align: center;
 }
 .logo img {
-  width: 15%;
+  width: 100%;
 }
 /* Adicionando a transição de fade */
 .fade-enter-active,
