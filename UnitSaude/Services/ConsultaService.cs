@@ -777,6 +777,21 @@ namespace UnitSaude.Services
                     return response;
                 }
 
+                // Guarda os valores antigos para usar no email
+                var dataAntiga = consulta.Data;
+                var horarioAntigo = consulta.Horario;
+
+                // Busca os dados do paciente e do professor para envio de e-mails
+                var paciente = await _context.Pacientes.FindAsync(consulta.PacienteId);
+                var professor = await _context.Professores.FindAsync(consulta.ProfessorId);
+
+                // Envia e-mails de notificação
+                await _emailService.EnviarAsync(paciente.email, "Consulta Reagendada",
+                    $"Sua consulta com o(a) professor(a) {professor.nome} foi reagendada de {dataAntiga} às {horarioAntigo} para {consulta.Data} às {consulta.Horario}.");
+
+                await _emailService.EnviarAsync(professor.email, "Consulta Reagendada",
+                    $"A consulta com o(a) paciente {paciente.nome} foi reagendada de {dataAntiga} às {horarioAntigo} para {consulta.Data} às {consulta.Horario}.");
+
                 consulta.Data = dto.NovaData;
                 consulta.Horario = dto.NovoHorario;
 
