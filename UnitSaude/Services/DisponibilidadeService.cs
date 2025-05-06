@@ -39,6 +39,30 @@ namespace UnitSaude.Services
                     return response;
                 }
 
+                // VALIDAÇÃO DE DOMINGOS - DataInicio
+                if (dto.DataInicio.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    response.Status = false;
+                    response.Message = "Não é possível cadastrar disponibilidade começando em domingo.";
+                    return response;
+                }
+
+                // VALIDAÇÃO DE DOMINGOS - DataFim
+                if (dto.DataFim.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    response.Status = false;
+                    response.Message = "Não é possível cadastrar disponibilidade terminando em domingo.";
+                    return response;
+                }
+
+                // Validação adicional: DataFim não pode ser anterior à DataInicio
+                if (dto.DataFim < dto.DataInicio)
+                {
+                    response.Status = false;
+                    response.Message = "A data final não pode ser anterior à data inicial.";
+                    return response;
+                }
+
                 var disponibilidade = new Disponibilidade
                 {
                     DataInicio = dto.DataInicio,
