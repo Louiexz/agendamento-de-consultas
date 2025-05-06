@@ -784,6 +784,7 @@ namespace UnitSaude.Services
 
                 response.Message = "Consulta reagendada com sucesso!";
                 response.Data = $"{consulta.Data} às {consulta.Horario}";
+                response.Status = true;
 
                 // Opcional: Enviar e-mail de confirmação
                 await _emailService.EnviarAsync(
