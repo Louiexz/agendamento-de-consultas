@@ -5,6 +5,7 @@ import com.example.unitsaude.data.dto.auth.LoginResponse;
 import com.example.unitsaude.data.dto.auth.RecuperarSenhaRequest;
 import com.example.unitsaude.data.dto.auth.RecuperarSenhaResponse;
 import com.example.unitsaude.data.dto.auth.RedefinirSenhaRequest;
+import com.example.unitsaude.data.dto.auth.RegisterRequest;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -22,5 +23,6 @@ public interface ApiService {
     @POST("/api/Usuario/redefinir-senha")
     Call<ResponseBody> redefinirSenha(@Body RedefinirSenhaRequest request);
 
-
+    @POST("/api/Paciente/CreatePaciente")
+    Call<ResponseBody> registrar(@Body RegisterRequest registerRequest);
 }

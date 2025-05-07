@@ -10,13 +10,21 @@ import android.widget.Toast;
 import android.widget.EditText;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ProgressBar;
 
 import android.app.DatePickerDialog;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import com.example.unitsaude.viewmodel.RegisterView;
+import android.view.View;
+import androidx.lifecycle.ViewModelProvider;
+
 public class RegisterActivity extends AppCompatActivity {
+    private RegisterView registerViewModel;
+    private ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,12 +33,30 @@ public class RegisterActivity extends AppCompatActivity {
         EditText cpfEditText = findViewById(R.id.cpfEditText);
         EditText nomeEditText = findViewById(R.id.nomeEditText);
         EditText emailEditText = findViewById(R.id.emailEditText);
+        EditText telefoneEditText = findViewById(R.id.telefoneEditText);
         EditText senhaEditText = findViewById(R.id.senhaEditText);
         EditText confirmaSenhaEditText = findViewById(R.id.confirmaSenhaEditText);
+        EditText nascimentoEditText = findViewById(R.id.nascimentoEditText);
+        
+        progressBar = findViewById(R.id.progressBar);
         Button registrarButton = findViewById(R.id.registrarButton);
         Button voltarButton = findViewById(R.id.voltarButton);
 
-        EditText nascimentoEditText = findViewById(R.id.nascimentoEditText);
+        registerViewModel = new ViewModelProvider(this).get(RegisterView.class);
+
+        // Observa o estado de carregamento
+        registerViewModel.getLoadingLiveData().observe(this, isLoading -> {
+            // Você pode adicionar um spinner de carregamento aqui
+            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            registrarButton.setEnabled(!isLoading);
+        });
+
+        // Observa o erro, se houver
+        registerViewModel.getErrorLiveData().observe(this, errorMessage -> {
+            if (errorMessage != null) {
+                Toast.makeText(RegisterActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         nascimentoEditText.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
@@ -46,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
                     Calendar selectedDate = Calendar.getInstance();
                     selectedDate.set(selectedYear, selectedMonth, selectedDay);
 
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     String formattedDate = dateFormat.format(selectedDate.getTime());
                     
                     // Atualiza o EditText com a data selecionada
@@ -58,7 +84,6 @@ public class RegisterActivity extends AppCompatActivity {
             datePickerDialog.show();
         });
 
-
         voltarButton.setOnClickListener(v -> {
             startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
             finish();
@@ -68,8 +93,10 @@ public class RegisterActivity extends AppCompatActivity {
             String cpf = cpfEditText.getText().toString().trim();
             String nome = nomeEditText.getText().toString().trim();
             String email = emailEditText.getText().toString().trim();
+            String telefone = telefoneEditText.getText().toString().trim();
             String senha = senhaEditText.getText().toString().trim();
             String confirmaSenha = confirmaSenhaEditText.getText().toString().trim();
+            String dataNascimento = nascimentoEditText.getText().toString().trim();
 
             if (cpf.isEmpty() || nome.isEmpty() || email.isEmpty() || senha.isEmpty()) {
                 Toast.makeText(this, "Preencha todos os campos obrigatórios", Toast.LENGTH_SHORT).show();
@@ -101,8 +128,15 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            // Aqui você pode chamar a ViewModel ou um serviço de API para registrar o usuário
-            Toast.makeText(this, "Registro enviado!", Toast.LENGTH_SHORT).show();
+            registerViewModel.registrar(cpf, nome, email, senha, telefone, dataNascimento);
+        });
+
+        registerViewModel.getRegisterResponseLiveData().observe(this, responseBody -> {
+            if (responseBody != null) {
+                Toast.makeText(RegisterActivity.this, "Cadastro realizado com sucesso", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                finish();
+            }
         });
     }
 }

@@ -7,6 +7,7 @@ import com.example.unitsaude.data.dto.auth.LoginResponse;
 import com.example.unitsaude.data.dto.auth.RecuperarSenhaRequest;
 import com.example.unitsaude.data.dto.auth.RecuperarSenhaResponse;
 import com.example.unitsaude.data.dto.auth.RedefinirSenhaRequest;
+import com.example.unitsaude.data.dto.auth.RegisterRequest;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -32,4 +33,9 @@ public class AuthRepository {
         return apiService.redefinirSenha(new RedefinirSenhaRequest(token, novaSenha));
     }
 
+    public Call<ResponseBody> registrarPaciente(String cpf, String nome, String email,
+    String senha, String telefone, String dataNascimento) {
+        return apiService.registrar(new RegisterRequest(cpf, nome, email, senha,
+        telefone, dataNascimento));
+    }
 }

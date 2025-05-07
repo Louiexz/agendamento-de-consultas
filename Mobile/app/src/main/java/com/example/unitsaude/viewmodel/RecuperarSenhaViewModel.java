@@ -11,7 +11,6 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.unitsaude.data.repositorio.AuthRepository;
 import com.example.unitsaude.data.dto.auth.RecuperarSenhaResponse;
 
-
 import java.io.IOException;
 
 import okhttp3.ResponseBody;
