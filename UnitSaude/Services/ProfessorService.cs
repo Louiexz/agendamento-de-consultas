@@ -39,13 +39,16 @@ namespace UnitSaude.Services
                     return response;
                 }
 
-                // Valida��o da especialidade
+                // Validação das especialidades
                 var especialidadesPermitidas = DadosFixosConsulta.ObterEspecialidadesPorArea(professorDto.area);
-                if (!especialidadesPermitidas.Contains(professorDto.especialidade))
+                foreach (var especialidade in professorDto.especialidades)
                 {
-                    response.Status = false;
-                    response.Message = "Especialidade inv�lida para a �rea especificada.";
-                    return response;
+                    if (!especialidadesPermitidas.Contains(especialidade))
+                    {
+                        response.Status = false;
+                        response.Message = $"Especialidade '{especialidade}' inválida para a área especificada.";
+                        return response;
+                    }
                 }
 
                 var professor = new Professor
@@ -58,7 +61,7 @@ namespace UnitSaude.Services
                     dataCadastro = DateOnly.FromDateTime(DateTime.UtcNow),
                     dataNascimento = professorDto.dataNascimento,
                     area = professorDto.area,
-                    especialidade = professorDto.especialidade,
+                    especialidades = professorDto.especialidades, // Agora é uma lista
                     codigoProfissional = professorDto.codigoProfissional,
                     TipoUsuario = "Professor",
                     ativo = true
@@ -77,7 +80,7 @@ namespace UnitSaude.Services
                     telefone = professor.telefone,
                     dataNascimento = professor.dataNascimento,
                     area = professor.area,
-                    especialidade = professor.especialidade,
+                    especialidades = professorDto.especialidades, // Agora é uma lista
                     codigoProfissional = professor.codigoProfissional,
 
                 };
@@ -112,7 +115,7 @@ namespace UnitSaude.Services
                         telefone = x.telefone,
                         dataNascimento = x.dataNascimento,
                         area = x.area,
-                        especialidade = x.especialidade,
+                        especialidades = x.especialidades, // Alterado para a lista
                         codigoProfissional = x.codigoProfissional,
 
                     }).ToListAsync();
@@ -155,7 +158,7 @@ namespace UnitSaude.Services
                     telefone = professor.telefone,
                     dataNascimento = professor.dataNascimento,
                     area = professor.area,
-                    especialidade = professor.especialidade,
+                    especialidades = professor.especialidades, // Alterado para a lista
                     codigoProfissional = professor.codigoProfissional,
 
                 };
@@ -195,19 +198,24 @@ namespace UnitSaude.Services
                     response.Message = "�rea inv�lida.";
                     return response;
                 }
-                if (professorDto.area != null){
-                    // Valida��o da especialidade
+                if (professorDto.area != null)
+                {
                     var especialidadesPermitidas = DadosFixosConsulta.ObterEspecialidadesPorArea(professorDto.area);
-                    if (professorDto.especialidade != null &&
-                        !especialidadesPermitidas.Contains(professorDto.especialidade))
+                    if (professorDto.especialidades != null)
                     {
-                        response.Status = false;
-                        response.Message = "Especialidade inv�lida para a �rea especificada.";
-                        return response;
+                        foreach (var especialidade in professorDto.especialidades)
+                        {
+                            if (!especialidadesPermitidas.Contains(especialidade))
+                            {
+                                response.Status = false;
+                                response.Message = $"Especialidade '{especialidade}' inválida para a área especificada.";
+                                return response;
+                            }
+                        }
                     }
                 }
 
-                
+
 
                 foreach (var property in professorDto.GetType().GetProperties())
                 {
@@ -233,7 +241,7 @@ namespace UnitSaude.Services
                     telefone = professorExistente.telefone,
                     codigoProfissional = professorExistente.codigoProfissional,
                     dataNascimento = professorExistente.dataNascimento,
-                    especialidade = professorExistente.especialidade,
+                    especialidades = professorExistente.especialidades, // Alterado para lista
                     area = professorExistente.area,
                 };
 
@@ -339,7 +347,7 @@ namespace UnitSaude.Services
             {
                 // Filtra os professores pela especialidade
                 var professores = await _context.Professores
-                    .Where(x => x.especialidade == especialidade)
+                    .Where(x => x.especialidades.Contains(especialidade))
                     .Select(x => new ReadProfessorDto
                     {
                         id = x.Id_Usuario,
@@ -349,7 +357,7 @@ namespace UnitSaude.Services
                         telefone = x.telefone,
                         dataNascimento = x.dataNascimento,
                         area = x.area,
-                        especialidade = x.especialidade,
+                        especialidades = x.especialidades, // Alterado para lista
                         codigoProfissional = x.codigoProfissional,
                     })
                     .ToListAsync();
@@ -388,7 +396,7 @@ namespace UnitSaude.Services
                     query = query.Where(p =>
                         (!string.IsNullOrEmpty(filtro.Nome) && p.nome.Contains(filtro.Nome)) ||
                         (!string.IsNullOrEmpty(filtro.CodigoProfissional) && p.codigoProfissional == filtro.CodigoProfissional) ||
-                        (!string.IsNullOrEmpty(filtro.Especialidade) && p.especialidade == filtro.Especialidade)
+                        (!string.IsNullOrEmpty(filtro.Especialidade) && p.especialidades.Contains(filtro.Especialidade))
                     );
                 }
 
@@ -410,7 +418,7 @@ namespace UnitSaude.Services
                     telefone = professor.telefone,
                     dataNascimento = professor.dataNascimento,
                     area = professor.area,
-                    especialidade = professor.especialidade,
+                    especialidades = professor.especialidades,
                     codigoProfissional = professor.codigoProfissional,
                 }).ToList();
 

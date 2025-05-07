@@ -11,7 +11,7 @@ namespace UnitSaude.Dto.Professor
         public string? telefone { get; set; }
         public DateOnly? dataNascimento { get; set; }
         public string? area { get; set; }
-        public string? especialidade { get; set; }
+        public List<string> especialidades { get; set; } = new List<string>(); // Alterado para List<string>
         public string? codigoProfissional { get; set; }
     }
 }

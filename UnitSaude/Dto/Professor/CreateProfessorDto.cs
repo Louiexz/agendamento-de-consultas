@@ -13,7 +13,7 @@ namespace UnitSaude.Dto.Professor
 
         public DateOnly? dataNascimento { get; set; }
         public required string area { get; set; }
-        public required string especialidade { get; set; }
+        public List<string> especialidades { get; set; } = new List<string>(); // Alterado para List<string>
         public required string codigoProfissional { get; set; }
     }
 }

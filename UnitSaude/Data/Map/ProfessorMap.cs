@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using UnitSaude.Models;
+using System.Text.Json;
 
 namespace UnitSaude.Data.Map
 {
@@ -19,7 +20,14 @@ namespace UnitSaude.Data.Map
             builder.Property(u => u.TipoUsuario).HasMaxLength(50);
             builder.Property(u => u.ativo).HasDefaultValue(true);
             builder.Property(u => u.area).HasMaxLength(255);
-            builder.Property(u => u.especialidade).HasMaxLength(255);
+            // Alteração para armazenar JSON
+            builder.Property(u => u.especialidades)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null))
+                .HasColumnType("text");
+
+
             builder.Property(u => u.codigoProfissional).HasMaxLength(255);
 
             builder.HasIndex(u => u.cpf).IsUnique();
