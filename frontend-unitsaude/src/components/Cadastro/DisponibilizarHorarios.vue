@@ -337,11 +337,10 @@ select.form-control:hover {
   display: grid;
   grid-template-columns: auto 1fr; /* 2 colunas: uma para a seta e outra para o título */
   align-items: center; /* Alinha os itens verticalmente */
-  margin-bottom: 3rem;
+  margin-bottom: 1rem;
 }
 
 .botaocentro {
   text-align: center;
-  margin-top: 2rem;
 }
 </style>

@@ -35,25 +35,25 @@
           />
         </div>
 
-        <div v-if="this.isProfessor === true">
-          <label for="area" class="form-label">Área</label>
-          <input
-            type="text"
-            class="form-control"
-            id="area"
-            :value="usuario.area"
-            disabled
-          >
-        </div>
-        <div v-if="isProfessor === true">
-          <label for="especialidade" class="form-label">Especialidade</label>
-          <input
-            type="text"
-            class="form-control"
-            id="especialidade"
-            :value="usuario.especialidade"
-            disabled
-          >
+        <!-- Por este: -->
+        <div v-if="isProfessor">
+          <label class="form-label">Especialidades</label>
+          <div class="especialidades-container">
+            <template
+              v-if="usuario.especialidades && usuario.especialidades.length"
+            >
+              <span
+                v-for="(especialidade, index) in usuario.especialidades"
+                :key="index"
+                class="especialidade-badge"
+              >
+                {{ especialidade }}
+              </span>
+            </template>
+            <span v-else class="text-muted"
+              >Nenhuma especialidade cadastrada</span
+            >
+          </div>
         </div>
 
         <div>
@@ -117,8 +117,8 @@ export default {
   props: {
     isProfessor: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   components: {
     ConsultaView,
@@ -135,7 +135,18 @@ export default {
     carregaPerfil() {
       const store = useUsuarioStore();
 
-      this.usuario = store.getUsuario();
+      const usuarioStore = store.getUsuario();
+
+      const especialidades =
+        usuarioStore.especialidades ||
+        (usuarioStore.especialidade ? [usuarioStore.especialidade] : []);
+
+      this.usuario = {
+        ...usuarioStore,
+        especialidades: Array.isArray(especialidades)
+          ? especialidades
+          : [especialidades],
+      };
     },
     async carregaConsultas() {
       try {
@@ -163,7 +174,6 @@ export default {
     },
   },
   mounted() {
-
     this.carregaPerfil();
     this.carregaConsultas();
   },
@@ -171,7 +181,6 @@ export default {
 </script>
 
 <style scoped>
-
 .title {
   text-align: center;
   display: grid;
@@ -186,5 +195,25 @@ h3 {
 }
 .bi-person {
   font-size: 10rem;
+}
+.especialidades-container {
+  min-height: 38px;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+}
+
+.especialidade-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  margin: 0.125rem;
+  background-color: #e9ecef;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.text-muted {
+  color: #6c757d;
+  font-style: italic;
 }
 </style>

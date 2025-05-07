@@ -181,11 +181,12 @@ export default {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 50%;
-  height: 60vh;
+  max-height: 80vh; /* alterado de height para max-height */
   gap: 1rem;
 }
 #pacientes-data {
   overflow-y: auto;
+  height: 30vh;
   padding: 10px; /* para evitar que o conteúdo fique colado com a barra de rolagem */
 }
 /* Estilizar a barra de rolagem, opcional */

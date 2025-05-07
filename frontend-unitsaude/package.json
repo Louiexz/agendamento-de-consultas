@@ -17,6 +17,7 @@
     "sweetalert2": "^11.19.1",
     "vue": "^3.5.13",
     "vue-cal": "^5.0.1-rc.19",
+    "vue-multiselect": "^3.2.0",
     "vue-router": "^4.0.3",
     "vuex": "^4.0.0"
   },

@@ -277,17 +277,33 @@ export default {
       console.log("Data selecionada:", this.dataConsulta);
     },
     async obterProfessores() {
-      try {
-        const response = await api.get(
-          `/api/Professor/listar-professores-especialidade?especialidade=${this.selectedEspecialidade}`
-        );
-        console.log(response);
-        this.professores = response.data.data;
-      } catch (error) {
-        console.error("Erro ao carregar professores:", error);
-        this.erro = "Erro ao carregar professores. Tente novamente mais tarde.";
+  try {
+    this.isLoading = true;
+    const response = await api.get('/api/Professor/listar-professores-especialidade', {
+      params: {
+        especialidade: this.selectedEspecialidade
+      },
+      paramsSerializer: {
+        indexes: null // Remove notação de array
       }
-    },
+    });
+
+    if (response.data?.status) {
+      this.professores = response.data.data;
+    } else {
+      console.error('Erro na resposta:', response.data?.message);
+      this.professores = [];
+    }
+  } catch (error) {
+    console.error('Erro na requisição:', {
+      message: error.message,
+      response: error.response?.data
+    });
+    this.erro = "Não foi possível carregar os professores";
+  } finally {
+    this.isLoading = false;
+  }
+},
 
     async obterHorariosDisponiveis() {
       if (

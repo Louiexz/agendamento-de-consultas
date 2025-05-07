@@ -39,33 +39,6 @@
               required
             />
           </div>
-
-          <div v-if="user === 'professor'">
-            <div class="mb-3">
-              <label for="area">Área</label>
-              <input
-                type="text"
-                id="area"
-                class="form-control"
-                v-model="area"
-                placeholder="Área do professor"
-                required
-              />
-            </div>
-
-            <div class="mb-3">
-              <label for="codigo-profissional">Código profissional</label>
-              <input
-                type="text"
-                id="codigo-profissional"
-                class="form-control"
-                v-model="codigoProfissional"
-                placeholder="CRM-PE 123456"
-                required
-              />
-            </div>
-          </div>
-
           <div class="mb-3">
             <label for="dataNascimento" class="form-label"
               >Data de Nascimento</label
@@ -78,8 +51,81 @@
               required
             />
           </div>
+
+          <div v-if="user === 'professor'">
+            <div class="mb-3">
+              <label for="area" class="form-label">Área</label>
+              <select
+                v-model="area"
+                id="area"
+                class="form-control"
+                @change="carregarEspecialidades"
+                required
+              >
+                <option value="" disabled selected>
+                  Selecione uma área...
+                </option>
+                <option
+                  v-for="area in areasDisponiveis"
+                  :key="area"
+                  :value="area"
+                >
+                  {{ area }}
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="especialidades" class="form-label"
+                >Especialidades</label
+              >
+              <div class="multiselect-wrapper">
+                <multiselect
+                  v-model="especialidadesSelecionadas"
+                  id="especialidades"
+                  :options="especialidadesDisponiveis"
+                  :multiple="true"
+                  :close-on-select="false"
+                  :clear-on-select="false"
+                  :preserve-search="true"
+                  placeholder="Selecione as especialidades"
+                  label="nome"
+                  track-by="nome"
+                  :preselect-first="false"
+                  required
+                >
+                  <template
+                    slot="selection"
+                    slot-scope="{ values, search, isOpen }"
+                  >
+                    <span
+                      class="multiselect__single"
+                      v-if="values.length && !isOpen"
+                    >
+                      {{ values.length }} especialidades selecionadas
+                    </span>
+                  </template>
+                </multiselect>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="RightCad p-2">
+          <div v-if="user === 'professor'">
+            <div class="mb-3">
+              <label for="codigo-profissional" class="form-label"
+                >Código profissional</label
+              >
+              <input
+                type="text"
+                id="codigo-profissional"
+                class="form-control"
+                v-model="codigoProfissional"
+                placeholder="CRM-PE 123456"
+                required
+              />
+            </div>
+          </div>
           <div class="mb-3">
             <label for="telefone" class="form-label">Telefone</label>
             <input
@@ -104,19 +150,6 @@
             />
           </div>
 
-          <div v-if="user === 'professor'">
-            <div class="mb-3">
-              <label for="especialidade">Especialidade</label>
-              <input
-                type="text"
-                id="especialidade"
-                class="form-control"
-                v-model="especialidade"
-                placeholder="Especialidade do professor"
-                required
-              />
-            </div>
-          </div>
           <div class="mb-3">
             <label for="senha" class="form-label">Senha</label>
             <input
@@ -190,6 +223,8 @@ import api from "@/services/api";
 import { useAuthStore } from "@/store/auth";
 import Swal from "sweetalert2";
 import BackButton from "@/components/btnVoltar.vue";
+import Multiselect from "vue-multiselect";
+import "vue-multiselect/dist/vue-multiselect.css";
 
 export default {
   props: {
@@ -200,6 +235,7 @@ export default {
   },
   components: {
     BackButton,
+    Multiselect,
   },
   data() {
     return {
@@ -216,6 +252,9 @@ export default {
       area: "",
       especialidade: "",
       isLoading: false,
+      areasDisponiveis: [],
+      especialidadesDisponiveis: [],
+      especialidadesSelecionadas: [],
     };
   },
   watch: {
@@ -233,6 +272,31 @@ export default {
       }
     },
 
+    async carregarAreas() {
+      try {
+        const response = await api.get("/api/Consulta/areas");
+        this.areasDisponiveis = response.data.data;
+      } catch (error) {
+        console.error("Erro ao carregar áreas:", error);
+      }
+    },
+
+    async carregarEspecialidades() {
+      if (!this.area) return;
+
+      try {
+        const response = await api.get(
+          `/api/Consulta/especialidades/${this.area}`
+        );
+        this.especialidadesDisponiveis = response.data.data.map((esp) => ({
+          nome: esp,
+          id: esp.toLowerCase().replace(/\s+/g, "-"),
+        }));
+      } catch (error) {
+        console.error("Erro ao carregar especialidades:", error);
+      }
+    },
+
     limparCampos() {
       // Limpa todos os campos de input após o sucesso do cadastro
       this.email = "";
@@ -245,6 +309,7 @@ export default {
       this.codigoProfissional = "";
       this.area = "";
       this.especialidade = "";
+      this.especialidadesSelecionadas = "";
     },
 
     async cadastrarPaciente() {
@@ -258,6 +323,10 @@ export default {
       });
     },
     async cadastrarProfessor() {
+      // Transforma o array de objetos em array de strings
+      const especialidades = this.especialidadesSelecionadas.map(
+        (esp) => esp.nome
+      );
       const response = await api.post("/api/Professor/CreateProfessor", {
         cpf: this.cpf,
         nome: this.nome,
@@ -266,7 +335,7 @@ export default {
         telefone: this.telefone,
         dataNascimento: this.dataNascimento,
         area: this.area,
-        especialidade: this.especialidade,
+        especialidades: especialidades, // Agora é um array
         codigoProfissional: this.codigoProfissional,
       });
     },
@@ -315,6 +384,9 @@ export default {
         this.isLoading = false; // Desativa o spinner independente do resultado
       }
     },
+  },
+  mounted() {
+    this.carregarAreas();
   },
 };
 </script>
@@ -374,5 +446,27 @@ export default {
 
 .is-invalid {
   border-color: red;
+}
+
+:deep(.multiselect__option--highlight) {
+  background: #186fc0; /* Azul do seu tema */
+  color: white;
+}
+
+:deep(.multiselect__option--selected.multiselect__option--highlight) {
+  background: #d8bd2c; /* Amarelo do seu tema */
+  color: #000;
+}
+
+:deep(.multiselect__tag) {
+  background: #186fc0; /* Azul do seu tema */
+}
+
+:deep(.multiselect__tag-icon:after) {
+  color: white;
+}
+
+:deep(.multiselect__tag-icon:hover) {
+  background: #1357a3; /* Azul mais escuro para hover */
 }
 </style>

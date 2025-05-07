@@ -18,7 +18,6 @@ app.use(router)
 import { useAuthStore } from '@/store/auth'
 import { useConsultaStore } from '@/store/consulta'
 import { useUsuarioStore } from '@/store/usuario'
-
 const auth = useAuthStore()
 const consulta = useConsultaStore()
 const usuario = useUsuarioStore()

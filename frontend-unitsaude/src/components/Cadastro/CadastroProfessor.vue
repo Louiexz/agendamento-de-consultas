@@ -28,6 +28,5 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 30px;
 }
 </style>

@@ -50,7 +50,18 @@
             to="/perfilProfessor"
             class="professor-info"
           >
-            {{ professorInfo.nome }} {{ professorInfo.especialidade }}
+            {{ professorInfo.nome }} -
+            <span
+              v-if="
+                professorInfo.especialidades &&
+                professorInfo.especialidades.length
+              "
+            >
+              {{ professorInfo.especialidades.join(", ") }}
+            </span>
+            <span v-else-if="professorInfo.especialidade">
+              {{ professorInfo.especialidade }}
+            </span>
           </RouterLink>
         </div>
       </div>
@@ -99,7 +110,7 @@ export default {
   methods: {
     verPerfilProfessor(usuarioSelecionado) {
       const usuarioStore = useUsuarioStore();
-      
+
       usuarioStore.setUsuario(usuarioSelecionado);
     },
     capitalizar(str) {
@@ -107,46 +118,55 @@ export default {
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     },
     async procurarProfessores() {
-      this.isLoading = true; // Ativa o spinner
+      this.isLoading = true;
       this.error = "";
       try {
-        const isEspecialidade = this.professor.includes(" ");
+        const searchTerm = this.professor.trim();
 
-        // Se campo está vazio, lista todos
-        if (this.professor === "") {
+        if (searchTerm === "") {
           const res = await api.get("/api/Professor/ListarTodos");
           this.professores = res.data.data || [];
-          this.error = ""; // limpa erro se campo está vazio
           return;
         }
 
-        // Busca com filtro
         const res = await api.get("/api/Professor/ListarComFiltro", {
           params: {
-            nome: isEspecialidade ? "" : this.capitalizar(this.professor),
-            especialidade: isEspecialidade
-              ? this.capitalizar(this.professor)
-              : "",
+            filtro: searchTerm,
           },
         });
 
         this.professores = res.data.data || [];
 
-        if (this.professores.length) {
-          this.error = ""; // limpa erro se encontrar resultados
-        } else {
-          this.error = "Professores não encontrados.";
+        if (this.professores.length === 0) {
+          this.error = "Nenhum professor encontrado.";
         }
       } catch (error) {
         this.error = "Erro ao buscar professores.";
-        this.professores = [];
+        console.error(error);
       } finally {
-        this.isLoading = false; // Desativa o spinner independente do resultado
+        this.isLoading = false;
       }
     },
   },
   mounted() {
-    this.procurarProfessores();
+    this.isLoading = true;
+    api
+      .get("/api/Professor/ListarTodos")
+      .then((res) => {
+        this.professores = res.data.data.map((prof) => ({
+          ...prof,
+          especialidades:
+            prof.especialidades ||
+            (prof.especialidade ? [prof.especialidade] : []),
+        }));
+      })
+      .catch((error) => {
+        this.error = "Erro ao carregar professores";
+        console.error(error);
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
   },
 };
 </script>
@@ -190,12 +210,13 @@ export default {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 50%;
-  height: 60vh;
+  max-height: 80vh; /* alterado de height para max-height */
   gap: 1rem;
 }
 
 #professores-data {
   overflow-y: auto;
+  height: 30vh;
   padding: 10px; /* para evitar que o conteúdo fique colado com a barra de rolagem */
 }
 
