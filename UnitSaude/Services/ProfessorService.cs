@@ -341,42 +341,45 @@ namespace UnitSaude.Services
 
         public async Task<ResponseModel<List<ReadProfessorDto>>> ListarProfessoresPorEspecialidade(string especialidade)
         {
-            ResponseModel<List<ReadProfessorDto>> response = new();
+            var response = new ResponseModel<List<ReadProfessorDto>>();
 
             try
             {
-                // Filtra os professores pela especialidade
+                // Primeiro carrega os professores com suas especialidades
                 var professores = await _context.Professores
-                    .Where(x => x.especialidades.Contains(especialidade))
-                    .Select(x => new ReadProfessorDto
-                    {
-                        id = x.Id_Usuario,
-                        cpf = x.cpf,
-                        nome = x.nome,
-                        email = x.email,
-                        telefone = x.telefone,
-                        dataNascimento = x.dataNascimento,
-                        area = x.area,
-                        especialidades = x.especialidades, // Alterado para lista
-                        codigoProfissional = x.codigoProfissional,
-                    })
+                    .Include(p => p.Consultas)
                     .ToListAsync();
 
-                if (professores.Count == 0)
-                {
-                    response.Status = false;
-                    response.Message = "Nenhum professor encontrado para esta especialidade.";
-                }
-                else
-                {
-                    response.Data = professores;
-                    response.Message = "Professores listados com sucesso!";
-                }
+                // Filtra na memória (client-side)
+                var professoresFiltrados = professores
+                    .Where(p => p.especialidades != null &&
+                                p.especialidades.Any(e =>
+                                    e.Equals(especialidade, StringComparison.OrdinalIgnoreCase)))
+                    .Select(p => new ReadProfessorDto
+                    {
+                        id = p.Id_Usuario,
+                        cpf = p.cpf,
+                        nome = p.nome,
+                        email = p.email,
+                        telefone = p.telefone,
+                        dataNascimento = p.dataNascimento,
+                        area = p.area,
+                        especialidades = p.especialidades,
+                        codigoProfissional = p.codigoProfissional
+                    })
+                    .ToList();
+
+                response.Data = professoresFiltrados;
+                response.Message = professoresFiltrados.Any()
+                    ? "Professores encontrados com sucesso"
+                    : "Nenhum professor encontrado para esta especialidade";
             }
             catch (Exception ex)
             {
                 response.Status = false;
-                response.Message = ex.Message;
+                response.Message = $"Erro ao buscar professores: {ex.Message}";
+                // Log adicional para debug
+                Console.WriteLine($"ERRO DETALHADO: {ex}");
             }
 
             return response;
