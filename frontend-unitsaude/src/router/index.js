@@ -6,25 +6,33 @@ import usual_routes from "./usuarios.js";
 //Admin
 import admin_routes from "./admin.js";
 
+//Paciente
+import paciente_routes from "./paciente.js";
+
+//Professor
+import professor_routes from "./professor.js";
+
 //Admin e Paciente
 import CadastrarConsulta from '@/views/Cadastro/CadastrarConsultaView.vue';
 
 // Admin e Professor
 import VisualizarPacientesView from '@/views/Visualizar/VisualizarPacientesView.vue';
+import PerfilProfessor from "@/views/Visualizar/PerfilProfessorView.vue";
 
-// Professor
-import TelaProfessor from '@/views/TelaProfessor.vue';
-
-// Paciente
-import TelaPaciente from '@/views/TelaPaciente.vue';
+// Usuários logados
+import PerfilPaciente from "@/views/Visualizar/PerfilPacienteView.vue";
 
 import { useAuthStore } from '@/store/auth';
+import { useUsuarioStore } from '@/store/usuario';
 
 const getAuth = () => useAuthStore();
+const getPerfil = () => useUsuarioStore();
 
 const routes = [
   ...usual_routes,
   ...admin_routes,
+  ...paciente_routes,
+  ...professor_routes,
   {
     path: '/cadastrar-consultas',
     name: 'cadastrar-consultas',
@@ -38,17 +46,17 @@ const routes = [
     meta: { requiresAuth: true, allowedRoles: ['Administrador', 'Professor'] },
   },
   {
-    path: '/professor',
-    name: 'professor',
-    component: TelaProfessor,
-    meta: { requiresAuth: true, allowedRoles: ['Professor'] },
+    path: "/perfilPaciente",
+    name: "perfil-paciente",
+    component: PerfilPaciente,
+    meta: { requiresAuth: true, allowedRoles: ["Administrador", "Professor", "Paciente"] }
   },
   {
-    path: '/paciente',
-    name: 'paciente',
-    component: TelaPaciente,
-    meta: { requiresAuth: true, allowedRoles: ['Paciente'] },
-  },
+    path: "/perfilProfessor",
+    name: "perfil-professor",
+    component: PerfilProfessor,
+    meta: { requiresAuth: true, allowedRoles: ['Administrador', 'Professor'] },
+  }
 ]
 
 const router = createRouter({
@@ -58,6 +66,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const auth = getAuth()
+  const perfil = getPerfil()
 
   if (auth.token && to.path === '/login') {
     if (auth.tipoUsuario === 'Administrador') {
@@ -79,8 +88,29 @@ router.beforeEach((to, from, next) => {
     }
   }
 
+  // Atualiza o perfil na store com base na navegação de página
+  if (from.name === 'visualizar-pacientes' && perfil.perfilAtual !== 'paciente') {
+    perfil.setPerfil('paciente')  // Se vem de 'visualizar-pacientes', define o perfil como 'paciente'
+  }
+
+  if (from.name === 'visualizar-professores' && perfil.perfilAtual !== 'professor') {
+    perfil.setPerfil('professor')  // Se vem de 'visualizar-professores', define o perfil como 'professor'
+  }
+
+  // Logica para navegação entre as páginas de perfil
+  if (to.name === 'perfil-paciente') {
+    if (perfil.perfilAtual !== 'paciente') {
+      return next("/pacientes")  // Bloqueia a navegação se o perfil não for 'paciente'
+    }
+  }
+
+  if (to.name === 'perfil-professor') {
+    if (perfil.perfilAtual !== 'professor') {
+      return next("/professores")  // Bloqueia a navegação se o perfil não for 'professor'
+    }
+  }
+
   next()
 })
-
 
 export default router

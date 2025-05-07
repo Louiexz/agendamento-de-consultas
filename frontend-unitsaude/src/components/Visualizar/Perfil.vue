@@ -1,14 +1,14 @@
 <template>
-  <div class="container py-5 shadow p-5">
+  <div class="container py-5 shadow p-5" v-if="usuario">
     <div class="title mb-4">
       <BackButton />
-      <h3>Perfil - {{ paciente.nome }}</h3>
+      <h3>Perfil - {{ usuario.nome }}</h3>
     </div>
     <div class="d-flex flex-wrap align-items-center gap-5">
       <i
         class="bi bi-person border border-dark p-3"
-        :title="`Foto de ${paciente.nome}`"
-        aria-label="Foto do paciente"
+        :title="`Foto de ${usuario.nome}`"
+        aria-label="Foto do usuario"
         style="font-size: 10rem"
       ></i>
 
@@ -19,7 +19,7 @@
             type="text"
             class="form-control"
             id="nome"
-            :value="paciente.nome"
+            :value="usuario.nome"
             disabled
           />
         </div>
@@ -30,9 +30,30 @@
             type="email"
             class="form-control"
             id="email"
-            :value="paciente.email"
+            :value="usuario.email"
             disabled
           />
+        </div>
+
+        <div v-if="this.isProfessor === true">
+          <label for="area" class="form-label">Área</label>
+          <input
+            type="text"
+            class="form-control"
+            id="area"
+            :value="usuario.area"
+            disabled
+          >
+        </div>
+        <div v-if="isProfessor === true">
+          <label for="especialidade" class="form-label">Especialidade</label>
+          <input
+            type="text"
+            class="form-control"
+            id="especialidade"
+            :value="usuario.especialidade"
+            disabled
+          >
         </div>
 
         <div>
@@ -41,7 +62,7 @@
             type="text"
             class="form-control"
             id="telefone"
-            :value="paciente.telefone"
+            :value="usuario.telefone"
             disabled
           />
         </div>
@@ -52,7 +73,7 @@
             type="text"
             class="form-control"
             id="cpf"
-            :value="paciente.cpf"
+            :value="usuario.cpf"
             disabled
           />
         </div>
@@ -63,7 +84,7 @@
             type="date"
             class="form-control"
             id="nascimento"
-            :value="paciente.dataNascimento"
+            :value="usuario.dataNascimento"
             disabled
           />
         </div>
@@ -93,20 +114,19 @@ import ConsultaView from "@/components/Consulta";
 import BackButton from "@/components/btnVoltar.vue";
 
 export default {
+  props: {
+    isProfessor: {
+      type: Boolean,
+      default: false
+    }
+  },
   components: {
     ConsultaView,
     BackButton,
   },
   data() {
     return {
-      paciente: {
-        nome: "",
-        email: "",
-        telefone: "",
-        cpf: "",
-        dataNascimento: "",
-        id: null,
-      },
+      usuario: {},
       consultas: [],
       erro: "",
     };
@@ -114,19 +134,27 @@ export default {
   methods: {
     carregaPerfil() {
       const store = useUsuarioStore();
-      this.paciente = store.getUsuario();
+
+      this.usuario = store.getUsuario();
     },
     async carregaConsultas() {
       try {
-        if (this.paciente?.id) {
-          const response = await api.get(
-            `api/Consulta/GetConsultaPorPaciente/${this.paciente.id}`
+        let response;
+
+        if (this.usuario && this.usuario?.id && !this.isProfessor) {
+          response = await api.get(
+            `api/Consulta/GetConsultaPorPaciente/${this.usuario.id}`
           );
-          if (response.data.status) {
-            this.consultas = response.data.data;
-          } else {
-            this.erro = response.data.message;
-          }
+        } else if (this.usuario && this.usuario?.id && this.isProfessor) {
+          response = await api.get(
+            `api/Consulta/GetConsultaPorProfessor/${this.usuario.id}`
+          );
+        }
+
+        if (response.data.status) {
+          this.consultas = response.data.data;
+        } else {
+          this.erro = response.data.message;
         }
       } catch (error) {
         this.erro = "Erro ao carregar consultas.";
@@ -135,6 +163,7 @@ export default {
     },
   },
   mounted() {
+
     this.carregaPerfil();
     this.carregaConsultas();
   },

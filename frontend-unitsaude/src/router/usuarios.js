@@ -3,7 +3,6 @@ import LoginView from '@/views/Autenticacao/LoginView.vue';
 import Registrarse from '@/views/Cadastro/RegistrarseView.vue';
 import RecuperarSenha from '@/views/Autenticacao/RecuperarSenhaView.vue';
 import RedefinirSenha from '@/views/Autenticacao/RedefinirSenhaView.vue';
-import PerfilPaciente from "@/views/Visualizar/PerfilPacienteView.vue";
 
 export default [
   {
@@ -30,10 +29,4 @@ export default [
     name: 'RedefinirSenha',
     component: RedefinirSenha,
   },
-  {
-      path: "/perfilPaciente",
-      name: "PerfilPaciente",
-      component: PerfilPaciente,
-      roles: ["Administrador", "Professor", "Paciente"]
-  }
 ]

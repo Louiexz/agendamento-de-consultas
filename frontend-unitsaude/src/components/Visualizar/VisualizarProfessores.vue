@@ -78,6 +78,7 @@
 
 <script>
 import BackButton from "@/components/btnVoltar.vue";
+import { useUsuarioStore } from "@/store/usuario";
 import Header from "@/components/Header.vue";
 import api from "@/services/api";
 
@@ -96,6 +97,11 @@ export default {
     BackButton,
   },
   methods: {
+    verPerfilProfessor(usuarioSelecionado) {
+      const usuarioStore = useUsuarioStore();
+      
+      usuarioStore.setUsuario(usuarioSelecionado);
+    },
     capitalizar(str) {
       if (!str) return "";
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();

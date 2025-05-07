@@ -1,6 +1,6 @@
 <template>
     <Header/>
-    <Perfil/>
+    <Perfil :isProfessor=true />
 </template>
 
 <script>

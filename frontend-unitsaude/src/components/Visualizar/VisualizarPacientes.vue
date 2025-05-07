@@ -83,7 +83,7 @@ export default {
   methods: {
     verPerfilPaciente(usuarioSelecionado) {
       const usuarioStore = useUsuarioStore();
-
+      
       usuarioStore.setUsuario(usuarioSelecionado);
     },
     capitalizar(str) {
