@@ -197,9 +197,6 @@ export default {
     window.onCaptchaExpired = () => {
       this.onCaptchaExpired();
     };
-    setTimeout(() => {
-      if (this.checkCaptcha && this.captchaVerified) this.onCaptchaExpired();
-    }, 5000); // 10 segundos, por exemplo
   },
 };
 </script>
