@@ -98,17 +98,18 @@ export default {
     },
     onCaptchaExpired() {
       this.captchaVerified = false;
-      grecaptcha.reset();
+      if (window.grecaptcha && grecaptcha.reset) {
+        grecaptcha.reset();
+      }
     },
     loadRecaptchaScript() {
       let actualScript = document.querySelector("#recaptcha-script");
       if (actualScript) {
-        grecaptcha.reset();
+        document.head.removeChild(actualScript);
       } else {
-        //document.head.removeChild(actualScript);
         const script = document.createElement("script");
         script.id = "recaptcha-script";
-        script.src = "https://www.google.com/recaptcha/enterprise.js";
+        script.src = "https://www.google.com/recaptcha/api.js";
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
@@ -118,24 +119,23 @@ export default {
       this.isLoading = true; // Ativa o spinner
       this.erro = null; // Limpa erros anteriores
       try {
-        if (this.checkCaptcha) {
-          if (!this.captchaVerified) {
-            alert("Por favor, confirme que você não é um robô.");
-            return;
-          }
-
+        if (this.captchaVerified && this.checkCaptcha) {
           try {
             // Envia o token para o backend
-            const tokenResponse = await api.post("/api/Usuario/check-captcha", {
-              captchaToken: this.captchaToken
-            });
+            if (this.captchaToken) {
+              console.log(this.captchaToken);
+              const tokenResponse = await api.post("/api/Usuario/check-captcha", {
+                captchaToken: this.captchaToken
+              });
 
-            if (tokenResponse.data?.success === false) {
-              alert("Verificação de captcha falhou.");
+              if (!tokenResponse.data.success) {
+                console.log("Verificação de captcha falhou.");
+                return;
+              }
+            } else {
+              console.log("Token de captcha inválido");
               return;
             }
-
-            this.checkCaptcha = false;
           } catch (error) {
             console.log("Erro na verificação do captcha:", error);
           }
@@ -179,8 +179,8 @@ export default {
         }
         this.userAttempts += 1;
 
-        if (this.userAttempts >= 3) {
-          if (this.userAttempts === 3) this.checkCaptcha = true;
+        if (this.userAttempts === 3) {
+          this.checkCaptcha = true;
           this.captchaVerified = false;
           this.loadRecaptchaScript();
         }
@@ -190,9 +190,16 @@ export default {
     },
   },
   mounted() {
-    // Adicione isso para tornar os callbacks acessíveis globalmente
-    window.onCaptchaVerified = () => this.onCaptchaVerified();
-    window.onCaptchaExpired = () => this.onCaptchaExpired();
+  // Define funções globais
+    window.onCaptchaVerified = (token) => {
+      this.onCaptchaVerified(token);
+    };
+    window.onCaptchaExpired = () => {
+      this.onCaptchaExpired();
+    };
+    setTimeout(() => {
+      if (this.checkCaptcha && this.captchaVerified) this.onCaptchaExpired();
+    }, 5000); // 10 segundos, por exemplo
   },
 };
 </script>
