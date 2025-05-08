@@ -8,6 +8,7 @@ using UnitSaude.Data;
 using UnitSaude.Interfaces;
 using UnitSaude.Services;
 using UnitSaude.Utils;
+
 // Load environment variables from .env file
 Env.Load();
 var builder = WebApplication.CreateBuilder(args);
@@ -56,8 +57,6 @@ builder.Services.AddScoped<UsuarioInterface, UsuarioService>();
 builder.Services.AddScoped<DisponibilidadeInterface, DisponibilidadeService>();
 builder.Services.AddScoped<EmailService>();
 
-
-
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -100,8 +99,13 @@ var jwtSettings = builder.Configuration.GetSection("Jwt");
 
 var key = jwtSettings["Key"]
     ?? Environment.GetEnvironmentVariable("JWT_KEY");
-var keyBytes = Encoding.UTF8.GetBytes(key);
 
+if (string.IsNullOrWhiteSpace(key))
+{
+    throw new Exception("A chave JWT não foi encontrada. Configure 'Jwt:Key' no appsettings.json ou defina a variável de ambiente JWT_KEY.");
+}
+
+var keyBytes = Encoding.UTF8.GetBytes(key);
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
