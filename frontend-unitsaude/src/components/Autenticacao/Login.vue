@@ -83,15 +83,18 @@ export default {
       email: "",
       senha: "",
       erro: null,
+      isLoading: false,
+
       checkCaptcha: false,
       captchaVerified: true,
       userAttempts: 0,
-      isLoading: false,
+      captchaToken: null,
     };
   },
   methods: {
-    onCaptchaVerified() {
+    onCaptchaVerified(token) {
       this.captchaVerified = true;
+      this.captchaToken = token; // Salva o token
     },
     onCaptchaExpired() {
       this.captchaVerified = false;
@@ -105,7 +108,7 @@ export default {
         //document.head.removeChild(actualScript);
         const script = document.createElement("script");
         script.id = "recaptcha-script";
-        script.src = "https://www.google.com/recaptcha/api.js";
+        script.src = "https://www.google.com/recaptcha/enterprise.js";
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
@@ -120,14 +123,22 @@ export default {
             alert("Por favor, confirme que você não é um robô.");
             return;
           }
-          const captchaToken = grecaptcha.getResponse();
 
-          const tokenResponse = await api.post("/api/Usuario/CheckCaptcha", {
-            captchaToken: captchaToken,
-          });
+          try {
+            // Envia o token para o backend
+            const tokenResponse = await api.post("/api/Usuario/check-captcha", {
+              captchaToken: this.captchaToken
+            });
 
-          if (tokenResponse.status == false)
-            return alert("Verificação de captcha falhou.");
+            if (tokenResponse.data?.success === false) {
+              alert("Verificação de captcha falhou.");
+              return;
+            }
+
+            this.checkCaptcha = false;
+          } catch (error) {
+            console.log("Erro na verificação do captcha:", error);
+          }
         }
 
         const response = await api.post("/api/Usuario/Login", {
