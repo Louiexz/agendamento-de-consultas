@@ -66,7 +66,6 @@ public class LoginActivity extends AppCompatActivity {
                 SharedPreferencesManager preferencesManager = new SharedPreferencesManager(this);
                 String tipo = preferencesManager.getUserTipo();
 
-
             //    Intent intent;
              //   switch (tipo.toLowerCase()) {
             //        case "administrador":

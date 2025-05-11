@@ -22,10 +22,11 @@ public class SharedPreferencesManager {
         editor.apply();  // Salva de forma assíncrona
     }
 
-    public void saveUserInfo(String nome, String tipoUsuario) {
+    public void saveUserInfo(String nome, String tipoUsuario, int idUsuario) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("user_nome", nome);
         editor.putString("user_tipo", tipoUsuario);
+        editor.putInt("user_id", idUsuario);
         editor.apply();
     }
 
@@ -37,6 +38,10 @@ public class SharedPreferencesManager {
         return sharedPreferences.getString("user_tipo", null);
     }
 
+    public int getUserId() {
+        return sharedPreferences.getInt("user_id", -1);
+    }
+    
 
     public String getAuthToken() {
         return sharedPreferences.getString(KEY_AUTH_TOKEN, null);

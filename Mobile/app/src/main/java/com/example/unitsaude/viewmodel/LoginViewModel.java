@@ -82,9 +82,13 @@ public class LoginViewModel extends AndroidViewModel {
             SharedPreferencesManager preferencesManager = new SharedPreferencesManager(getApplication());
             preferencesManager.saveAuthToken(token);
 
+             // Adicione esta linha:
+            com.example.unitsaude.data.api.ApiClient.setAuthToken(token);
+
             String nome = response.getUsuario().get("nome").getAsString();
             String tipo = response.getUsuario().get("tipoUsuario").getAsString();
-            preferencesManager.saveUserInfo(nome, tipo);
+            int idUsuario = response.getUsuario().get("id_Usuario").getAsInt();
+            preferencesManager.saveUserInfo(nome, tipo, idUsuario);
 
             tokenLiveData.setValue(token);
             loginResponseLiveData.setValue(response);

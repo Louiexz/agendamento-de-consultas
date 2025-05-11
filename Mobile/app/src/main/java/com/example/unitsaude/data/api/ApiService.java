@@ -7,10 +7,15 @@ import com.example.unitsaude.data.dto.auth.RecuperarSenhaResponse;
 import com.example.unitsaude.data.dto.auth.RedefinirSenhaRequest;
 import com.example.unitsaude.data.dto.auth.RegisterRequest;
 
+import com.example.unitsaude.data.dto.consultation.GetConsultationRequest;
+import com.example.unitsaude.data.dto.consultation.GetConsultationResponse;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Path;
 import retrofit2.http.POST;
+import retrofit2.http.GET;
 
 public interface ApiService {
 
@@ -25,4 +30,7 @@ public interface ApiService {
 
     @POST("/api/Paciente/CreatePaciente")
     Call<ResponseBody> registrar(@Body RegisterRequest registerRequest);
+
+    @GET("/api/Consulta/GetConsultaPorPaciente/{pacienteId}")
+    Call<GetConsultationResponse> getConsultas(@Path("pacienteId") int pacienteId);
 }
