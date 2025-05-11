@@ -18,7 +18,7 @@
     "vue": "^3.5.13",
     "vue-cal": "^5.0.1-rc.19",
     "vue-multiselect": "^3.2.0",
-    "vue-router": "^4.0.3",
+    "vue-router": "^4.5.1",
     "vuex": "^4.0.0"
   },
   "devDependencies": {

@@ -22,8 +22,11 @@ import PerfilProfessor from "@/views/Visualizar/PerfilProfessorView.vue";
 // Usuários logados
 import PerfilPaciente from "@/views/Visualizar/PerfilPacienteView.vue";
 
+
 import { useAuthStore } from '@/store/auth';
 import { useUsuarioStore } from '@/store/usuario';
+
+
 
 const getAuth = () => useAuthStore();
 const getPerfil = () => useUsuarioStore();
@@ -109,8 +112,10 @@ router.beforeEach((to, from, next) => {
       return next("/professores")  // Bloqueia a navegação se o perfil não for 'professor'
     }
   }
+  
 
   next()
 })
+
 
 export default router
