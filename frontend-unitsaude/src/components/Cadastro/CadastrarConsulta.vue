@@ -7,139 +7,131 @@
         <BackButton class="voltar" />
         <h2>Agendar Consulta</h2>
       </div>
-      <!-- Formulário -->
+
+      <!-- Formulário em etapas -->
       <form @submit.prevent="criarConsulta">
-        <div class="consulta justify-content-center">
-          <div class="align-content-center">
-            <div class="form-group">
-              <label for="area">Área</label>
-              <select
-                v-model="selectedArea"
-                id="area"
-                class="form-control"
-                required
-              >
-                <option value="" disabled selected>
-                  Selecione uma área...
-                </option>
-                <option v-for="area in areas" :key="area" :value="area">
-                  {{ area }}
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="especialidade">Especialidade</label>
-              <select
-                v-model="selectedEspecialidade"
-                id="especialidade"
-                class="form-control"
-                required
-              >
-                <option value="" disabled selected>
-                  Selecione uma especialidade...
-                </option>
-                <option
-                  v-for="especialidade in especialidades"
-                  :key="especialidade"
-                  :value="especialidade"
-                >
-                  {{ especialidade }}
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group position-relative">
-              <label for="paciente">Paciente</label>
-              <input
-                v-model="searchPaciente"
-                type="text"
-                id="paciente"
-                class="form-control"
-                placeholder="Digite nome ou CPF do paciente"
-                autocomplete="off"
-              />
-              <ul
-                v-if="pacientes.length"
-                class="list-group position-absolute w-100"
-                style="z-index: 1000"
-              >
-                <li
-                  v-for="paciente in pacientes"
-                  :key="paciente.id"
-                  @click="selecionarPaciente(paciente)"
-                  class="list-group-item list-group-item-action"
-                  style="cursor: pointer"
-                >
-                  {{ paciente.nome }} - {{ paciente.cpf }}
-                </li>
-              </ul>
-            </div>
-
-            <div class="form-group">
-              <label for="professor">Professor</label>
-              <select
-                v-model="selectedProfessor"
-                id="professor"
-                class="form-control"
-                required
-              >
-                <option value="" disabled selected>
-                  Selecione um professor...
-                </option>
-                <option
-                  v-for="professor in professores"
-                  :key="professor.id"
-                  :value="professor.id"
-                >
-                  {{ professor.nome }}
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="horario">Horário</label>
-              <select
-                v-model="horarioConsulta"
-                id="horario"
-                class="form-control"
-                style="height: 45px"
-                required
-              >
-                <option disabled value="">Selecione um horário</option>
-
-                <!-- Grupo de Horários Disponíveis -->
-                <optgroup label="Disponíveis">
-                  <option
-                    v-for="item in horariosDisponiveis.filter(
-                      (h) => h.status === 'Disponível'
-                    )"
-                    :key="item.horario"
-                    :value="item.horario"
-                  >
-                    {{ item.horario }}
-                  </option>
-                </optgroup>
-
-                <!-- Grupo de Horários Indisponíveis -->
-                <optgroup label="Fila de Espera">
-                  <option
-                    v-for="item in horariosDisponiveis.filter(
-                      (h) => h.status !== 'Disponível'
-                    )"
-                    :key="item.horario + '-fila'"
-                    :value="item.horario"
-                  >
-                    {{ item.horario }}
-                  </option>
-                </optgroup>
-              </select>
-            </div>
+        <!-- Etapa 1: Seleção de Área e Especialidade -->
+        <div v-if="etapaAtual === 1" class="etapa">
+          <div class="form-group">
+            <label for="area">Área</label>
+            <select
+              v-model="selectedArea"
+              id="area"
+              class="form-control"
+              required
+            >
+              <option value="" disabled selected>Selecione uma área...</option>
+              <option v-for="area in areas" :key="area" :value="area">
+                {{ area }}
+              </option>
+            </select>
           </div>
 
-          <div class="form-group calendario-wrapper">
-            <!-- <label for="data">Data</label> -->
+          <div class="form-group">
+            <label for="especialidade">Especialidade</label>
+            <select
+              v-model="selectedEspecialidade"
+              id="especialidade"
+              class="form-control"
+              required
+            >
+              <option value="" disabled selected>
+                Selecione uma especialidade...
+              </option>
+              <option
+                v-for="especialidade in especialidades"
+                :key="especialidade"
+                :value="especialidade"
+              >
+                {{ especialidade }}
+              </option>
+            </select>
+          </div>
 
+          <div class="form-group botaocentro">
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="avancarEtapa(2)"
+              :disabled="!selectedArea || !selectedEspecialidade"
+            >
+              Próximo
+            </button>
+          </div>
+        </div>
+
+        <!-- Etapa 2: Seleção de Paciente -->
+        <div v-if="etapaAtual === 2" class="etapa">
+          <div class="form-group position-relative">
+            <label for="paciente">Paciente</label>
+            <input
+              v-model="searchPaciente"
+              type="text"
+              id="paciente"
+              class="form-control"
+              placeholder="Digite nome ou CPF do paciente"
+              autocomplete="off"
+            />
+            <ul
+              v-if="pacientes.length"
+              class="list-group position-absolute w-100"
+              style="z-index: 1000"
+            >
+              <li
+                v-for="paciente in pacientes"
+                :key="paciente.id"
+                @click="selecionarPaciente(paciente)"
+                class="list-group-item list-group-item-action"
+                style="cursor: pointer"
+              >
+                {{ paciente.nome }} - {{ paciente.cpf }}
+              </li>
+            </ul>
+          </div>
+
+          <div class="form-group">
+            <label for="professor">Professor</label>
+            <select
+              v-model="selectedProfessor"
+              id="professor"
+              class="form-control"
+              required
+            >
+              <option value="" disabled selected>
+                Selecione um professor...
+              </option>
+              <option
+                v-for="professor in professores"
+                :key="professor.id"
+                :value="professor.id"
+              >
+                {{ professor.nome }}
+              </option>
+            </select>
+          </div>
+
+          <div class="botoes-navegacao">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="retrocederEtapa(1)"
+            >
+              Voltar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="avancarEtapa(3)"
+              :disabled="!selectedPacienteId || !selectedProfessor"
+            >
+              Próximo
+            </button>
+          </div>
+        </div>
+
+        <!-- Etapa 3: Seleção de Data e Horário -->
+        <div v-if="etapaAtual === 3" class="etapa">
+          <div class="calendario-wrapper">
             <vue-cal
               date-picker
               default-view="month"
@@ -148,19 +140,27 @@
               :min-date="new Date().toISOString().split('T')[0]"
               :disabled-dates="disableSundays"
               @cell-click="selecionarData"
+              :selected-date="dataConsulta"
             />
           </div>
-        </div>
-        <div class="form-group botaocentro">
-          <button type="submit" class="btn btn-primary" :disabled="isLoading">
-            <span v-if="!isLoading">Agendar</span>
-            <span
-              v-else
-              class="spinner-border spinner-border-sm"
-              role="status"
-              aria-hidden="true"
-            ></span>
-          </button>
+
+          <div class="botoes-navegacao">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="retrocederEtapa(2)"
+            >
+              Voltar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="mostrarHorariosSweetAlert"
+              :disabled="!dataConsulta"
+            >
+              Selecionar Horário
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -198,7 +198,7 @@ export default {
       horarioConsulta: "",
       statusConsulta: "Agendada",
       erro: null,
-      isLoading: false,
+      etapaAtual: 1, // Nova propriedade para controlar a etapa atual
     };
   },
   methods: {
@@ -254,6 +254,28 @@ export default {
       const day = new Date(date).getDay(); // Obtemos o dia da semana (0 = Domingo, 1 = Segunda, ...)
       return day === 0; // Retorna true se for domingo
     },
+    formatarData(data) {
+      if (!data) return "";
+      const options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+      return new Date(data).toLocaleDateString("pt-BR", options);
+    },
+
+    avancarEtapa(novaEtapa) {
+      this.etapaAtual = novaEtapa;
+      // Quando avançar para a etapa 3, carregar horários se já tiver data selecionada
+      if (novaEtapa === 3 && this.dataConsulta) {
+        this.obterHorariosDisponiveis();
+      }
+    },
+
+    retrocederEtapa(etapaAnterior) {
+      this.etapaAtual = etapaAnterior;
+    },
     selecionarData(payload) {
       const dataSelecionada = payload?.cell?.start;
       if (!(dataSelecionada instanceof Date)) {
@@ -275,49 +297,143 @@ export default {
 
       this.dataConsulta = dataSelecionada.toISOString().split("T")[0];
       console.log("Data selecionada:", this.dataConsulta);
+      this.obterHorariosDisponiveis();
+    },
+
+    selecionarHorario(horario) {
+      this.horarioConsulta = horario;
     },
     async obterProfessores() {
-  try {
-    this.isLoading = true;
-    const response = await api.get('/api/Professor/listar-professores-especialidade', {
-      params: {
-        especialidade: this.selectedEspecialidade
-      },
-      paramsSerializer: {
-        indexes: null // Remove notação de array
+      try {
+        const response = await api.get(
+          `/api/Professor/listar-professores-especialidade?especialidade=${this.selectedEspecialidade}`
+        );
+        console.log(response);
+        this.professores = response.data.data;
+      } catch (error) {
+        console.error("Erro ao carregar professores:", error);
+        this.erro = "Erro ao carregar professores. Tente novamente mais tarde.";
       }
-    });
+    },
 
-    if (response.data?.status) {
-      this.professores = response.data.data;
-    } else {
-      console.error('Erro na resposta:', response.data?.message);
-      this.professores = [];
-    }
-  } catch (error) {
-    console.error('Erro na requisição:', {
-      message: error.message,
-      response: error.response?.data
-    });
-    this.erro = "Não foi possível carregar os professores";
-  } finally {
-    this.isLoading = false;
-  }
-},
+    async mostrarHorariosSweetAlert() {
+      try {
+        // Mostra loading enquanto busca horários (exatamente como no exemplo)
+        Swal.fire({
+          title: "Buscando horários...",
+          html: "Aguarde enquanto carregamos os horários disponíveis",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
 
+        const response = await api.get("/api/Consulta/horarios-disponiveis", {
+          params: {
+            data: this.dataConsulta,
+            area: this.selectedArea,
+            especialidade: this.selectedEspecialidade,
+          },
+        });
+
+        Swal.close(); // Fecha loading
+
+        // Verifica se existem horários (igual ao exemplo)
+        if (!response.data.status || !response.data.data.length) {
+          return Swal.fire({
+            icon: "error",
+            title: "Sem horários disponíveis",
+            text: "Não encontramos horários para esta data. Tente outra data ou entre em contato.",
+            confirmButtonColor: "#d8bd2c",
+          });
+        }
+
+        const horariosDisponiveis = response.data.data;
+
+        // Cria as opções de seleção igual ao exemplo
+        const inputOptions = horariosDisponiveis.reduce((options, horario) => {
+          const group =
+            horario.status === "Disponível"
+              ? "Horários Disponíveis"
+              : "Fila de Espera";
+          if (!options[group]) options[group] = {};
+          options[group][horario.horario] = `${horario.horario}${
+            horario.status !== "Disponível" ? ` (${horario.status})` : ""
+          }`;
+          return options;
+        }, {});
+
+        // Mostra o select de horários igual ao exemplo
+        const { value: novoHorario } = await Swal.fire({
+          title: `Selecione o horário para ${this.formatarData(
+            this.dataConsulta
+          )}`,
+          input: "select",
+          inputOptions: inputOptions,
+          inputPlaceholder: "Selecione um horário",
+          showCancelButton: true,
+          confirmButtonText: "Confirmar",
+          cancelButtonText: "Voltar",
+          confirmButtonColor: "#d8bd2c",
+          inputValidator: (value) =>
+            !value && "Selecione um horário para continuar",
+        });
+
+        if (novoHorario) {
+          // Remove o status do horário se existir (igual ao exemplo)
+          this.horarioConsulta = novoHorario.split(" ")[0];
+
+          // Mostra confirmação antes de agendar
+          const { isConfirmed } = await Swal.fire({
+            title: "Confirmar agendamento?",
+            html: `
+            <div style="text-align:left">
+              <p><b>Detalhes do agendamento:</b></p>
+              <p>• Data: <b>${this.formatarData(this.dataConsulta)}</b></p>
+              <p>• Horário: <b>${this.horarioConsulta}</b></p>
+              <p>• Área: <b>${this.selectedArea}</b></p>
+              <p>• Especialidade: <b>${this.selectedEspecialidade}</b></p>
+            </div>
+          `,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#28a745",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Confirmar Agendamento",
+            cancelButtonText: "Revisar",
+          });
+
+          if (isConfirmed) {
+            // Chama o método de criação da consulta
+            await this.criarConsulta();
+          }
+        }
+      } catch (error) {
+        Swal.close();
+        console.error("Erro ao carregar horários:", error);
+
+        await Swal.fire({
+          icon: "error",
+          title: "Erro ao carregar horários",
+          text: "Ocorreu um erro ao buscar os horários disponíveis. Por favor, tente novamente.",
+          confirmButtonColor: "#d8bd2c",
+        });
+      }
+    },
+    // Modificação no método obterHorariosDisponiveis para carregar automaticamente
     async obterHorariosDisponiveis() {
       if (
         !this.dataConsulta ||
         !this.selectedArea ||
         !this.selectedEspecialidade
-      ) {
-        return; // Não faz a requisição se algum dado necessário estiver ausente
-      }
+      )
+        return;
 
       try {
+        this.isLoadingHorarios = true;
         const response = await api.get("/api/Consulta/horarios-disponiveis", {
           params: {
-            data: this.dataConsulta, // Certifique-se de que está formatando a data corretamente
+            data: this.dataConsulta,
             area: this.selectedArea,
             especialidade: this.selectedEspecialidade,
           },
@@ -327,18 +443,23 @@ export default {
           this.horariosDisponiveis = response.data.data;
         } else {
           this.horariosDisponiveis = [];
-          Swal.fire({
-            icon: "info",
-            title: "Nenhum horário disponível",
-            text: response.data.message,
-            background: "#ffffff",
-            color: "#186fc0",
-            confirmButtonColor: "#d8bd2c",
-          });
+          // Mostrar feedback apenas se estiver na etapa de seleção de horário
+          if (this.etapaAtual === 3) {
+            Swal.fire({
+              icon: "info",
+              title: "Nenhum horário disponível",
+              text: response.data.message,
+              confirmButtonColor: "#d8bd2c",
+            });
+          }
         }
       } catch (error) {
         console.error("Erro ao carregar horários disponíveis:", error);
-        this.erro = "Erro ao carregar horários. Tente novamente mais tarde.";
+        if (this.etapaAtual === 3) {
+          this.erro = "Erro ao carregar horários. Tente novamente mais tarde.";
+        }
+      } finally {
+        this.isLoadingHorarios = false;
       }
     },
 
@@ -362,9 +483,6 @@ export default {
         return;
       }
 
-      this.isLoading = true; // Ativa o spinner
-      this.erro = null; // Limpa erros anteriores
-
       const consulta = {
         data: this.dataConsulta,
         horario: this.horarioConsulta,
@@ -375,11 +493,25 @@ export default {
         professorId: this.selectedProfessor,
       };
 
+      // Armazena a referência do alerta de loading
+      const loadingAlert = Swal.fire({
+        title: "Agendando consulta...",
+        html: "Por favor, aguarde enquanto processamos seu agendamento",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       try {
         const response = await api.post(
           "/api/Consulta/CreateConsulta",
           consulta
         );
+
+        // Fecha o loading antes de mostrar o sucesso
+        await loadingAlert.close();
+
         await Swal.fire({
           icon: "success",
           title: "Consulta agendada com sucesso!",
@@ -392,7 +524,12 @@ export default {
         });
 
         this.resetForm();
+
+        this.$router.push('/admin');
       } catch (error) {
+        // Fecha o loading em caso de erro também
+        await loadingAlert.close();
+
         const mensagemErro =
           error.response && error.response.data && error.response.data.message
             ? error.response.data.message
@@ -406,8 +543,6 @@ export default {
           color: "#186fc0",
           confirmButtonColor: "#d8bd2c",
         });
-      } finally {
-        this.isLoading = false; // Desativa o spinner independente do resultado
       }
     },
     resetForm() {
@@ -515,6 +650,192 @@ select.form-control:hover {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* Novos estilos para o fluxo em etapas */
+.etapa {
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.botoes-navegacao {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+/* Estilos para a grade de horários */
+.horarios-container {
+  margin-top: 2rem;
+  animation: slideUp 0.4s ease;
+}
+
+.horarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.horario-btn {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  text-align: center;
+}
+
+.horario-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.horario-disponivel {
+  background-color: #f8f9fa;
+  border-color: #186fc0;
+  color: #186fc0;
+}
+
+.horario-disponivel:hover {
+  background-color: #e7f3ff;
+}
+
+.horario-indisponivel {
+  background-color: #f8f9fa;
+  border-color: #ddd;
+  color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.horario-selecionado {
+  background-color: #d8bd2c;
+  color: white;
+  border-color: #d8bd2c;
+}
+
+.badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Estilos para o SweetAlert de horários */
+.swal-horarios-container {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.swal-horarios-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.swal-horarios-group h5 {
+  text-align: left;
+  margin: 0 0 10px 0;
+  color: #186fc0;
+  font-size: 1.1rem;
+}
+
+.swal-horarios-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.swal-horario-btn {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  text-align: center;
+  font-size: 14px;
+  outline: none;
+}
+
+.swal-horario-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.swal-horario-btn:not(.espera) {
+  border-color: #186fc0;
+  color: #186fc0;
+}
+
+.swal-horario-btn:not(.espera):hover {
+  background-color: #e7f3ff;
+}
+
+.swal-horario-btn.selected {
+  background-color: #d8bd2c;
+  color: white;
+  border-color: #d8bd2c;
+}
+
+.swal-horario-btn.espera {
+  border-color: #ddd;
+  color: #6c757d;
+  opacity: 0.9;
+}
+
+.swal-horario-btn.espera:hover {
+  opacity: 1;
+}
+
+.swal-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ajustes para mobile */
+@media (max-width: 600px) {
+  .swal-horarios-buttons {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+
+  .swal-horarios-group h5 {
+    font-size: 1rem;
+  }
 }
 
 /* Estiliza o contêiner principal do calendário */
