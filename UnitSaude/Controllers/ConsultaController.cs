@@ -185,5 +185,12 @@ namespace UnitSaude.Controllers
             }
         }
 
+        [HttpPost("confirmar/{id}")]
+        public async Task<ActionResult<ResponseModel<ReadConsultaDto>>> ConfirmarConsulta(int id)
+        {
+            var response = await _consultaService.ConfirmarConsulta(id);
+            return Ok(response);
+        }
+
     }
 }

@@ -12,7 +12,7 @@
         { "Psicologia", new List<string> { "Clínica", "Escolar" } }
     };
 
-        public static readonly List<string> Status = new List<string> { "Em Espera", "Agendada", "Concluída", "Cancelada" };
+        public static readonly List<string> Status = new List<string> { "Em Espera", "Agendada", "Concluída", "Cancelada", "Pendente" };
 
         public static List<string> ObterAreas()
             => EspecialidadesPorArea.Keys.ToList();

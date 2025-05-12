@@ -7,6 +7,7 @@ namespace UnitSaude.Dto.Consulta
     {
         public DateOnly? Data { get; set; }
         public TimeOnly? Horario { get; set; }
+        public DateTime DataCadastro { get; set; } = DateTime.UtcNow;
         public required string Status { get; set; }
         public required string Area { get; set; }
         public required string Especialidade { get; set; }

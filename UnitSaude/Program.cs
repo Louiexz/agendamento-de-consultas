@@ -8,6 +8,8 @@ using UnitSaude.Data;
 using UnitSaude.Interfaces;
 using UnitSaude.Services;
 using UnitSaude.Utils;
+using Hangfire;
+using Hangfire.PostgreSql;
 
 // Load environment variables from .env file
 Env.Load();
@@ -47,6 +49,27 @@ builder.Services.AddDbContext<ClinicaDbContext>(options =>
     options.UseNpgsql(connectionString)
 );
 
+var hangfireConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? connectionString;
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UsePostgreSqlStorage(hangfireConnectionString, new PostgreSqlStorageOptions
+    {
+        QueuePollInterval = TimeSpan.FromSeconds(15), // Intervalo de verificação de jobs
+        InvisibilityTimeout = TimeSpan.FromHours(3), // Tempo máximo que um job pode ficar invisível
+        DistributedLockTimeout = TimeSpan.FromMinutes(5), // Tempo máximo para locks distribuídos
+        PrepareSchemaIfNecessary = true, // Cria automaticamente as tabelas necessárias
+        EnableTransactionScopeEnlistment = true
+    }));
+
+// Adiciona o servidor de processamento de jobs
+builder.Services.AddHangfireServer(options => {
+    options.ServerName = "UnitSaude.Hangfire"; // Nome do servidor
+    options.Queues = new[] { "default" }; // Filas a serem monitoradas
+    options.WorkerCount = Environment.ProcessorCount * 5; // Número de workers
+});
+
 builder.Services.AddScoped<AdminInterface, AdminService>();
 builder.Services.AddScoped<AnexoInterface, AnexoService>();
 builder.Services.AddScoped<ConsultaInterface, ConsultaService>();
@@ -56,6 +79,7 @@ builder.Services.AddScoped<ProntuarioInterface, ProntuarioService>();
 builder.Services.AddScoped<UsuarioInterface, UsuarioService>();
 builder.Services.AddScoped<DisponibilidadeInterface, DisponibilidadeService>();
 builder.Services.AddScoped<EmailService>();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers()
@@ -154,12 +178,23 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+ServiceActivator.Configure(app.Services);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    // Dashboard do Hangfire apenas em desenvolvimento
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        DashboardTitle = "UnitSaude - Hangfire Dashboard",
+        Authorization = new[] { new HangfireAuthorizationFilter() },
+        StatsPollingInterval = 5000 // Atualiza a cada 5 segundos
+    });
 }
+
 
 app.UseHttpsRedirection();
 

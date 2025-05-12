@@ -6,6 +6,7 @@ namespace UnitSaude.Models
     public class Consulta
     {
         public int id_Consulta { get; set; }
+        public DateTime DataCadastro { get; set; } = DateTime.UtcNow;
         public DateOnly? Data { get; set; }
         public TimeOnly? Horario { get; set; }
         public required string Status { get; set; }

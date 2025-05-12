@@ -13,6 +13,11 @@ namespace UnitSaude.Data.Map
             builder.Property(u => u.Horario).IsRequired(false);
             builder.Property(u => u.Status).IsRequired().HasMaxLength(20);
 
+            // Para definir um valor padrão na aplicação (caso não queira usar SQL)
+            builder.Property(u => u.DataCadastro)
+                   .IsRequired();
+
+
             builder.HasOne(u => u.Paciente)
                    .WithMany(u => u.Consultas)
                    .HasForeignKey(u => u.PacienteId)
