@@ -31,16 +31,14 @@ export default {
   font-size: 35px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* sombra leve inicial */
-  border-radius: 100%;
-  padding: 8px;
   background-color: none;
 }
 
 .bi-arrow-left:hover {
   color: #186fc0;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* sombra mais forte no hover */
-  transform: translateY(-2px) scale(1.05);  /* leve "pulo" e aumento */
+  transform: translateY(-2px) scale(1.05); /* Leve "pulo" e aumento */
+  filter: brightness(1.2) contrast(1.1);  /* Brilho e contraste ajustados */
+  filter: brightness(1.2) contrast(1.1) drop-shadow(0 4px 4px rgba(0, 0, 0, 0.4)); 
 }
 
 

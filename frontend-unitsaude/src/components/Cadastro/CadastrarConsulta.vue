@@ -196,7 +196,7 @@ export default {
       searchPaciente: "",
       dataConsulta: "",
       horarioConsulta: "",
-      statusConsulta: "Agendada",
+      statusConsulta: "Pendente",
       erro: null,
       etapaAtual: 1, // Nova propriedade para controlar a etapa atual
     };
@@ -256,13 +256,19 @@ export default {
     },
     formatarData(data) {
       if (!data) return "";
+
+      const date = new Date(data);
+      // Adiciona 3 horas para compensar UTC → Brasília
+      date.setHours(date.getHours() + 3);
+
       const options = {
         weekday: "long",
         year: "numeric",
         month: "long",
         day: "numeric",
       };
-      return new Date(data).toLocaleDateString("pt-BR", options);
+
+      return date.toLocaleDateString("pt-BR", options);
     },
 
     avancarEtapa(novaEtapa) {
@@ -491,6 +497,7 @@ export default {
         especialidade: this.selectedEspecialidade,
         pacienteId: this.selectedPacienteId,
         professorId: this.selectedProfessor,
+        dataCadastro: new Date().toISOString(), // Adiciona a data de cadastro atual
       };
 
       // Armazena a referência do alerta de loading
@@ -525,7 +532,7 @@ export default {
 
         this.resetForm();
 
-        this.$router.push('/admin');
+        this.$router.push("/admin");
       } catch (error) {
         // Fecha o loading em caso de erro também
         await loadingAlert.close();
