@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Componente Header -->
-    <Header/>
+    <Header />
 
     <div
       class="main d-flex min-vh-100 justify-content-center align-items-center"
@@ -51,7 +51,7 @@
         <router-link to="/consultas/Fisioterapia" class="card p-3 no-underline">
           <span>Fisioterapia</span>
         </router-link>
-        <router-link to="/consultas/Nutricao" class="card p-3 no-underline">
+        <router-link to="/consultas/Nutrição" class="card p-3 no-underline">
           <span>Nutrição</span>
         </router-link>
         <router-link to="/consultas/Odontologia" class="card p-3 no-underline">
@@ -59,6 +59,9 @@
         </router-link>
         <router-link to="/consultas/Psicologia" class="card p-3 no-underline">
           <span>Psicologia</span>
+        </router-link>
+        <router-link to="/consultas/Enfermagem" class="card p-3 no-underline">
+          <span>Enfermagem</span>
         </router-link>
       </div>
     </div>
@@ -146,6 +149,5 @@ span {
   span {
     font-size: small;
   }
-  
 }
 </style>

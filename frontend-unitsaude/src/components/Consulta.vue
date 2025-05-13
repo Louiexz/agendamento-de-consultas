@@ -2,7 +2,27 @@
   <div class="consulta shadow-sm mb-1">
     <span>
       <b>{{ formatData(consulta.data) }} às {{ consulta.horario }}</b>
-      <StatusBadge :status="consulta.status" />
+      
+      <span
+        v-if="consulta.status === 'Concluída'"
+        class="badge bg-success ms-2"
+        >Concluída</span
+      >
+      <span
+        v-if="consulta.status === 'Cancelada'"
+        class="badge bg-danger ms-2"
+        >Cancelada</span
+      >
+      <span
+        v-if="consulta.status === 'Pendente'"
+        class="badge bg-warning  ms-2"
+        >Pendente</span
+      >
+      <span
+        v-else-if="consulta.status === 'Em Espera'"
+        class="badge bg-info ms-2"
+        >Em Espera</span
+      >
     </span>
     <span>
       <i class="bi bi-clipboard2-pulse-fill"></i>
@@ -14,7 +34,7 @@
 
     <div class="consulta-detalhes">
       <button
-        v-if="consulta.status === 'Pendente'"
+        v-if="consulta.status === 'Pendente' && isAdmin"
         class="btn-confirmar me-2"
         @click="confirmarConsulta(consulta)"
       >
@@ -46,6 +66,7 @@ export default {
       auth: useAuthStore(),
     };
   },
+  
   methods: {
     formatData(data) {
       if (!data) return "";

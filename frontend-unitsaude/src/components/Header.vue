@@ -25,15 +25,23 @@
         <strong>{{ auth.nomeUsuario }}</strong> <br />
         <small>{{ auth.tipoUsuario }}</small>
       </div>
-      <i class="bi bi-person-circle"></i>
+      <RouterLink
+        :to="perfilRoute"
+        @click="carregarPerfilUsuarioLogado"
+        class="icon"
+      >
+        <i class="bi bi-person-circle"></i>
+      </RouterLink>
       <LogoutButton />
     </div>
   </nav>
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useAuthStore } from "@/store/auth";
+import { useUsuarioStore } from "@/store/usuario";
+import api from "@/services/api";
 import LogoutButton from "@/components/Autenticacao/Logout.vue";
 
 export default {
@@ -42,11 +50,54 @@ export default {
   },
   setup() {
     const auth = useAuthStore();
+    const usuarioStore = useUsuarioStore();
     const isMenuOpen = ref(false);
+
+    // Computed property para determinar a rota de perfil baseada no tipo de usuário
+    const perfilRoute = computed(() => {
+      switch (auth.tipoUsuario) {
+        case "Administrador":
+          return "/perfilAdmin";
+        case "Professor":
+          return "/perfilProfessor";
+        case "Paciente":
+          return "/perfilPaciente";
+        default:
+          return "/";
+      }
+    });
+
+    // Método para carregar os dados do usuário logado
+    const carregarPerfilUsuarioLogado = async () => {
+      try {
+        // Limpa o perfil atual antes de carregar o novo
+        usuarioStore.limparPerfil();
+        usuarioStore.setUsuario({});
+
+        // Define o perfil como o do usuário logado e busca os dados
+        if (auth.tipoUsuario === "Paciente") {
+          usuarioStore.setPerfil("paciente");
+          const response = await api.get(`/api/Paciente/${auth.id_Usuario}`);
+          usuarioStore.setUsuario(response.data.data);
+        } else if (auth.tipoUsuario === "Professor") {
+          usuarioStore.setPerfil("professor");
+          const response = await api.get(`/api/Professor/${auth.id_Usuario}`);
+          usuarioStore.setUsuario(response.data.data);
+        } else if (auth.tipoUsuario === "Administrador") {
+          usuarioStore.setPerfil("admin");
+          const response = await api.get(`/api/Admin/${auth.id_Usuario}`);
+          usuarioStore.setUsuario(response.data.data);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar perfil do usuário logado:", error);
+      }
+    };
 
     return {
       auth,
       isMenuOpen,
+      perfilRoute,
+      carregarPerfilUsuarioLogado,
     };
   },
 };
@@ -56,9 +107,17 @@ export default {
 .logo {
   width: 120px;
 }
-
+.icon {
+  text-decoration: none;
+}
 .bi-person-circle {
   font-size: 40px;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+.bi-person-circle:hover {
+  color: #d8bd2c;
 }
 
 .bg-primary {

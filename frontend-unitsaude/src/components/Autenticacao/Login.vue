@@ -150,11 +150,14 @@ export default {
         const token = response.data.token;
         const tipoUsuario = response.data.usuario.tipoUsuario;
         const nomeUsuario = response.data.usuario.nome;
+        const id_Usuario = response.data.usuario.id_Usuario;
+        
 
         const auth = useAuthStore();
         auth.setToken(token);
         auth.setNomeUsuario(nomeUsuario);
         auth.setTipoUsuario(tipoUsuario);
+        auth.setUserId(id_Usuario);
 
         if (tipoUsuario === "Administrador") {
           this.$router.push("/admin");
