@@ -425,62 +425,178 @@ export default {
     },
 
     async alterarStatusConsulta(consulta) {
+      const { value: novoStatus } = await Swal.fire({
+        title: "Alterar Status da Consulta",
+        html: `<div style="text-align:left">
+             <p><b>Consulta:</b> ${consulta.nomePaciente} com ${
+          consulta.nomeProfessor
+        }</p>
+             <p><b>Data:</b> ${this.formatData(consulta.data)} às ${
+          consulta.horario
+        }</p>
+             <p><b>Status atual:</b> ${consulta.status}</p>
+           </div>`,
+        input: "select",
+        inputOptions: {
+          Agendada: "Agendada",
+          Concluída: "Concluída",
+          Cancelada: "Cancelada",
+        },
+        inputPlaceholder: "Selecione o novo status",
+        inputValidator: (value) => {
+          if (!value) return "Selecione um status válido";
+          if (value === consulta.status)
+            return "O status deve ser diferente do atual";
+        },
+        showCancelButton: true,
+        confirmButtonText: "Confirmar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#d8bd2c",
+        cancelButtonColor: "#d33",
+        allowOutsideClick: false,
+      });
+
+      if (!novoStatus) return;
+
       try {
-        const { value: novoStatus } = await Swal.fire({
-          title: "Alterar Status",
-          html: this.getStatusChangeHtml(consulta),
-          input: "select",
-          inputOptions: {
-            Agendada: "Agendada",
-            Concluída: "Concluída",
-            Cancelada: "Cancelada",
-          },
-          inputPlaceholder: "Selecione o novo status",
-          inputValidator: (value) => {
-            if (!value) return "Selecione um status válido";
-            if (value === consulta.status) return "O status deve ser diferente";
-          },
-          showCancelButton: true,
-          confirmButtonText: "Confirmar",
-          cancelButtonText: "Cancelar",
-          confirmButtonColor: "#d8bd2c",
-          cancelButtonColor: "#d33",
-        });
-
-        if (!novoStatus) return;
-
+        // Mostra loading durante a requisição
         Swal.fire({
-          title: "Atualizando...",
+          title: "Atualizando status...",
           allowOutsideClick: false,
           didOpen: () => Swal.showLoading(),
         });
 
-        const { data } = await api.patch(
+        const resposta = await api.patch(
           `/api/Consulta/${consulta.id_Consulta}/status`,
           {
-            novoStatus,
+            novoStatus: novoStatus,
           }
         );
 
-        Swal.fire({
-          icon: "success",
-          title: "✅ Status atualizado!",
-          html: this.getStatusUpdatedHtml(novoStatus),
-          confirmButtonColor: "#d8bd2c",
-        });
+        Swal.close();
 
-        this.$emit("consulta-atualizada", {
-          id: consulta.id_Consulta,
-          novoStatus,
-        });
+        if (resposta.data.status) {
+          await Swal.fire({
+            icon: "success",
+            title: "✅ Status atualizado!",
+            html: `<div style="text-align:left">
+                 <p>Status alterado para: <b>${novoStatus}</b></p>
+                 ${
+                   novoStatus === "Cancelada"
+                     ? "<p>O paciente e professor serão notificados por e-mail.</p>"
+                     : ""
+                 }
+               </div>`,
+            confirmButtonColor: "#d8bd2c",
+          });
 
-        if (novoStatus === "Concluída") {
-          await this.verificarConsultasEmEspera(consulta);
+          // Dentro de alterarStatusConsulta():          // Dentro de alterarStatusConsulta():
+          this.$emit("consulta-atualizada", {
+            id: consulta.id_Consulta,
+            novoStatus: novoStatus, // Novo status selecionado
+          });
+          // Só verifica consultas em espera se o status foi alterado para "Concluída"
+          if (novoStatus === "Concluída") {
+            await this.verificarConsultasEmEspera(consulta);
+          }
+        } else {
+          throw new Error(resposta.data.message);
         }
       } catch (error) {
-        this.handleError(error, "Falha na atualização");
+        Swal.fire({
+          icon: "error",
+          title: "Falha na atualização",
+          html: `<div style="text-align:left">
+               <p><b>Erro ao alterar status:</b></p>
+               <p>${error.response?.data?.message || error.message}</p>
+             </div>`,
+          confirmButtonColor: "#d8bd2c",
+        });
       }
     },
+
+    async verificarConsultasEmEspera(consultaConcluida) {
+      try {
+        // Verifica se a consulta concluída estava AGENDADA
+        if (consultaConcluida.status !== "Agendada") {
+          console.log(
+            "Consulta concluída não estava agendada, ignorando fila de espera"
+          );
+          return;
+        }
+
+        // Verifica disponibilidade para o horário
+        const disponibilidade = await api.get(
+          "/api/Disponibilidade/Verificar",
+          {
+            params: {
+              area: consultaConcluida.area,
+              especialidade: consultaConcluida.especialidade,
+              data: consultaConcluida.data,
+              horario: consultaConcluida.horario,
+            },
+          }
+        );
+
+        if (!disponibilidade.data.disponivel) {
+          console.log("Não há disponibilidade para este horário");
+          return;
+        }
+
+        // Verifica se já existe consulta AGENDADA ou PENDENTE no mesmo horário
+        const conflito = await api.get("/api/Consulta/VerificarConflito", {
+          params: {
+            area: consultaConcluida.area,
+            especialidade: consultaConcluida.especialidade,
+            data: consultaConcluida.data,
+            horario: consultaConcluida.horario,
+          },
+        });
+
+        if (conflito.data.existe) {
+          console.log("Já existe consulta agendada/pendente neste horário");
+          return;
+        }
+
+        // Busca a próxima consulta em espera
+        const response = await api.get("/api/Consulta/ProximaEmEspera", {
+          params: {
+            area: consultaConcluida.area,
+            especialidade: consultaConcluida.especialidade,
+            data: consultaConcluida.data,
+            horario: consultaConcluida.horario,
+          },
+        });
+
+        if (response.data.consulta) {
+          // Atualiza automaticamente para Pendente
+          await api.patch(
+            `/api/Consulta/${response.data.consulta.id_Consulta}/status`,
+            {
+              status: "Pendente",
+            }
+          );
+
+          // Atualiza a lista local
+          this.$emit("consulta-atualizada", {
+            id: response.data.consulta.id_Consulta,
+            novoStatus: "Pendente",
+          });
+
+          // Envia notificação por e-mail (opcional)
+          await api.post("/api/Notificacao/Enviar", {
+            consultaId: response.data.consulta.id_Consulta,
+            tipo: "MovidaParaPendente",
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao verificar consultas em espera:", error);
+        // Não mostra alerta para o usuário, apenas loga o erro
+      }
+    },
+
+
+  },
 
     handleError(error, title) {
       console.error(title, error);
@@ -492,8 +608,7 @@ export default {
       });
     },
 
-    // ... manter os outros métodos (verificarConsultasEmEspera, etc)
-  },
+
   computed: {
     isAdmin() {
       return this.auth.tipoUsuario === "Administrador";
