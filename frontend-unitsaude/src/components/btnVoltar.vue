@@ -18,6 +18,8 @@ export default {
       } else if (auth.tipoUsuario === "Administrador") {
         // Se o usuário for um administrador, redireciona para uma página específica
         this.$router.push("/admin"); // Substitua '/paginaX' pela página do administrador
+      }  else if (auth.tipoUsuario === "Professor") {
+        this.$router.push("/professor");
       }
     },
   },
