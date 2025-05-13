@@ -15,13 +15,7 @@
             <i class="bi bi-calendar-plus-fill"></i>
             <span>Disponibilizar Horários</span>
           </router-link>
-          <router-link
-            to="/cadastrar-consultas"
-            class="card align-items-center p-4 no-underline w-50"
-          >
-            <i class="bi bi-calendar2-week-fill"></i>
-            <span>Cadastrar Consulta</span>
-          </router-link>
+ 
         </div>
         <router-link
           to="/pacientes"

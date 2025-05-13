@@ -1,20 +1,109 @@
 <template>
-  <div class="paciente-home">
-    <h1>Bem-vindo, Paciente!</h1>
-    <!-- Conteúdo específico do paciente -->
-    <router-link to="/consultas">Minhas Consultas</router-link>
+  <div>
+    <!-- Componente Header -->
+    <Header/>
+
+    <div
+      class="main d-flex min-vh-100 justify-content-center align-items-center"
+    >
+      <div class="funcoes d-flex flex-column gap-3">
+     
+        <router-link
+          to="/pacientes"
+          class="card align-items-center p-4 no-underline"
+        >
+        <i class="bi bi-calendar-plus-fill"></i>
+          <span>Agendar Consultas</span>
+        </router-link>
+
+      
+      </div>
+
+    </div>
   </div>
 </template>
 
 <script>
+import Header from "@/components/Header.vue"; 
+
 export default {
-  name: 'PacienteHome'
-}
+  components: {
+    Header, 
+  },
+};
 </script>
 
 <style scoped>
-.paciente-home {
-  padding: 20px;
-  background-color: #e3f2fd;
+.main {
+  padding-top: 4rem;
+}
+.bi {
+  color: #186fc0;
+  font-size: 40px;
+}
+
+span {
+  font-size: large;
+}
+
+.main {
+  gap: 10%;
+}
+
+.funcoes {
+  width: 40%;
+  text-align: center;
+}
+
+.consultas {
+  width: 30%;
+}
+
+.title {
+  background-color: #186fc0;
+  padding: 10px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  color: white;
+  text-align: center;
+}
+
+.title h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.card {
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .main {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .funcoes {
+    width: 70%;
+  }
+
+  .consultas {
+    width: 70%;
+  }
+
+  .main {
+    margin-top: 15vh;
+    margin-bottom: 25px;
+  }
+  span {
+    font-size: small;
+  }
+  
 }
 </style>
