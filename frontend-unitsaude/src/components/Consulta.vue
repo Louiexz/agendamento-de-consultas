@@ -2,20 +2,17 @@
   <div class="consulta shadow-sm mb-1">
     <span>
       <b>{{ formatData(consulta.data) }} às {{ consulta.horario }}</b>
-      
-      <span
-        v-if="consulta.status === 'Concluída'"
-        class="badge bg-success ms-2"
+
+      <span v-if="consulta.status === 'Agendada'" class="badge bg-primary ms-2"
+        >Agendada</span
+      >
+      <span v-if="consulta.status === 'Concluída'" class="badge bg-success ms-2"
         >Concluída</span
       >
-      <span
-        v-if="consulta.status === 'Cancelada'"
-        class="badge bg-danger ms-2"
+      <span v-if="consulta.status === 'Cancelada'" class="badge bg-danger ms-2"
         >Cancelada</span
       >
-      <span
-        v-if="consulta.status === 'Pendente'"
-        class="badge bg-warning  ms-2"
+      <span v-if="consulta.status === 'Pendente'" class="badge bg-warning ms-2"
         >Pendente</span
       >
       <span
@@ -66,13 +63,13 @@ export default {
       auth: useAuthStore(),
     };
   },
-  
+
   methods: {
     formatData(data) {
       if (!data) return "";
       const date = new Date(data);
       date.setHours(date.getHours() + 3); // Ajuste para fuso horário
-      
+
       return date.toLocaleDateString("pt-BR", {
         weekday: "long",
         year: "numeric",
@@ -86,12 +83,12 @@ export default {
       consultaStore.setConsulta(consulta);
 
       const { isAdmin } = this;
-      const buttons = isAdmin 
+      const buttons = isAdmin
         ? {
             showDenyButton: true,
-            denyButtonText: 'Alterar Status',
+            denyButtonText: "Alterar Status",
             showCancelButton: true,
-            cancelButtonText: 'Reagendar'
+            cancelButtonText: "Reagendar",
           }
         : {};
 
@@ -111,7 +108,10 @@ export default {
       if (isAdmin) {
         if (result.isDenied) {
           await this.alterarStatusConsulta(consulta);
-        } else if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
+        } else if (
+          result.isDismissed &&
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
           await this.reagendarConsulta(consulta);
         }
       }
@@ -125,7 +125,9 @@ export default {
           <p><strong>Área:</strong> ${consulta.area}</p>
           <p><strong>Especialidade:</strong> ${consulta.especialidade}</p>
           <p><strong>Status:</strong> ${consulta.status}</p>
-          <p><strong>Data e hora:</strong> ${this.formatData(consulta.data)} às ${consulta.horario}</p>
+          <p><strong>Data e hora:</strong> ${this.formatData(
+            consulta.data
+          )} às ${consulta.horario}</p>
         </div>
       `;
     },
@@ -134,7 +136,9 @@ export default {
       try {
         const { isConfirmed } = await Swal.fire({
           title: "Confirmar Consulta",
-          html: `Deseja confirmar a consulta de <b>${consulta.nomePaciente}</b> para
+          html: `Deseja confirmar a consulta de <b>${
+            consulta.nomePaciente
+          }</b> para
                ${this.formatData(consulta.data)} às ${consulta.horario}?`,
           icon: "question",
           showCancelButton: true,
@@ -152,8 +156,10 @@ export default {
           didOpen: () => Swal.showLoading(),
         });
 
-        const { data } = await api.post(`/api/Consulta/confirmar/${consulta.id_Consulta}`);
-        
+        const { data } = await api.post(
+          `/api/Consulta/confirmar/${consulta.id_Consulta}`
+        );
+
         Swal.fire({
           icon: "success",
           title: "✅ Confirmada!",
@@ -179,7 +185,10 @@ export default {
 
           // Valida se é domingo (0 = Domingo, 1 = Segunda, etc.)
           if (date.getDay() === 0) {
-            return { isValid: false, message: "Domingos não estão disponíveis" };
+            return {
+              isValid: false,
+              message: "Domingos não estão disponíveis",
+            };
           }
 
           // Valida se é data passada
@@ -446,9 +455,12 @@ export default {
           didOpen: () => Swal.showLoading(),
         });
 
-        const { data } = await api.patch(`/api/Consulta/${consulta.id_Consulta}/status`, {
-          novoStatus
-        });
+        const { data } = await api.patch(
+          `/api/Consulta/${consulta.id_Consulta}/status`,
+          {
+            novoStatus,
+          }
+        );
 
         Swal.fire({
           icon: "success",
@@ -484,9 +496,9 @@ export default {
   },
   computed: {
     isAdmin() {
-      return this.auth.tipoUsuario === 'Administrador';
-    }
-  }
+      return this.auth.tipoUsuario === "Administrador";
+    },
+  },
 };
 </script>
 
