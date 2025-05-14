@@ -31,6 +31,7 @@
               type="password"
               id="senha"
               class="form-control"
+              @change="showCaptcha"
               v-model="senha"
               placeholder="Digite sua senha"
               required
@@ -41,10 +42,9 @@
               ></span
             >
           </div>
-          <div class="text-center">
+          <div class="text-center align-items-center">
             <!-- reCAPTCHA v2 Checkbox -->
             <div
-              v-if="checkCaptcha"
               class="g-recaptcha"
               data-sitekey="6Lc6yigrAAAAAG3SV8WLTI-Aj9KZ5YonZh_7dpUr"
               data-callback="onCaptchaVerified"
@@ -84,17 +84,13 @@ export default {
       senha: "",
       erro: null,
       isLoading: false,
-
-      checkCaptcha: false,
-      captchaVerified: true,
-      userAttempts: 0,
-      captchaToken: null,
+      
+      captchaVerified: false,
     };
   },
   methods: {
-    onCaptchaVerified(token) {
+    onCaptchaVerified() {
       this.captchaVerified = true;
-      this.captchaToken = token; // Salva o token
     },
     onCaptchaExpired() {
       this.captchaVerified = false;
@@ -119,28 +115,6 @@ export default {
       this.isLoading = true; // Ativa o spinner
       this.erro = null; // Limpa erros anteriores
       try {
-        if (this.captchaVerified && this.checkCaptcha) {
-          try {
-            // Envia o token para o backend
-            if (this.captchaToken) {
-              console.log(this.captchaToken);
-              const tokenResponse = await api.post("/api/Usuario/check-captcha", {
-                captchaToken: this.captchaToken
-              });
-
-              if (!tokenResponse.data.success) {
-                console.log("Verificação de captcha falhou.");
-                return;
-              }
-            } else {
-              console.log("Token de captcha inválido");
-              return;
-            }
-          } catch (error) {
-            console.log("Erro na verificação do captcha:", error);
-          }
-        }
-
         const response = await api.post("/api/Usuario/Login", {
           credential: this.email,
           password: this.senha,
@@ -150,8 +124,7 @@ export default {
         const token = response.data.token;
         const tipoUsuario = response.data.usuario.tipoUsuario;
         const nomeUsuario = response.data.usuario.nome;
-        const id_Usuario = response.data.usuario.id_Usuario;
-        
+        const id_Usuario = response.data.usuario.id_Usuario;        
 
         const auth = useAuthStore();
         auth.setToken(token);
@@ -180,13 +153,6 @@ export default {
           console.error("Erro desconhecido:", error);
           this.erro = "Erro inesperado ao tentar logar.";
         }
-        this.userAttempts += 1;
-
-        if (this.userAttempts === 3) {
-          this.checkCaptcha = true;
-          this.captchaVerified = false;
-          this.loadRecaptchaScript();
-        }
       } finally {
         this.isLoading = false; // Desativa o spinner independente do resultado
       }
@@ -210,6 +176,9 @@ export default {
   padding: 0 15vw;
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 2 colunas com largura igual */
+}
+.container {
+  max-width: 95%
 }
 .logoL {
   align-content: center;
