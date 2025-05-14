@@ -23,8 +23,9 @@
               id="cpf"
               class="form-control"
               v-model="cpf"
+              @input="formatarCPF"
               placeholder="Digite seu CPF"
-              required
+              maxlength="14"
             />
           </div>
 
@@ -261,8 +262,33 @@ export default {
     confirmarSenha(newValue) {
       this.senhaNaoConfere = newValue !== this.senha;
     },
+    cpf(newValue) {
+      // Chama a formatação sempre que o CPF muda
+      this.formatarCPF();
+    },
   },
   methods: {
+    formatarCPF() {
+      // Remove tudo que não é dígito
+      let cpfLimpo = this.cpf.replace(/\D/g, "");
+
+      // Limita a 11 caracteres
+      cpfLimpo = cpfLimpo.substring(0, 11);
+
+      // Aplica a formatação do CPF (xxx.xxx.xxx-xx)
+      let cpfFormatado = "";
+      for (let i = 0; i < cpfLimpo.length; i++) {
+        if (i === 3 || i === 6) {
+          cpfFormatado += ".";
+        } else if (i === 9) {
+          cpfFormatado += "-";
+        }
+        cpfFormatado += cpfLimpo[i];
+      }
+
+      this.cpf = cpfFormatado;
+    },
+
     handleHome(auth) {
       if (!auth.token) {
         // Exibe o alerta primeiro
@@ -340,6 +366,12 @@ export default {
       });
     },
     async cadastrar() {
+      const cpfNumeros = this.cpf.replace(/\D/g, "");
+      if (cpfNumeros.length !== 11) {
+        this.erro = "CPF deve conter 11 dígitos";
+        this.isLoading = false;
+        return;
+      }
       if (this.senha !== this.confirmarSenha) {
         this.erro = "As senhas não coincidem!";
         return;
