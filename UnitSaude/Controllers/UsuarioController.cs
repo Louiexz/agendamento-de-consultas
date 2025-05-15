@@ -145,31 +145,5 @@ namespace UnitSaude.Controllers
                 return BadRequest("Token inválido ou expirado.");
             }
         }
-        [HttpPost("check-captcha")]
-        public async Task<IActionResult> CheckCaptcha([FromBody] CaptchaRequest request)
-        {
-            if (string.IsNullOrEmpty(request.CaptchaToken))
-                return BadRequest(new { success = false, message = "Captcha inválido." });
-
-            var secretKey = _configuration["SECRET_KEY"]
-                ?? Environment.GetEnvironmentVariable("SECRET_KEY");
-            
-            using var httpClient = new HttpClient();
-            var content = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("secret", secretKey),
-                new KeyValuePair<string, string>("response", request.CaptchaToken)
-            });
-
-            var response = await httpClient.PostAsync("https://www.google.com/recaptcha/api/siteverify", content);
-            var jsonString = await response.Content.ReadAsStringAsync();
-
-            var result = JsonSerializer.Deserialize<GoogleCaptchaResponse>(jsonString);
-
-            if (result != null && result.Success && result.Score >= 0.5)
-                return Ok(new { success = true });
-
-            return BadRequest(new { success = false, message = "Falha na verificação do captcha." });
-        }
     }
 }
