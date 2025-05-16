@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using UnitSaude.Dto.Disponibilidade;
 using UnitSaude.Interfaces;
 using UnitSaude.Models;
+using UnitSaude.Services;
 
 namespace UnitSaude.Controllers
 {
@@ -31,6 +32,14 @@ namespace UnitSaude.Controllers
         {
             var response = await _disponibilidadeService.ListarDisponibilidades();
             if (!response.Status) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpDelete("DeleteDisponibilidade/{id}")]
+        public async Task<ActionResult<ResponseModel<Disponibilidade>>> RemoverDisponibilidade(int id)
+        {
+            var response = await _disponibilidadeService.RemoverDisponibilidade(id);
+            if (!response.Status) return NotFound(response);
             return Ok(response);
         }
 

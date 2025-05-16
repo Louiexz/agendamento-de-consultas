@@ -130,6 +130,37 @@ namespace UnitSaude.Services
             return await Task.FromResult(response);
         }
 
+        public async Task<ResponseModel<Disponibilidade>> RemoverDisponibilidade(int disponibilidadeId)
+        {
+            ResponseModel<Disponibilidade> response = new();
+
+            try
+            {
+                var disponibilidade = await _context.Disponibilidades.FindAsync(disponibilidadeId);
+
+                if (disponibilidade == null)
+                {
+                    response.Status = false;
+                    response.Message = "Disponibilidade.";
+                    return response;
+                }
+
+                _context.Disponibilidades.Remove(disponibilidade);
+
+                await _context.SaveChangesAsync();
+
+                response.Data = disponibilidade;
+                response.Message = "Disponibilidade removida com sucesso!";
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+
 
     }
 }
