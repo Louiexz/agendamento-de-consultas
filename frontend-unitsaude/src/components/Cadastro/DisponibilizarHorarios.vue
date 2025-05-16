@@ -2,7 +2,6 @@
   <Header />
 
   <div class="main-container d-flex justify-content-center align-items-center">
-    <!-- Formulário -->
     <div class="form card">
       <div class="Title">
         <BackButton />
@@ -104,58 +103,16 @@
           </button>
         </div>
       </form>
+
+          <div class="botaocentro mt-3">
+      <button @click="abrirModalDisponibilidades" class="btn btn-secondary">
+        Ver Disponibilidades Cadastradas
+      </button>
+    </div>
     </div>
 
-    <!-- Lista de disponibilidades existentes -->
-    <div class="disponibilidades-list card">
-      <h3>Disponibilidades Cadastradas</h3>
+    <!-- Botão para abrir o modal de disponibilidades -->
 
-      <!-- Loading -->
-      <div v-if="isLoadingDisponibilidades" class="text-center my-3">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Carregando...</span>
-        </div>
-        <p>Carregando disponibilidades...</p>
-      </div>
-
-      <!-- Mensagem quando não há disponibilidades -->
-      <div v-else-if="disponibilidades.length === 0" class="alert alert-info">
-        Nenhuma disponibilidade cadastrada.
-      </div>
-
-      <!-- Lista de disponibilidades -->
-      <div class="disponibilidades-container">
-        <div
-          v-for="disponibilidade in disponibilidades"
-          :key="disponibilidade.id"
-          class="disponibilidade-item card p-2 mb-2 shadow-sm"
-        >
-          <div class="d-flex justify-content-between">
-            <strong
-              >{{ disponibilidade.area }} -
-              {{ disponibilidade.especialidade }}</strong
-            >
-            <span
-              class="status"
-              :class="{
-                ativo: disponibilidade.ativo,
-                inativo: !disponibilidade.ativo,
-              }"
-            >
-              {{ disponibilidade.ativo ? "Ativo" : "Inativo" }}
-            </span>
-          </div>
-          <div>
-            De {{ formatDate(disponibilidade.dataInicio) }} até
-            {{ formatDate(disponibilidade.dataFim) }}
-          </div>
-          <div>
-            Horário: {{ disponibilidade.horarioInicio }} às
-            {{ disponibilidade.horarioFim }}
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -188,11 +145,217 @@ export default {
   },
   methods: {
     // Método para formatar data
-    formatDate(dateString) {
+    formatarData(dateString) {
       if (!dateString) return "";
       const date = new Date(dateString);
-            date.setHours(date.getHours() + 3);
+      date.setHours(date.getHours() + 3);
       return date.toLocaleDateString("pt-BR");
+    },
+
+    async abrirModalDisponibilidades() {
+      try {
+        this.isLoadingDisponibilidades = true;
+        await this.obterDisponibilidades();
+        this.isLoadingDisponibilidades = false;
+
+        if (this.disponibilidades.length === 0) {
+          await Swal.fire({
+            title: "Disponibilidades Cadastradas",
+            html: '<div class="alert alert-info">Nenhuma disponibilidade cadastrada.</div>',
+            background: "#ffffff",
+            color: "#186fc0",
+            confirmButtonColor: "#d8bd2c",
+          });
+          return;
+        }
+
+        const disponibilidadesHTML = `
+          <div class="disponibilidades-container" style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+            ${this.disponibilidades
+              .map(
+                (disp) => `
+              <div class="disponibilidade-item card p-2 mb-2 shadow-sm" style="cursor: default;">
+                <div class="d-flex justify-content-between">
+                  <strong>${disp.area} - ${disp.especialidade}</strong>
+                  <div>
+                    <span class="status ${
+                      disp.ativo ? "ativo" : "inativo"
+                    }" style="
+                      font-size: 0.8rem;
+                      padding: 0.2rem 0.5rem;
+                      border-radius: 4px;
+                      display: inline-block;
+                      ${
+                        disp.ativo
+                          ? "background-color: #d4edda; color: #155724;"
+                          : "background-color: #f8d7da; color: #721c24;"
+                      }
+                    ">
+                      ${disp.ativo ? "Ativo" : "Inativo"}
+                    </span>
+                    <button 
+                      class="btn-delete" 
+                      data-id="${disp.id}"
+                      style="
+                        background: none;
+                        border: none;
+                        color: #ff4444;
+                        cursor: pointer;
+                        font-size: 1.2rem;
+                        margin-left: 10px;
+                      "
+                      title="Excluir disponibilidade"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+                <div>De ${this.formatarData(
+                  disp.dataInicio
+                )} até ${this.formatarData(disp.dataFim)}</div>
+                <div>Horário: ${disp.horarioInicio} às ${disp.horarioFim}</div>
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+        `;
+
+        await Swal.fire({
+          title: "Disponibilidades Cadastradas",
+          html: disponibilidadesHTML,
+          background: "#ffffff",
+          color: "#186fc0",
+          confirmButtonColor: "#d8bd2c",
+          showConfirmButton: false,
+          showCloseButton: true,
+          width: "800px",
+          didOpen: () => {
+            document.querySelectorAll(".btn-delete").forEach((btn) => {
+              btn.addEventListener("click", async (e) => {
+                e.stopPropagation();
+                const id = parseInt(btn.getAttribute("data-id"));
+                await this.deletarDisponibilidade(id);
+              });
+            });
+          },
+        });
+      } catch (error) {
+        console.error("Erro ao abrir modal de disponibilidades:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Erro",
+          text: "Ocorreu um erro ao carregar as disponibilidades.",
+          background: "#ffffff",
+          color: "#186fc0",
+          confirmButtonColor: "#d8bd2c",
+        });
+      } finally {
+        this.isLoadingDisponibilidades = false;
+      }
+    },
+
+    async deletarDisponibilidade(id) {
+      const confirmacao = await Swal.fire({
+        title: "Confirmar exclusão",
+        text: "Tem certeza que deseja remover esta disponibilidade?",
+        icon: "warning",
+        background: "#ffffff",
+        color: "#186fc0",
+        showCancelButton: true,
+        confirmButtonColor: "#d8bd2c",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sim, remover!",
+        cancelButtonText: "Cancelar",
+      });
+
+      if (confirmacao.isConfirmed) {
+        try {
+          const response = await api.delete(
+            `/api/Disponibilidade/DeleteDisponibilidade/${id}`
+          );
+
+          if (response.data.status) {
+            await Swal.fire({
+              icon: "success",
+              title: "Removido!",
+              text: "A disponibilidade foi removida com sucesso.",
+              background: "#ffffff",
+              color: "#186fc0",
+              confirmButtonColor: "#d8bd2c",
+            });
+
+            await this.obterDisponibilidades();
+            await this.abrirModalDisponibilidades();
+          }
+        } catch (error) {
+          console.error("Erro ao deletar disponibilidade:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Erro",
+            text:
+              error.response?.data?.message ||
+              "Ocorreu um erro ao remover a disponibilidade.",
+            background: "#ffffff",
+            color: "#186fc0",
+            confirmButtonColor: "#d8bd2c",
+          });
+        }
+      }
+    },
+
+    async deletarDisponibilidade(id) {
+      try {
+        const confirmacao = await Swal.fire({
+          title: "Tem certeza?",
+          text: "Você não poderá reverter isso!",
+          icon: "warning",
+          background: "#ffffff",
+          color: "#186fc0",
+          showCancelButton: true,
+          confirmButtonColor: "#d8bd2c",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Sim, deletar!",
+          cancelButtonText: "Cancelar",
+        });
+
+        if (confirmacao.isConfirmed) {
+          const response = await api.delete(
+            `/api/Disponibilidade/DeleteDisponibilidade/${id}`
+          );
+
+          if (response.data.status) {
+            await Swal.fire({
+              icon: "success",
+              title: "Deletado!",
+              text: "A disponibilidade foi removida com sucesso.",
+              background: "#ffffff",
+              color: "#186fc0",
+              confirmButtonColor: "#d8bd2c",
+            });
+
+            // Atualiza a lista de disponibilidades
+            await this.obterDisponibilidades();
+            // Reabre o modal para mostrar a lista atualizada
+            await this.abrirModalDisponibilidades();
+          } else {
+            throw new Error(
+              response.data.message || "Erro ao deletar disponibilidade"
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao deletar disponibilidade:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Erro",
+          text:
+            error.message || "Ocorreu um erro ao deletar a disponibilidade.",
+          background: "#ffffff",
+          color: "#186fc0",
+          confirmButtonColor: "#d8bd2c",
+        });
+      }
     },
 
     // Método para obter as disponibilidades existentes

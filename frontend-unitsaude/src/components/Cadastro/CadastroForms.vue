@@ -226,6 +226,7 @@ import Swal from "sweetalert2";
 import BackButton from "@/components/btnVoltar.vue";
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.css";
+import { cpf } from "cpf-cnpj-validator";
 
 export default {
   props: {
@@ -263,30 +264,25 @@ export default {
       this.senhaNaoConfere = newValue !== this.senha;
     },
     cpf(newValue) {
-      // Chama a formatação sempre que o CPF muda
       this.formatarCPF();
+      // Validação em tempo real enquanto digita
+      if (newValue.replace(/\D/g, "").length === 11) {
+        this.erro = cpf.isValid(newValue) ? "" : "CPF inválido";
+      } else {
+        this.erro = "";
+      }
     },
   },
   methods: {
     formatarCPF() {
       // Remove tudo que não é dígito
-      let cpfLimpo = this.cpf.replace(/\D/g, "");
-
+      let cpfLimpo = this.cpf.replace(/\D/g, '');
+      
       // Limita a 11 caracteres
       cpfLimpo = cpfLimpo.substring(0, 11);
-
-      // Aplica a formatação do CPF (xxx.xxx.xxx-xx)
-      let cpfFormatado = "";
-      for (let i = 0; i < cpfLimpo.length; i++) {
-        if (i === 3 || i === 6) {
-          cpfFormatado += ".";
-        } else if (i === 9) {
-          cpfFormatado += "-";
-        }
-        cpfFormatado += cpfLimpo[i];
-      }
-
-      this.cpf = cpfFormatado;
+      
+      // Formata usando a biblioteca
+      this.cpf = cpf.format(cpfLimpo);
     },
 
     handleHome(auth) {
@@ -367,9 +363,10 @@ export default {
     },
     async cadastrar() {
       const cpfNumeros = this.cpf.replace(/\D/g, "");
-      if (cpfNumeros.length !== 11) {
-        this.erro = "CPF deve conter 11 dígitos";
-        this.isLoading = false;
+      
+      // Validação do CPF usando a biblioteca
+      if (!cpf.isValid(this.cpf)) {
+        this.erro = "Digite um CPF válido";
         return;
       }
       if (this.senha !== this.confirmarSenha) {

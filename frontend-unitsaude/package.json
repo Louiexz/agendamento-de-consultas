@@ -10,15 +10,18 @@
   "dependencies": {
     "axios": "^1.8.4",
     "core-js": "^3.8.3",
+    "cpf-cnpj-validator": "^1.0.3",
     "js-cookie": "^3.0.5",
     "lodash.debounce": "^4.0.8",
     "pinia": "^3.0.2",
     "pinia-plugin-persistedstate": "^4.2.0",
     "sweetalert2": "^11.19.1",
+    "v-mask": "^2.3.0",
     "vue": "^3.5.13",
     "vue-cal": "^5.0.1-rc.19",
     "vue-multiselect": "^3.2.0",
     "vue-router": "^4.5.1",
+    "vue-the-mask": "^0.11.1",
     "vuex": "^4.0.0"
   },
   "devDependencies": {
