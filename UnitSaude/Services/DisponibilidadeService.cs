@@ -63,6 +63,23 @@ namespace UnitSaude.Services
                     return response;
                 }
 
+                var sobreposicao = await _context.Disponibilidades
+           .Where(d => d.Area == dto.Area && d.Especialidade == dto.Especialidade && d.Ativo)
+           .AnyAsync(d =>
+               // Verifica se o novo período sobrepõe algum existente
+               (dto.DataInicio >= d.DataInicio && dto.DataInicio <= d.DataFim) || // Novo início dentro de um período existente
+               (dto.DataFim >= d.DataInicio && dto.DataFim <= d.DataFim) ||      // Novo fim dentro de um período existente
+               (dto.DataInicio <= d.DataInicio && dto.DataFim >= d.DataFim)      // Novo período engloba um existente
+           );
+
+                if (sobreposicao)
+                {
+                    response.Status = false;
+                    response.Message = "Já existe uma disponibilidade cadastrada para este período.";
+                    return response;
+                }
+
+
                 var disponibilidade = new Disponibilidade
                 {
                     DataInicio = dto.DataInicio,
