@@ -1,13 +1,22 @@
 package com.example.unitsaude;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import android.content.Intent;
 import android.os.Bundle;
+
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.example.unitsaude.activities.LoginActivity;
 
 import com.example.unitsaude.adapter.ConsultaAgendadaAdapter;
 import com.example.unitsaude.adapter.ConsultaEsperaAdapter;
@@ -15,8 +24,6 @@ import com.example.unitsaude.adapter.ConsultaEsperaAdapter;
 import com.example.unitsaude.data.dto.consultation.GetConsultationDto;
 import com.example.unitsaude.data.dto.consultation.GetConsultationRequest;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import com.example.unitsaude.viewmodel.ConsultationView;
 import android.view.View;
@@ -36,6 +43,25 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         preferencesManager = new SharedPreferencesManager(this);
+
+        ImageButton btnSair = findViewById(R.id.btnSair);
+        ProgressBar progressBarAgendadas = findViewById(R.id.progressBarAgendadas);
+        ProgressBar progressBarEspera = findViewById(R.id.progressBarEspera);
+
+        // Configura o botão de sair
+        btnSair.setOnClickListener(v -> {
+            preferencesManager.clearAll();
+
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
+        // Verifica se o usuário está logado
+        if (preferencesManager.isLoggedIn()) {
+            com.example.unitsaude.data.api.ApiClient.setAuthToken(preferencesManager.getAuthToken());
+        }
+
         consultationViewModel = new ViewModelProvider(this).get(ConsultationView.class);
 
         consultas = new ArrayList<>();
@@ -50,6 +76,12 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Erro ao encontrar os ListViews", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        consultationViewModel.getLoadingLiveData().observe(this, isLoading -> {
+            // Você pode adicionar um spinner de carregamento aqui
+            progressBarAgendadas.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            progressBarEspera.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        });
 
         consultationViewModel.getConsultationResponseLiveData().observe(this, responseBody -> {
             if (responseBody != null) {

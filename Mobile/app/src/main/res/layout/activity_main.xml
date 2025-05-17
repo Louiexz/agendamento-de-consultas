@@ -16,7 +16,8 @@
         android:orientation="horizontal"
         android:background="#186FC0"
         android:padding="5dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layout_alignParentTop="true">
 
         <ImageView
             android:id="@+id/imageView"
@@ -34,15 +35,25 @@
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
             android:padding="8dp" />
+
+        <ImageButton
+            android:id="@+id/btnSair"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_door"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            android:padding="8dp" />
     </LinearLayout>
 
-    <!-- Conteúdo principal -->
+    <!-- Conteúdo com Scroll -->
     <ScrollView
         android:id="@+id/ConsultScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="20dp"
         android:layout_below="@id/HeaderBar">
+
         <LinearLayout
             android:id="@+id/mainContent"
             android:layout_width="match_parent"
@@ -85,112 +96,118 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Listas de Consultas -->
+            <!-- Consultas agendadas -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="20dp"
+                android:paddingLeft="15dp"
+                android:text="Consultas agendadas"/>
+
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="#186FC0"
+                android:padding="10dp"
+                android:paddingBottom="4dp"
+                android:gravity="center_vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:padding="20dp"
-                    android:paddingLeft="15dp"
-                    android:text="Consultas agendadas"/>
-
-                <!-- Cabeçalho das colunas -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:background="#186FC0"
-                    android:padding="10dp"
-                    android:paddingBottom="4dp"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Área"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Data"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Horário"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"/>
-                </LinearLayout>
-
-                <ListView
-                    android:id="@+id/listViewAgendadas"
-                    android:layout_width="match_parent"
-                    android:layout_height="130dp"
                     android:layout_weight="1"
-                    android:gravity="center_vertical" />
+                    android:text="Área"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"/>
 
-                <!-- Consultas em espera -->
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:padding="20dp"
-                    android:paddingLeft="15dp"
-                    android:text="Consultas em espera"/>
-
-                <!-- Cabeçalho das colunas -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:background="#186FC0"
-                    android:padding="10dp"
-                    android:paddingBottom="4dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Área"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Status"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"/>
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Ação"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"/>
-                </LinearLayout>
-
-                <ListView
-                    android:id="@+id/listViewEspera"
-                    android:layout_width="match_parent"
-                    android:layout_height="130dp"
                     android:layout_weight="1"
-                    android:gravity="center_vertical" />
+                    android:text="Data"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Horário"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"/>
             </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progressBarAgendadas"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <ListView
+                android:id="@+id/listViewAgendadas"
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:gravity="center_vertical" />
+
+            <!-- Consultas em espera -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="20dp"
+                android:paddingLeft="15dp"
+                android:text="Consultas em espera"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="#186FC0"
+                android:padding="10dp"
+                android:paddingBottom="4dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Área"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Status"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Ação"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progressBarEspera"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <ListView
+                android:id="@+id/listViewEspera"
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:gravity="center_vertical" />
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

@@ -24,9 +24,6 @@ public class LoginViewModel extends AndroidViewModel {
     private final MutableLiveData<LoginResponse> loginResponseLiveData;
     private final AuthRepository authRepository;
 
-
-
-
     public LoginViewModel(Application application) {
         super(application);
         tokenLiveData = new MutableLiveData<>();
@@ -38,6 +35,10 @@ public class LoginViewModel extends AndroidViewModel {
 
     public LiveData<String> getTokenLiveData() {
         return tokenLiveData;
+    }
+
+    public void setTokenLiveData(String token) {
+        tokenLiveData.setValue(token);
     }
 
     public LiveData<String> getErrorLiveData() {
@@ -52,7 +53,11 @@ public class LoginViewModel extends AndroidViewModel {
         return loginResponseLiveData;
     }
 
-    public void login(String credential, String password) {
+    public void login(String credential, String password, boolean saveLogin) {
+        if (credential.isEmpty() || password.isEmpty()) {
+            errorLiveData.setValue("Preencha todos os campos");
+            return;
+        }
         loadingLiveData.setValue(true);
 
         authRepository.login(credential, password).enqueue(new Callback<LoginResponse>() {
@@ -61,7 +66,7 @@ public class LoginViewModel extends AndroidViewModel {
                 loadingLiveData.setValue(false);
 
                 if (response.isSuccessful() && response.body() != null) {
-                    handleSuccessfulLogin(response.body());
+                    handleSuccessfulLogin(response.body(), saveLogin);
                 } else {
                     handleLoginError(response);
                 }
@@ -76,11 +81,12 @@ public class LoginViewModel extends AndroidViewModel {
         });
     }
 
-    private void handleSuccessfulLogin(LoginResponse response) {
+    private void handleSuccessfulLogin(LoginResponse response, boolean saveLogin) {
         String token = response.getToken();
         if (token != null && !token.isEmpty()) {
             SharedPreferencesManager preferencesManager = new SharedPreferencesManager(getApplication());
             preferencesManager.saveAuthToken(token);
+            preferencesManager.setLoginIn(saveLogin);
 
              // Adicione esta linha:
             com.example.unitsaude.data.api.ApiClient.setAuthToken(token);

@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
+import android.widget.CheckBox;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -24,22 +26,22 @@ public class LoginActivity extends AppCompatActivity {
     private EditText emailEditText, senhaEditText;
     private Button loginButton;
     private LoginViewModel loginViewModel;
+    private CheckBox lembrarCheckBox;
 
     private ProgressBar progressBar;
-
+    private SharedPreferencesManager preferencesManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
         emailEditText = findViewById(R.id.emailEditText);
         senhaEditText = findViewById(R.id.senhaEditText);
+        lembrarCheckBox = findViewById(R.id.lembrarCheckBox);
         loginButton = findViewById(R.id.loginButton);
-        progressBar = findViewById(R.id.progressBar);
+        progressBar = findViewById(R.id.loginProgressBar);
         TextView esqueciSenhaText = findViewById(R.id.esqueciSenhaText);
-
 
         // Inicializa a ViewModel corretamente
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
@@ -61,32 +63,21 @@ public class LoginActivity extends AppCompatActivity {
         // Observa o token, indicando que o login foi bem-sucedido
         loginViewModel.getTokenLiveData().observe(this, token -> {
             if (token != null && !token.isEmpty()) {
+                Toast.makeText(LoginActivity.this, "Login realizado com sucesso!", Toast.LENGTH_SHORT).show();
+                
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-
-                SharedPreferencesManager preferencesManager = new SharedPreferencesManager(this);
-                String tipo = preferencesManager.getUserTipo();
-
-            //    Intent intent;
-             //   switch (tipo.toLowerCase()) {
-            //        case "administrador":
-                   //     intent = new Intent(this, AdminActivity.class);
-                   //     break;
-                  //  case "tecnico":
-                   //     intent = new Intent(this, TecnicoActivity.class);
-                   //     break;
-                   // case "cliente":
-                     //   intent = new Intent(this, ClienteActivity.class);
-                    //    break;
-            //        default:
-             //           intent = new Intent(this, MainActivity.class);
-               //         break;
-             //   }
-
                 startActivity(intent);
                 finish();
-                Toast.makeText(LoginActivity.this, "Login realizado com sucesso!", Toast.LENGTH_SHORT).show();
             }
         });
+
+        preferencesManager = new SharedPreferencesManager(this);
+
+        // Verifica se o usuário já está logado
+        if (preferencesManager.isLoggedIn()) {
+            String token = preferencesManager.getAuthToken();
+            loginViewModel.setTokenLiveData(token);
+        }
 
         // Configura o botão de login
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -110,7 +101,7 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
-                loginViewModel.login(credential, password);
+                loginViewModel.login(credential, password, lembrarCheckBox.isChecked());
             }
         });
 

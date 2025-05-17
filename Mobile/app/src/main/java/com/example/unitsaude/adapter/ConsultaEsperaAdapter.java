@@ -28,6 +28,13 @@ public class ConsultaEsperaAdapter extends ConsultaAdapter {
         // Obter o objeto GetConsultationDto na posição atual
         GetConsultationDto consulta = consultas.get(position);
 
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(consultas.get(position));
+            }
+        });
+
         // Definir os valores nos TextViews
         TextView tvArea = convertView.findViewById(R.id.tvArea);
         TextView tvStatus = convertView.findViewById(R.id.tvStatus);

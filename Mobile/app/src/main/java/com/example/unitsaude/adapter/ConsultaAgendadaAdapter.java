@@ -29,6 +29,13 @@ public class ConsultaAgendadaAdapter extends ConsultaAdapter {
         // Obter o objeto GetConsultationDto na posição atual
         GetConsultationDto consulta = consultas.get(position);
 
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(consultas.get(position));
+            }
+        });
+
         TextView tvArea = convertView.findViewById(R.id.tvArea);
         TextView tvData = convertView.findViewById(R.id.tvData);
         TextView tvHora = convertView.findViewById(R.id.tvHora);

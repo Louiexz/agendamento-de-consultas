@@ -1,107 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/login"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#186FC0">
+    android:fillViewport="true">
 
-    <!-- Logo no topo centralizada -->
-    <LinearLayout
-        android:id="@+id/logoContainer"
+    <RelativeLayout
+        android:id="@+id/login"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="48dp"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:background="#186FC0">
 
-        <ImageView
-            android:id="@+id/logoImageView"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:contentDescription="Logo"
-            android:src="@drawable/logo" />
-    </LinearLayout>
-
-    <!-- Card de login centralizado verticalmente -->
-    <LinearLayout
-        android:id="@+id/loginCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginHorizontal="32dp"
-        android:background="@android:color/white"
-        android:elevation="6dp"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:padding="24dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="Login"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/emailEditText"
+        <!-- Logo no topo centralizada -->
+        <LinearLayout
+            android:id="@+id/logoContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="@android:color/black"
-            android:hint="Digite seu e-mail"
-            android:inputType="textEmailAddress" />
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="48dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/senhaEditText"
+            <ImageView
+                android:id="@+id/logoImageView"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:contentDescription="Logo"
+                android:src="@drawable/logo" />
+        </LinearLayout>
+
+        <!-- Card de login centralizado verticalmente -->
+        <LinearLayout
+            android:id="@+id/loginCard"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:backgroundTint="@android:color/black"
-            android:hint="Digite sua senha"
-            android:inputType="textPassword" />
-
-        <TextView
-            android:id="@+id/esqueciSenhaText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginBottom="16dp"
-            android:text="Esqueceu sua senha?"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="14sp"
-            android:clickable="true"
-            android:focusable="true"/>
-
-        <Button
-            android:id="@+id/loginButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:backgroundTint="#D8BD2C"
-            android:text="Entrar"
-            android:textColor="@android:color/white" />
-
-        <Button
-            android:id="@+id/registrarButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:text="Registre-se"
-            android:textColor="@android:color/black"
-            android:background="@android:color/transparent"
-            android:textStyle="bold" />
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:visibility="gone" />
-    </LinearLayout>
+            android:layout_marginHorizontal="40dp"
+            android:layout_below="@id/logoContainer"
+            android:background="@android:color/white"
+            android:elevation="6dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp">
 
-</RelativeLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Login"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/emailEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="@android:color/black"
+                android:hint="Digite seu e-mail"
+                android:inputType="textEmailAddress" />
+
+            <EditText
+                android:id="@+id/senhaEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="@android:color/black"
+                android:hint="Digite sua senha"
+                android:inputType="textPassword" />
+            
+            <CheckBox
+                android:id="@+id/lembrarCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Lembrar login" />
+
+            <TextView
+                android:id="@+id/esqueciSenhaText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginBottom="16dp"
+                android:text="Esqueceu sua senha?"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <Button
+                android:id="@+id/loginButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:backgroundTint="#D8BD2C"
+                android:text="Entrar"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/registrarButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="Registre-se"
+                android:textColor="@android:color/black"
+                android:background="@android:color/transparent"
+                android:textStyle="bold" />
+
+            <ProgressBar
+                android:id="@+id/loginProgressBar"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+        </LinearLayout>
+    </RelativeLayout>
+</ScrollView>

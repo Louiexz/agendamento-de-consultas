@@ -12,23 +12,30 @@ public class GetConsultationDto {
     private String nomePaciente;
     private String nomeProfessor;
 
-    public String getHora() {
-        return this.horario;
-    }
-
     public String getData() {
         return this.data;
     }
-
-    public String getStatus() {
-        return this.status;
+    public String getHora() {
+        return this.horario;
     }
-
+    public String getEspecialidade() {
+        return this.especialidade;
+    }
     public String getArea() {
         return this.area;
     }
-
-    public String getEspecialidade() {
-        return this.especialidade;
+    public String getStatus() {
+        return this.status;
+    }
+    public String[] getConsulta() {
+        String[] consulta = new String[7];
+        consulta[0] = this.data;
+        consulta[1] = this.horario;
+        consulta[2] = this.status;
+        consulta[3] = this.especialidade;
+        consulta[4] = this.area;
+        consulta[5] = this.nomeProfessor;
+        consulta[6] = this.nomePaciente;
+        return consulta;
     }
 }
