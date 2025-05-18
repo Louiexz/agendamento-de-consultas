@@ -23,7 +23,7 @@ export default {
 </script>
 <style scoped>
 .cadastro-professor {
-  padding: 3rem 15vw;
+  padding: 3.1rem 15vw;
   min-height: 100vh;
   display: flex;
   flex-direction: column;

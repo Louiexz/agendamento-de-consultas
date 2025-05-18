@@ -122,9 +122,9 @@ export default {
   },
   computed: {
   	filterProfessorId() {
-	  const prof = this.professores.find(p => p.id_Usuario === this.isProfessor.id);
-	  return prof ? prof.id_Usuario : '';
-	},
+  	  const prof = this.professores.find(p => p.id_Usuario === this.isProfessor.id);
+  	  return prof ? prof.id_Usuario : '';
+    },
     filtrosAtivos() {
       return this.filtros.status || this.filtros.especialidade || this.filtros.professorId;
     },
@@ -153,16 +153,33 @@ export default {
     async getConsultas() {
       this.isLoading = true;
       try {
-        const response = await api.get("api/Consulta/FiltrarConsultas", {
-          params: { Area: this.area }
-        });
-        
-        if (response.data?.data) {
-          this.consultas = response.data.data;
-          this.carregarProfessores();
+        if (this.isProfessor.status) {
+          const response = await api.get(`api/Consulta/GetConsultaPorProfessor/${this.isProfessor.professorId}`);
+
+          if (response.data?.data) {
+            this.consultas = response.data.data;
+          }
+        } else {
+          response = await api.get("api/Consulta/FiltrarConsultas", {
+            params: { Area: this.area }
+          });
+          if (response.data?.data) {
+            this.consultas = response.data.data;
+            this.carregarProfessores();
+
+            // Se for professor, filtra automaticamente após carregar professores
+            if (this.isProfessor.status) {
+              const prof = this.professores.find(p => p.nome === this.isProfessor.name);
+              if (prof) {
+                this.filtros.professorId = prof.id_Usuario;
+              }
+            }
+          }
         }
-      } catch(errpr) {
-      	console.log(error);
+
+        
+      } catch (error) {
+        console.log(error);
       } finally {
         this.isLoading = false;
       }
@@ -205,14 +222,6 @@ export default {
 	    this.getEspecialidades(),
 	    this.getConsultas()
 	  ]);
-
-	  // Atribui o professor automaticamente caso o usuário seja professor
-	  if (this.isProfessor.status) {
-	    const prof = this.professores.find(p => p.nome === this.isProfessor.name);
-	    if (prof) {
-	      this.filtros.professorId = prof.id_Usuario;
-	    }
-	  }
 	}
 };
 </script>

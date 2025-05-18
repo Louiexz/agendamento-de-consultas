@@ -28,28 +28,30 @@
                 'is-valid': cpf && !erroCPF && isCpfPotencialmenteValido,
               }"
               v-model="cpf"
+              maxlength="14"
+              minlength="14"
+              @input="validarInputNumerico($event, 'cpf')"
               v-maska
               data-maska="###.###.###-##"
               @blur="validarCPF"
               placeholder="000.000.000-00"
+              required
             />
             <div v-if="erroCPF" class="invalid-feedback d-block">
               {{ erroCPF }}
-            </div>
-            <div v-if="cpf && !erroCPF && isCpfPotencialmenteValido" class="valid-feedback d-block">
-              CPF válido
             </div>
           </div>
 
           <!-- Nome -->
           <div class="mb-3">
-            <label for="nome" class="form-label">Nome</label>
+            <label for="nome" class="form-label">Nome completo</label>
             <input
               type="text"
               id="nome"
+              @input="validarNome($event, 'nome')"        
               class="form-control"
               v-model="nome"
-              placeholder="Digite seu nome"
+              placeholder="Digite seu nome completo"
               required
             />
           </div>
@@ -60,6 +62,7 @@
             <input
               type="date"
               id="dataNascimento"
+              @input="validarDataNascimento($event)"
               class="form-control"
               v-model="dataNascimento"
               required
@@ -89,6 +92,8 @@
                 </option>
               </select>
             </div>
+
+            <!-- Especialidades -->
             <div class="mb-3">
               <label for="especialidades" class="form-label">Especialidades</label>
               <div class="multiselect-wrapper">
@@ -116,34 +121,35 @@
             </div>
           </div>
         </div>
-
         <div class="RightCad p-2">
           <!-- Código Profissional -->
-          <div v-if="user === 'professor'">
-            <div class="mb-3">
-              <label for="codigo-profissional" class="form-label">Código profissional</label>
-              <input
-                type="text"
-                id="codigo-profissional"
-                class="form-control"
-                v-model="codigoProfissional"
-                placeholder="CRM-PE 123456"
-                required
-              />
-            </div>
+          <div class="mb-3" v-if="user === 'professor'">
+            <label for="codigo-profissional" class="form-label">Código profissional</label>
+            <input
+              type="text"
+              id="codigo-profissional"
+              class="form-control"
+              v-model="codigoProfissional"
+              placeholder="CRM-PE 123456"
+              required
+            />
           </div>
 
           <!-- Telefone com Máscara -->
           <div class="mb-3">
             <label for="telefone" class="form-label">Telefone</label>
             <input
-              type="tel"
+              type="text"
               id="telefone"
+              @input="validarInputNumerico($event, 'telefone')"
               class="form-control"
               v-model="telefone"
+              maxlength="11"
+              minlength="10"
               v-maska
               :data-maska="['(##) ####-####', '(##) #####-####']"
               placeholder="(00) 00000-0000"
+              required
             />
           </div>
 
@@ -155,11 +161,11 @@
               id="email"
               class="form-control"
               v-model="email"
+              maxlenght="256"
               placeholder="Digite seu e-mail"
               required
             />
           </div>
-
           <!-- Senha -->
           <div class="mb-3">
             <label for="senha" class="form-label">Senha</label>
@@ -173,7 +179,6 @@
               required
             />
           </div>
-
           <!-- Confirmar Senha (Professor) -->
           <div class="mb-3" v-if="user === 'professor'">
             <label for="confirmarSenhaProf" class="form-label">Confirmar Senha</label>
@@ -183,6 +188,7 @@
               class="form-control"
               v-model="confirmarSenha"
               :class="{ 'is-invalid': senhaNaoConfere }"
+
               placeholder="Confirme sua senha"
               required
             />
@@ -198,6 +204,7 @@
             type="password"
             id="confirmarSenhaPac"
             class="form-control"
+
             v-model="confirmarSenha"
             :class="{ 'is-invalid': senhaNaoConfere }"
             placeholder="Confirme sua senha"
@@ -215,7 +222,7 @@
         <button
           type="submit"
           class="btn btn-primary w-50"
-          :disabled="senhaNaoConfere || isLoading"
+          :disabled="senhaNaoConfere || erroCPF || isLoading || erroApi"
         >
           <span v-if="!isLoading">Cadastrar</span>
           <span v-else class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -233,13 +240,8 @@ import BackButton from "@/components/btnVoltar.vue";
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.css";
 
-// Importar a função de validação da biblioteca correta
-// Se você instalou 'validation-br':
 import { isCPF } from 'validation-br';
-// Se você instalou 'cpf-cnpj-validator', o import que você tinha estava correto para validação:
 // import { cpf as cpfValidator } from "cpf-cnpj-validator"; // Renomeando para evitar conflito com data.cpf
-
-// Maska.js não precisa ser importada aqui se registrada globalmente em main.js
 
 export default {
   props: {
@@ -284,24 +286,39 @@ export default {
     confirmarSenha(newValue) {
       this.senhaNaoConfere = newValue !== this.senha;
     },
-    cpf(newValue, oldValue) {
-      // Validar no blur é geralmente melhor para UX, mas se quiser no watch:
-      // if (newValue && newValue.replace(/\D/g, '').length === 11) {
-      //   this.validarCPF();
-      // } else if (newValue && newValue.replace(/\D/g, '').length > 0) {
-      //   this.erroCPF = null; // Limpa erro se não estiver completo para validação ainda
-      // }
-    },
   },
   methods: {
-    // formatarCPF() { // REMOVIDO - Maska.js cuida disso
-    // },
+    validarInputNumerico(event, campo) {
+      const valor = event.target.value;
+      const apenasNumeros = valor.replace(/\D/g, "");
+
+      // Atribui dinamicamente ao campo correspondente
+      this[campo] = apenasNumeros;
+    },
+    validarInputTexto(event, campo) {
+      const valor = event.target.value;
+
+      const apenasLetras = valor.replace(/[^A-Za-zÀ-ÿ\s]/g, "");
+
+      this.nome = apenasLetras;
+    },
+    validarNome(event, campo) {
+      this.validarInputTexto(event, campo);
+
+      this[campo] = this[campo].trim();
+
+      if (this[campo].length < 5 || !this[campo].includes(" ")) {
+        this.erroApi = "Nome inválido. Por favor, escreva nome e sobrenome.";
+        return;
+      }
+
+      this.erroApi = null;
+    },
     validarCPF() {
       const cpfLimpo = this.cpf ? this.cpf.replace(/\D/g, '') : '';
+
       if (!cpfLimpo) {
-         this.erroCPF = "O CPF é obrigatório."; // Pode ser redundante se o campo for 'required'
-        this.erroCPF = null; // Ou limpa se vazio e não obrigatório explicitamente aqui
-        return true; // Considerar válido se não obrigatório e vazio, ou deixar a validação de 'required' HTML
+        return false;
       }
       // Use a função importada correta:
       if (!isCPF(cpfLimpo)) { // Usando isCPF de validation-br
@@ -311,6 +328,24 @@ export default {
       }
       this.erroCPF = null;
       return true;
+    },
+    validarDataNascimento(event) {
+      const dataNascimento = event.target.value;
+
+      const hoje = new Date();
+      const dataNasc = new Date(dataNascimento);
+
+      const idade = hoje.getFullYear() - dataNasc.getFullYear();
+      const mes = hoje.getMonth() - dataNasc.getMonth();
+      const dia = hoje.getDate() - dataNasc.getDate() - 1;
+
+      const tem18AnosOuMais = idade > 18 || (idade === 18 && (mes > 0 || (mes === 0 && dia >= 0)));
+
+      if (!tem18AnosOuMais) {
+        this.erroApi = "Usuário deve ter 18 anos ou mais.";
+        return;
+      }
+      this.erroApi = null; // limpa erro se estiver ok
     },
     handleHome(auth) {
       if (!auth.token) {
@@ -407,7 +442,6 @@ export default {
       // 2. Validar Senhas
       if (this.senha !== this.confirmarSenha) {
         this.senhaNaoConfere = true;
-        // this.erroApi = "As senhas não coincidem!"; // O v-if="senhaNaoConfere" já exibe
         return;
       }
 
@@ -443,8 +477,8 @@ export default {
           console.error("Erro da API:", error.response.data.message);
           this.erroApi = error.response.data.message;
         } else {
-          console.error("Erro desconhecido:", error);
-          this.erroApi = "Erro inesperado ao tentar realizar cadastro.";
+          console.error("Erro inesperado:", error);
+          this.erroApi = "Ocorreu um erro inesperado. Tente novamente.";
         }
       } finally {
         this.isLoading = false;
@@ -452,7 +486,9 @@ export default {
     },
   },
   mounted() {
-    this.carregarAreas();
+    if (this.user === "professor") {
+      this.carregarAreas();
+    }
   },
 };
 </script>

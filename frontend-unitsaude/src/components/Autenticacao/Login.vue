@@ -166,6 +166,14 @@ export default {
     window.onCaptchaExpired = () => {
       this.onCaptchaExpired();
     };
+
+    this.loadRecaptchaScript();
+
+    if(!document.querySelector("#recaptcha-script")){
+      this.captchaVerified = true;
+    } else {
+      this.loadRecaptchaScript();
+    }
   },
 };
 </script>

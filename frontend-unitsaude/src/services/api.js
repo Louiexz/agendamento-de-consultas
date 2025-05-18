@@ -3,7 +3,7 @@ import Cookies from 'js-cookie'; // Importa a biblioteca js-cookie
 
 // Definindo a URL base da API
 const api = axios.create({
-  baseURL: process.env.VUE_APP_API_URL,
+  baseURL: import.meta.env.VITE_APP_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },

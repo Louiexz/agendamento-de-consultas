@@ -97,7 +97,7 @@ export default {
 </script>
 <style scoped>
 .cadastro-paciente {
-  padding: 3rem 15vw;
+  padding: 4.5rem 15vw;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
