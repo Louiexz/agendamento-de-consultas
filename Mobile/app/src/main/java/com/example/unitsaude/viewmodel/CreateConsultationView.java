@@ -9,7 +9,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.unitsaude.data.api.ApiService;
 import com.example.unitsaude.data.api.ApiClient;
 
-import com.example.unitsaude.data.dto.consultation.GetConsultationResponse;
+import com.example.unitsaude.data.dto.consultation.CreateConsultationResponse;
+import com.example.unitsaude.data.dto.consultation.CreateConsultationRequest;
 
 import com.example.unitsaude.data.repositorio.ConsultationRepository;
 import com.example.unitsaude.utils.SharedPreferencesManager;
@@ -18,13 +19,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class ConsultationView extends AndroidViewModel {
+public class CreateConsultationView extends AndroidViewModel {
     private final MutableLiveData<String> errorLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loadingLiveData = new MutableLiveData<>(false);
-    private final MutableLiveData<GetConsultationResponse> consultationResponseLiveData = new MutableLiveData<>();
+    private final MutableLiveData<CreateConsultationResponse> consultationResponseLiveData = new MutableLiveData<>();
     private final ConsultationRepository consultationRepository;
 
-    public ConsultationView(Application application) {
+    public CreateConsultationView(Application application) {
         super(application);
         consultationRepository = new ConsultationRepository();
     }
@@ -37,17 +38,17 @@ public class ConsultationView extends AndroidViewModel {
         return loadingLiveData;
     }
 
-    public LiveData<GetConsultationResponse> getConsultationResponseLiveData() {
+    public LiveData<CreateConsultationResponse> getConsultationResponseLiveData() {
         return consultationResponseLiveData;
     }
 
-    public void getConsultas(int pacienteId) {
+    public void createConsulta(CreateConsultationRequest createConsultaRequest) {
         loadingLiveData.setValue(true);
 
-        consultationRepository.getConsultas(pacienteId)
-            .enqueue(new Callback<GetConsultationResponse>() {
+        consultationRepository.createConsulta(createConsultaRequest)
+            .enqueue(new Callback<CreateConsultationResponse>() {
                 @Override
-                public void onResponse(Call<GetConsultationResponse> call, Response<GetConsultationResponse> response) {
+                public void onResponse(Call<CreateConsultationResponse> call, Response<CreateConsultationResponse> response) {
                     loadingLiveData.setValue(false);
                     if (response.isSuccessful() && response.body() != null) {
                         handleSuccessfulConsultation(response.body());
@@ -57,7 +58,7 @@ public class ConsultationView extends AndroidViewModel {
                 }
 
                 @Override
-                public void onFailure(Call<GetConsultationResponse> call, Throwable t) {
+                public void onFailure(Call<CreateConsultationResponse> call, Throwable t) {
                     loadingLiveData.setValue(false);
                     errorLiveData.setValue("Erro ao conectar com o servidor");
                     Log.e("CONSULTATION_ERROR", "Erro ao conectar com o servidor", t);
@@ -65,11 +66,11 @@ public class ConsultationView extends AndroidViewModel {
             });
     }
 
-    private void handleSuccessfulConsultation(GetConsultationResponse body) {
+    private void handleSuccessfulConsultation(CreateConsultationResponse body) {
         consultationResponseLiveData.setValue(body);
     }
 
-    private void handleConsultationError(Response<GetConsultationResponse> response) {
+    private void handleConsultationError(Response<CreateConsultationResponse> response) {
         String errorBody = "";
         try {
             if (response.errorBody() != null) {

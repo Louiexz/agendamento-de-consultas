@@ -2,10 +2,17 @@ package com.example.unitsaude.data.repositorio;
 
 import com.example.unitsaude.data.api.ApiClient;
 import com.example.unitsaude.data.api.ApiService;
+
 import com.example.unitsaude.data.dto.consultation.GetConsultationResponse;
+
+import com.example.unitsaude.data.dto.consultation.CreateConsultationRequest;
+import com.example.unitsaude.data.dto.consultation.CreateConsultationResponse;
+
 import com.example.unitsaude.data.dto.consultation.GetSpecialtyResponse;
 import com.example.unitsaude.data.dto.consultation.GetHourRequest;
 import com.example.unitsaude.data.dto.consultation.GetHourResponse;
+
+
 import retrofit2.Call;
 
 public class ConsultationRepository {
@@ -39,5 +46,9 @@ public class ConsultationRepository {
             throw new IllegalArgumentException("Área não pode ser nula ou vazia");
         }
         return apiService.getHours(data, area, especialidade);
+    }
+
+    public Call<CreateConsultationResponse> createConsulta(CreateConsultationRequest createConsultaRequest) {
+        return apiService.createConsulta(createConsultaRequest);
     }
 }

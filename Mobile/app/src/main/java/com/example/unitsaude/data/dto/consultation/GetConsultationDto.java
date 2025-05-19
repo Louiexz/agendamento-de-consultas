@@ -27,6 +27,10 @@ public class GetConsultationDto {
     public String getStatus() {
         return this.status;
     }
+    public String getProfessorName() {
+        return this.nomeProfessor;
+    }
+
     public String[] getConsulta() {
         String[] consulta = new String[7];
         consulta[0] = this.data;

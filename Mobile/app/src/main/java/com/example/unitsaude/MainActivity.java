@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private List<GetConsultationDto> consultas; // Lista de todas as consultas
     private ConsultaAgendadaAdapter agendadasAdapter;
     private ConsultaEsperaAdapter esperaAdapter;
+    private ConsultaEsperaAdapter pendenteAdapter;
     private ConsultationView consultationViewModel;
     private SharedPreferencesManager preferencesManager;
 
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout btnAgendar = findViewById(R.id.btnAgendar);
         ProgressBar progressBarAgendadas = findViewById(R.id.progressBarAgendadas);
         ProgressBar progressBarEspera = findViewById(R.id.progressBarEspera);
+        ProgressBar progressBarPendente = findViewById(R.id.progressBarPendente);
 
         // Configura o botão de agendar
         btnAgendar.setOnClickListener(v -> {
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         ListView listViewAgendadas = findViewById(R.id.listViewAgendadas);
         ListView listViewEspera = findViewById(R.id.listViewEspera);
+        ListView listViewPendente = findViewById(R.id.listViewPendente);
 
         if (listViewAgendadas == null || listViewEspera == null) {
             Toast.makeText(this, "Erro ao encontrar os ListViews", Toast.LENGTH_SHORT).show();
@@ -90,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
             // Você pode adicionar um spinner de carregamento aqui
             progressBarAgendadas.setVisibility(isLoading ? View.VISIBLE : View.GONE);
             progressBarEspera.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            progressBarPendente.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         });
 
         consultationViewModel.getConsultationResponseLiveData().observe(this, responseBody -> {
@@ -99,12 +103,15 @@ public class MainActivity extends AppCompatActivity {
 
                 List<GetConsultationDto> consultasAgendadas = filterConsultasByStatus(consultas, "Agendada");
                 List<GetConsultationDto> consultasEmEspera = filterConsultasByStatus(consultas, "Em Espera");
+                List<GetConsultationDto> consultasPendente = filterConsultasByStatus(consultas, "Pendente");
 
                 agendadasAdapter = new ConsultaAgendadaAdapter(this, consultasAgendadas);
                 esperaAdapter = new ConsultaEsperaAdapter(this, consultasEmEspera);
+                pendenteAdapter = new ConsultaEsperaAdapter(this, consultasPendente);
 
                 listViewAgendadas.setAdapter(agendadasAdapter);
                 listViewEspera.setAdapter(esperaAdapter);
+                listViewPendente.setAdapter(pendenteAdapter);
             }
         });
     }

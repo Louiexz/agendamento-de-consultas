@@ -65,118 +65,24 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Consultas agendadas -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:padding="20dp"
-                android:paddingLeft="10dp"
-                android:text="Consultas agendadas"/>
-
-            <LinearLayout
+            <include
+                android:id="@+id/consultasAgendadas"
+                layout="@layout/consult_agendadas"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="#186FC0"
-                android:padding="10dp"
-                android:paddingBottom="4dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Área"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Data"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Horário"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"/>
-            </LinearLayout>
-
-            <ProgressBar
-                android:id="@+id/progressBarAgendadas"
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="gone" />
-
-            <ListView
-                android:id="@+id/listViewAgendadas"
+                android:layout_height="wrap_content"/>
+            
+            <include
+                android:id="@+id/consultasPendente"
+                layout="@layout/consult_pendente"
                 android:layout_width="match_parent"
-                android:layout_height="130dp"
-                android:gravity="center_vertical" />
-
-            <!-- Consultas em espera -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:padding="20dp"
-                android:paddingLeft="10dp"
-                android:text="Consultas em espera"/>
-
-            <LinearLayout
+                android:layout_height="wrap_content"/>
+            
+            <include
+                android:id="@+id/consultasEmEspera"
+                layout="@layout/consult_em_espera"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="#186FC0"
-                android:padding="10dp"
-                android:paddingBottom="4dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Área"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Status"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Ação"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"/>
-            </LinearLayout>
-
-            <ProgressBar
-                android:id="@+id/progressBarEspera"
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="gone" />
-
-            <ListView
-                android:id="@+id/listViewEspera"
-                android:layout_width="match_parent"
-                android:layout_height="130dp"
-                android:gravity="center_vertical" />
+                android:layout_height="wrap_content"/>
+            
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

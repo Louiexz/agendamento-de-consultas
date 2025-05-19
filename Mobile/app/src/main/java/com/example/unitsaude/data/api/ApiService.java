@@ -10,10 +10,15 @@ import com.example.unitsaude.data.dto.auth.RegisterRequest;
 import com.example.unitsaude.data.dto.consultation.GetConsultationRequest;
 import com.example.unitsaude.data.dto.consultation.GetConsultationResponse;
 
+import com.example.unitsaude.data.dto.consultation.CreateConsultationRequest;
+import com.example.unitsaude.data.dto.consultation.CreateConsultationResponse;
+
 import com.example.unitsaude.data.dto.consultation.GetSpecialtyResponse;
 
 import com.example.unitsaude.data.dto.consultation.GetHourRequest;
 import com.example.unitsaude.data.dto.consultation.GetHourResponse;
+
+import com.example.unitsaude.data.dto.professor.GetProfessorResponse;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -48,4 +53,10 @@ public interface ApiService {
         @Query("data") String data,
         @Query("area") String area,
         @Query("especialidade") String especialidade);
+    
+    @GET("api/Professor/listar-professores-especialidade")
+    Call<GetProfessorResponse> getProfessoresPorEspecialidade(@Query("especialidade") String especialidade);
+
+    @POST("api/Consulta/CreateConsulta")
+    Call<CreateConsultationResponse> createConsulta(@Body CreateConsultationRequest createConsultaRequest);
 }
