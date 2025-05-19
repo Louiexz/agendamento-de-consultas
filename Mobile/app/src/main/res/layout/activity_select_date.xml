@@ -29,26 +29,14 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Selecione o horário da consulta"
+            android:text="Selecione a data da consulta"
             android:textSize="18sp"
             android:padding="10dp" />
 
-        <ProgressBar
-            android:id="@+id/progressBarDate"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
-        
-        <!-- Lista ocupa 80% -->
-        <ListView
-            android:id="@+id/lvDate"
+        <CalendarView
+            android:id="@+id/calendarView"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="10dp"
-            android:paddingBottom="10dp" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" />
     </LinearLayout>
 </LinearLayout>

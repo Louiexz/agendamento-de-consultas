@@ -12,9 +12,13 @@ import com.example.unitsaude.data.dto.consultation.GetConsultationResponse;
 
 import com.example.unitsaude.data.dto.consultation.GetSpecialtyResponse;
 
+import com.example.unitsaude.data.dto.consultation.GetHourRequest;
+import com.example.unitsaude.data.dto.consultation.GetHourResponse;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Query;
 import retrofit2.http.Path;
 import retrofit2.http.POST;
 import retrofit2.http.GET;
@@ -38,4 +42,10 @@ public interface ApiService {
     
     @GET("/api/Consulta/especialidades/{area}")
     Call<GetSpecialtyResponse> getSpecialities(@Path("area") String area);
+
+    @GET("/api/Consulta/horarios-disponiveis")
+    Call<GetHourResponse> getHours(
+        @Query("data") String data,
+        @Query("area") String area,
+        @Query("especialidade") String especialidade);
 }

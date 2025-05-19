@@ -11,7 +11,7 @@ public class GetSpecialtyResponse {
         return data; // <-- retorna o campo correto
     }
 
-    public void setData(List<String> data) {
+    protected void setData(List<String> data) {
         this.data = data;
     }
 

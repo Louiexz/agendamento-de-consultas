@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Selecione o horário da consulta"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:layout_marginBottom="8dp" />
+
+    <ProgressBar
+        android:id="@+id/progressBarHours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+    <GridLayout
+        android:id="@+id/gridTimes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvTitle"
+        android:layout_marginTop="16dp"
+        android:columnCount="3"
+        android:alignmentMode="alignMargins"
+        android:rowCount="2"
+        android:padding="10dp" />
+    
+    <Button
+        android:id="@+id/btnCancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#F44336"
+        android:text="Cancelar" />
+</RelativeLayout>
