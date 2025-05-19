@@ -97,29 +97,6 @@
         </div>
       </form>
 
-      <div class="mt-5 consultas-section" v-if="!isOwnAdminProfile">
-        <h4>Histórico de Consultas</h4>
-
-        <!-- Loading para consultas -->
-        <div v-if="isLoadingConsultas" class="text-center my-5">
-          <div class="spinner-border text-primary" role="status"></div>
-          <p class="mt-2">Carregando consultas...</p>
-        </div>
-
-        <div v-else>
-          <div v-if="consultas?.length" class="consultas-list">
-            <ConsultaView
-              v-for="consulta in consultas"
-              :key="consulta.id_Consultas"
-              :consulta="consulta"
-            />
-          </div>
-
-          <div v-else class="no-consultas">
-            {{ erro || "Nenhuma consulta encontrada" }}
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -128,7 +105,6 @@
 import { useUsuarioStore } from "@/store/usuario";
 import { useAuthStore } from "@/store/auth";
 import api from "@/services/api";
-import ConsultaView from "@/components/Consulta";
 import BackButton from "@/components/btnVoltar.vue";
 
 export default {
@@ -139,7 +115,6 @@ export default {
     },
   },
   components: {
-    ConsultaView,
     BackButton,
   },
   data() {
@@ -220,43 +195,15 @@ export default {
         this.isLoadingProfile = false;
       }
     },
-    async carregaConsultas() {
-      if (this.isOwnAdminProfile) return;
 
-      this.isLoadingConsultas = true;
-      try {
-        if (!this.usuario?.id) {
-          this.erro = "Usuário não identificado";
-          return;
-        }
-
-        const endpoint = this.isProfessor
-          ? `api/Consulta/GetConsultaPorProfessor/${this.usuario.id}`
-          : `api/Consulta/GetConsultaPorPaciente/${this.usuario.id}`;
-
-        const response = await api.get(endpoint);
-
-        if (response.data.status) {
-          this.consultas = response.data.data;
-        } else {
-          this.erro = response.data.message;
-        }
-      } catch (error) {
-        this.erro = "Erro ao carregar consultas.";
-        console.error("Erro ao carregar consultas:", error);
-      } finally {
-        this.isLoadingConsultas = false;
-      }
-    },
   },
   mounted() {
     this.carregaPerfil();
-    this.carregaConsultas();
+
   },
   watch: {
     "$route.fullPath"() {
       this.carregaPerfil();
-      this.carregaConsultas();
     },
   },
 };

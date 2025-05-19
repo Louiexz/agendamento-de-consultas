@@ -37,6 +37,14 @@
       >
         Confirmar
       </button>
+
+      <button
+        v-if="isPaciente && podeCancelar(consulta)"
+        class="btn-cancelar me-2"
+        @click="cancelarConsulta(consulta)"
+      >
+        Cancelar
+      </button>
       <button class="btn-consulta" @click="verDetalhes(consulta)">
         Ver detalhes
       </button>
@@ -65,6 +73,11 @@ export default {
   },
 
   methods: {
+    
+    podeCancelar(consulta) {
+      const statusPermitidos = ["Pendente", "Em Espera", "Agendada"];
+      return statusPermitidos.includes(consulta.status);
+    },
     formatData(data) {
       if (!data) return "";
       const date = new Date(data);
@@ -173,6 +186,69 @@ export default {
         });
       } catch (error) {
         this.handleError(error, "Erro ao confirmar consulta");
+      }
+    },
+
+    async cancelarConsulta(consulta) {
+      try {
+        // Verificação adicional para consultas agendadas
+        if (consulta.status === "Agendada") {
+          // Poderia verificar aqui se passaram 24h da confirmação
+          // Mas essa verificação já é feita no backend
+        }
+
+        const { isConfirmed } = await Swal.fire({
+          title: "Cancelar Consulta",
+          html: `Deseja cancelar a consulta marcada para<br>
+               <b>${this.formatData(consulta.data)} às ${
+            consulta.horario
+          }</b>?`,
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Sim, cancelar",
+          cancelButtonText: "Manter consulta",
+        });
+
+        if (!isConfirmed) return;
+
+        Swal.fire({
+          title: "Processando cancelamento...",
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading(),
+        });
+
+        // Chama o endpoint de cancelamento
+        const { data } = await api.patch(
+          `/api/Consulta/CancelarConsulta/${consulta.id_Consulta}`
+        );
+
+        Swal.fire({
+          icon: "success",
+          title: "✅ Consulta cancelada!",
+          text: data.message,
+          confirmButtonColor: "#d8bd2c",
+        });
+
+        // Emite evento para atualizar a lista
+        this.$emit("consulta-atualizada", {
+          id: consulta.id_Consulta,
+          novoStatus: "Cancelada",
+        });
+      } catch (error) {
+        this.handleError(error, "Erro ao cancelar consulta");
+
+        // Mostra mensagem específica se for por causa das 24h
+        if (error.response?.data?.message?.includes("24 horas")) {
+          Swal.fire({
+            icon: "info",
+            title: "Atenção",
+            html: `Consultas agendadas só podem ser canceladas após 24 horas da confirmação.<br><br>
+                Entre em contato com a clínica se precisar de ajuda.`,
+            confirmButtonColor: "#d8bd2c",
+          });
+        }
       }
     },
 
@@ -594,30 +670,44 @@ export default {
         // Não mostra alerta para o usuário, apenas loga o erro
       }
     },
-
-
   },
 
-    handleError(error, title) {
-      console.error(title, error);
-      Swal.fire({
-        icon: "error",
-        title,
-        text: error.response?.data?.message || error.message,
-        confirmButtonColor: "#d8bd2c",
-      });
-    },
-
+  handleError(error, title) {
+    console.error(title, error);
+    Swal.fire({
+      icon: "error",
+      title,
+      text: error.response?.data?.message || error.message,
+      confirmButtonColor: "#d8bd2c",
+    });
+  },
 
   computed: {
     isAdmin() {
       return this.auth.tipoUsuario === "Administrador";
+    },
+    isPaciente() {
+      return this.auth.tipoUsuario === "Paciente";
     },
   },
 };
 </script>
 
 <style scoped>
+.btn-cancelar {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancelar:hover {
+  background-color: #c82333;
+  transform: scale(1.05);
+}
 /* Manter seus estilos existentes */
 .consulta {
   display: flex;
