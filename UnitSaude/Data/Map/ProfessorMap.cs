@@ -31,6 +31,9 @@ namespace UnitSaude.Data.Map
             builder.Property(u => u.codigoProfissional).HasMaxLength(255);
 
             builder.HasIndex(u => u.cpf).IsUnique();
+            builder.HasIndex(u => u.email).IsUnique();
+            builder.HasIndex(u => u.telefone).IsUnique();
+
 
 
         }
