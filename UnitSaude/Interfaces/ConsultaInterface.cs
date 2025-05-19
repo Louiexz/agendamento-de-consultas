@@ -25,6 +25,7 @@ namespace UnitSaude.Interfaces
         //public Task<ResponseModel<ReadConsultaDto>> GerenciarConsulta(UpdateConsultaDto consulta, int ConsultaId);
 
         public Task<ResponseModel<ReadConsultaDto>> ConfirmarConsulta(int consultaId);
+        public  Task<ResponseModel<string>> CancelarConsulta(int consultaId);
 
     }
 }

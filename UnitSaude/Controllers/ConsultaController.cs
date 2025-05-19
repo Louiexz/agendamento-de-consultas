@@ -192,5 +192,17 @@ namespace UnitSaude.Controllers
             return Ok(response);
         }
 
+        [HttpPatch("CancelarConsulta/{consultaId}")]
+        public async Task<ActionResult<ResponseModel<string>>> CancelarConsulta(int consultaId)
+        {
+            var response = await _consultaService.CancelarConsulta(consultaId);
+
+            if (!response.Status)
+            {
+                return BadRequest(response); // Retorna 400 com a mensagem de erro
+            }
+
+            return Ok(response); // Retorna 200 com a confirmação
+        }
     }
 }

@@ -343,6 +343,95 @@ namespace UnitSaude.Services
             return response;
         }
 
+        public async Task<ResponseModel<string>> CancelarConsulta(int consultaId)
+        {
+            var response = new ResponseModel<string>();
+
+            try
+            {
+                // Busca a consulta incluindo relacionamentos para envio de e-mail
+                var consulta = await _context.Consultas
+                    .Include(c => c.Paciente)
+                    .Include(c => c.Professor)
+                    .FirstOrDefaultAsync(c => c.id_Consulta == consultaId);
+
+                if (consulta == null)
+                {
+                    response.Status = false;
+                    response.Message = "Consulta não encontrada.";
+                    return response;
+                }
+
+                // Verifica se a consulta já está cancelada ou concluída
+                if (consulta.Status == "Cancelada" || consulta.Status == "Concluída")
+                {
+                    response.Status = false;
+                    response.Message = $"Não é possível cancelar uma consulta com status '{consulta.Status}'.";
+                    return response;
+                }
+
+                // Regras de cancelamento:
+                // - Consultas com status "Pendente" ou "Em Espera" podem ser canceladas imediatamente
+                // - Consultas "Agendadas" só podem ser canceladas após 24h da confirmação
+                if (consulta.Status == "Agendada")
+                {
+                    // Precisamos encontrar quando a consulta foi confirmada (mudou para Agendada)
+                    // Como não temos esse registro, vamos assumir que foi quando o status foi alterado
+                    // Ou usar DataCadastro como fallback (não ideal)
+
+                    // Esta é uma limitação - idealmente você deveria ter um campo DataConfirmacao
+                    var dataConfirmacao = consulta.DataCadastro; // Isso é aproximado
+
+                    // Verifica se passaram menos de 24 horas
+                    if (DateTime.UtcNow < dataConfirmacao.AddHours(24))
+                    {
+                        response.Status = false;
+                        response.Message = "Consultas agendadas só podem ser canceladas após 24 horas da confirmação.";
+                        return response;
+                    }
+                }
+
+                // Guarda o status anterior para verificar a fila depois
+                var statusAnterior = consulta.Status;
+
+                // Atualiza o status para Cancelada
+                consulta.Status = "Cancelada";
+                await _context.SaveChangesAsync();
+
+                // Se a consulta estava agendada ou pendente, verifica se há consultas em espera
+                if (statusAnterior == "Agendada" || statusAnterior == "Pendente")
+                {
+                    await VerificarConsultasEmEspera(
+                        consulta.Area,
+                        consulta.Especialidade,
+                        consulta.Data.Value,
+                        (TimeOnly)consulta.Horario);
+                }
+
+                // Envia e-mails de notificação
+                await _emailService.EnviarAsync(
+                    consulta.Paciente.email,
+                    "Consulta Cancelada",
+                    $"Sua consulta com {consulta.Professor.nome} para {consulta.Data} às {consulta.Horario} foi cancelada.");
+
+                await _emailService.EnviarAsync(
+                    consulta.Professor.email,
+                    "Consulta Cancelada",
+                    $"A consulta com {consulta.Paciente.nome} para {consulta.Data} às {consulta.Horario} foi cancelada.");
+
+                response.Status = true;
+                response.Message = "Consulta cancelada com sucesso!";
+                response.Data = consulta.Status;
+            }
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+
         public async Task VerificarConsultasEmEspera(string area, string especialidade, DateOnly data, TimeOnly horario)
         {
             try
