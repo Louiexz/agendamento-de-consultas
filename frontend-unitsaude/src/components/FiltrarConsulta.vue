@@ -160,7 +160,7 @@ export default {
             this.consultas = response.data.data;
           }
         } else {
-          response = await api.get("api/Consulta/FiltrarConsultas", {
+         const response = await api.get("api/Consulta/FiltrarConsultas", {
             params: { Area: this.area }
           });
           if (response.data?.data) {
