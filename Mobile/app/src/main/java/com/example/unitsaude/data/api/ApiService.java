@@ -10,6 +10,8 @@ import com.example.unitsaude.data.dto.auth.RegisterRequest;
 import com.example.unitsaude.data.dto.consultation.GetConsultationRequest;
 import com.example.unitsaude.data.dto.consultation.GetConsultationResponse;
 
+import com.example.unitsaude.data.dto.consultation.GetSpecialtyResponse;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -33,4 +35,7 @@ public interface ApiService {
 
     @GET("/api/Consulta/GetConsultaPorPaciente/{pacienteId}")
     Call<GetConsultationResponse> getConsultas(@Path("pacienteId") int pacienteId);
+    
+    @GET("/api/Consulta/especialidades/{area}")
+    Call<GetSpecialtyResponse> getSpecialities(@Path("area") String area);
 }

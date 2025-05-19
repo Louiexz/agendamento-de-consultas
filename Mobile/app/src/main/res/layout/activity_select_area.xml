@@ -1,0 +1,46 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Header fixo -->
+    <include
+        android:id="@+id/HeaderBar"
+        layout="@layout/header_bar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp" />
+
+    <!-- Conteúdo dividido proporcionalmente -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Título -->
+        <include
+            android:id="@+id/consultationTitle"
+            layout="@layout/consultation_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Selecione a área da consulta"
+            android:textSize="18sp"
+            android:padding="10dp" />
+
+        <!-- Lista ocupa 80% -->
+        <ListView
+            android:id="@+id/lvArea"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="10dp"
+            android:paddingBottom="10dp" />
+    </LinearLayout>
+</LinearLayout>

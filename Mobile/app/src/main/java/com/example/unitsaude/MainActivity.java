@@ -10,6 +10,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,11 +25,12 @@ import com.example.unitsaude.adapter.ConsultaEsperaAdapter;
 import com.example.unitsaude.data.dto.consultation.GetConsultationDto;
 import com.example.unitsaude.data.dto.consultation.GetConsultationRequest;
 
-
 import com.example.unitsaude.viewmodel.ConsultationView;
 import android.view.View;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.unitsaude.utils.SharedPreferencesManager;
+
+import com.example.unitsaude.activities.consultation.SelectAreaActivity;
 
 public class MainActivity extends AppCompatActivity {
     private List<GetConsultationDto> consultas; // Lista de todas as consultas
@@ -45,8 +47,15 @@ public class MainActivity extends AppCompatActivity {
         preferencesManager = new SharedPreferencesManager(this);
 
         ImageButton btnSair = findViewById(R.id.btnSair);
+        LinearLayout btnAgendar = findViewById(R.id.btnAgendar);
         ProgressBar progressBarAgendadas = findViewById(R.id.progressBarAgendadas);
         ProgressBar progressBarEspera = findViewById(R.id.progressBarEspera);
+
+        // Configura o botão de agendar
+        btnAgendar.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SelectAreaActivity.class);
+            startActivity(intent);
+        });
 
         // Configura o botão de sair
         btnSair.setOnClickListener(v -> {

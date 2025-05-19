@@ -9,49 +9,18 @@
     tools:context=".MainActivity">
 
     <!-- Header Bar with Logo and Bell -->
-    <LinearLayout
+    <include
         android:id="@+id/HeaderBar"
+        layout="@layout/header_bar"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:orientation="horizontal"
-        android:background="#186FC0"
-        android:padding="5dp"
-        android:gravity="center_vertical"
-        android:layout_alignParentTop="true">
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:scaleType="fitStart"
-            app:srcCompat="@drawable/logo" />
-
-        <ImageButton
-            android:id="@+id/btnSino"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_bell"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:padding="8dp" />
-
-        <ImageButton
-            android:id="@+id/btnSair"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_door"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:padding="8dp" />
-    </LinearLayout>
+        android:layout_height="70dp"/>
 
     <!-- Conteúdo com Scroll -->
     <ScrollView
         android:id="@+id/ConsultScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="20dp"
+        android:padding="16dp"
         android:layout_below="@id/HeaderBar">
 
         <LinearLayout
@@ -65,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:padding="20dp"
-                android:paddingLeft="15dp"
+                android:paddingLeft="10dp"
                 android:text="Serviços" />
 
             <!-- Agendar Consulta Button -->
@@ -102,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:padding="20dp"
-                android:paddingLeft="15dp"
+                android:paddingLeft="10dp"
                 android:text="Consultas agendadas"/>
 
             <LinearLayout
@@ -159,7 +128,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:padding="20dp"
-                android:paddingLeft="15dp"
+                android:paddingLeft="10dp"
                 android:text="Consultas em espera"/>
 
             <LinearLayout

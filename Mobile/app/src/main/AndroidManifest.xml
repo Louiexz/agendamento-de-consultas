@@ -30,7 +30,7 @@
                     android:pathPrefix="/redefinirSenha" />
             </intent-filter>
         </activity>
-         <activity
+        <activity
             android:name=".activities.RegisterActivity"
             android:exported="false" />
         <activity
@@ -47,6 +47,15 @@
         </activity>
         <activity
             android:name=".MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.consultation.SelectAreaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.consultation.SelectSpecialtyActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.consultation.SelectDateActivity"
             android:exported="false" />
     </application>
 
