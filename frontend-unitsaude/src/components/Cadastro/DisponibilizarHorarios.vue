@@ -104,15 +104,14 @@
         </div>
       </form>
 
-          <div class="botaocentro mt-3">
-      <button @click="abrirModalDisponibilidades" class="btn btn-secondary">
-        Ver Disponibilidades Cadastradas
-      </button>
-    </div>
+      <div class="botaocentro mt-3">
+        <button @click="abrirModalDisponibilidades" class="btn btn-secondary">
+          Ver Disponibilidades Cadastradas
+        </button>
+      </div>
     </div>
 
     <!-- Botão para abrir o modal de disponibilidades -->
-
   </div>
 </template>
 
@@ -256,59 +255,10 @@ export default {
     },
 
     async deletarDisponibilidade(id) {
-      const confirmacao = await Swal.fire({
-        title: "Confirmar exclusão",
-        text: "Tem certeza que deseja remover esta disponibilidade?",
-        icon: "warning",
-        background: "#ffffff",
-        color: "#186fc0",
-        showCancelButton: true,
-        confirmButtonColor: "#d8bd2c",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sim, remover!",
-        cancelButtonText: "Cancelar",
-      });
-
-      if (confirmacao.isConfirmed) {
-        try {
-          const response = await api.delete(
-            `/api/Disponibilidade/DeleteDisponibilidade/${id}`
-          );
-
-          if (response.data.status) {
-            await Swal.fire({
-              icon: "success",
-              title: "Removido!",
-              text: "A disponibilidade foi removida com sucesso.",
-              background: "#ffffff",
-              color: "#186fc0",
-              confirmButtonColor: "#d8bd2c",
-            });
-
-            await this.obterDisponibilidades();
-            await this.abrirModalDisponibilidades();
-          }
-        } catch (error) {
-          console.error("Erro ao deletar disponibilidade:", error);
-          Swal.fire({
-            icon: "error",
-            title: "Erro",
-            text:
-              error.response?.data?.message ||
-              "Ocorreu um erro ao remover a disponibilidade.",
-            background: "#ffffff",
-            color: "#186fc0",
-            confirmButtonColor: "#d8bd2c",
-          });
-        }
-      }
-    },
-
-    async deletarDisponibilidade(id) {
       try {
         const confirmacao = await Swal.fire({
           title: "Tem certeza?",
-          text: "Você não poderá reverter isso!",
+          text: "Você não poderá reverter isso, e as consultas não concluídas seram canceladas!",
           icon: "warning",
           background: "#ffffff",
           color: "#186fc0",
@@ -320,6 +270,7 @@ export default {
         });
 
         if (confirmacao.isConfirmed) {
+          this.isLoading = true;
           const response = await api.delete(
             `/api/Disponibilidade/DeleteDisponibilidade/${id}`
           );
@@ -355,6 +306,8 @@ export default {
           color: "#186fc0",
           confirmButtonColor: "#d8bd2c",
         });
+      } finally {
+        this.isLoading = false;
       }
     },
 

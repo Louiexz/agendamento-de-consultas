@@ -1,85 +1,121 @@
 <template>
-	<!-- Filtros -->
-    <div class="filtros mb-4 p-3 bg-light rounded">
-      <div class="row g-2 align-items-end">
-        <div class="col-md-3">
-          <label class="form-label small">Status</label>
-          <select class="form-select" v-model="filtros.status">
-            <option value="">Todos</option>
-            <option v-for="status in opcoesStatus" :key="status" :value="status">
-              {{ status }}
-            </option>
-          </select>
-        </div>
+  <!-- Filtros -->
+  <div class="filtros mb-4 p-3 bg-light rounded">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label small">Status</label>
+        <select class="form-select" v-model="filtros.status">
+          <option value="">Todos</option>
+          <option v-for="status in opcoesStatus" :key="status" :value="status">
+            {{ status }}
+          </option>
+        </select>
+      </div>
 
-        <div class="col-md-3">
-          <label class="form-label small">Especialidade</label>
-          <select class="form-select" v-model="filtros.especialidade">
-            <option value="">Todas</option>
-            <option v-for="esp in especialidades" :key="esp" :value="esp">
-              {{ esp }}
-            </option>
-          </select>
-        </div>
+      <div class="col-md-3">
+        <label class="form-label small">Especialidade</label>
+        <select class="form-select" v-model="filtros.especialidade">
+          <option value="">Todas</option>
+          <option v-for="esp in especialidades" :key="esp" :value="esp">
+            {{ esp }}
+          </option>
+        </select>
+      </div>
 
-        <div class="col-md-3">
-          <label class="form-label small">Professor</label>
-          <select v-if="!isProfessor.status" class="form-select" v-model="filtros.professorId">
-		    <option value="">Todos</option>
-		    <option v-for="prof in professores" :key="prof.id_Usuario" :value="prof.id_Usuario">
-		      {{ prof.nome }}
-		    </option>
-		  </select>
-
-		  <select v-else class="form-select" v-model="filtros.professorId" disabled>
-		    <option :value="filterProfessorId">
-		      {{ isProfessor.name }}
-		    </option>
-		  </select>
-        </div>
-
-        <div class="col-md-3">
-          <button 
-            class="btn-limpar-filtros" 
-            @click="limparFiltros"
-            :disabled="!filtrosAtivos"
+      <div class="col-md-3">
+        <label class="form-label small">Professor</label>
+        <select
+          v-if="!isProfessor.status"
+          class="form-select"
+          v-model="filtros.professorId"
+        >
+          <option value="">Todos</option>
+          <option
+            v-for="prof in professores"
+            :key="prof.id_Usuario"
+            :value="prof.id_Usuario"
           >
-            <i class="bi bi-x-circle"></i> Limpar
-          </button>
-        </div>
-      </div>
-    </div>
+            {{ prof.nome }}
+          </option>
+        </select>
 
-    <!-- Listagem com barra de rolagem -->
-    <div class="consultas-container">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">Listagem de Consultas</h4>
-        <span class="badge bg-secondary">
-          {{ consultasFiltradas.length }} registros
-        </span>
-      </div>
-
-      <div v-if="isLoading" class="text-center my-5">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-2">Carregando...</p>
+        <select
+          v-else
+          class="form-select"
+          v-model="filtros.professorId"
+          disabled
+        >
+          <option :value="filterProfessorId">
+            {{ isProfessor.name }}
+          </option>
+        </select>
       </div>
 
-      <div v-else class="lista-consultas">
-        <ConsultaView
-          v-for="consulta in consultasOrdenadas"
-          :key="consulta.id_Consulta"
-          :consulta="consulta"
-          @consulta-confirmada="handleConsultaConfirmada"
-          @consulta-atualizada="getConsultas"
-          class="mb-3"
+      <div class="col-md-3">
+        <label class="form-label small">Paciente</label>
+        <input
+          v-if="!isPaciente.status"
+          type="search"
+          class="form-control"
+          placeholder="Digite o nome do paciente"
+          v-model="filtros.paciente"
+          @input="filtrarPorPaciente"
         />
 
-        <div v-if="!consultasFiltradas.length" class="text-center py-4 text-muted">
-          <i class="bi bi-calendar-x fs-4"></i>
-          <p class="mt-2">Nenhuma consulta encontrada</p>
-        </div>
+        <input
+          v-else
+          type="text"
+          class="form-control"
+          :value="isPaciente.name"
+          disabled
+        />
+      </div>
+
+      <div class="col-md-3">
+        <button
+          class="btn-limpar-filtros"
+          @click="limparFiltros"
+          :disabled="!filtrosAtivos"
+        >
+          <i class="bi bi-x-circle"></i> Limpar
+        </button>
       </div>
     </div>
+  </div>
+
+  <!-- Listagem com barra de rolagem -->
+  <div class="consultas-container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">Listagem de Consultas</h4>
+      <span class="badge bg-secondary">
+        {{ consultasFiltradas.length }} registros
+      </span>
+    </div>
+
+    <div v-if="isLoading" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2">Carregando...</p>
+    </div>
+
+    <div v-else class="lista-consultas">
+      <ConsultaView
+        v-for="consulta in consultasOrdenadas"
+        :key="consulta.id_Consulta"
+        :consulta="consulta"
+        @consulta-confirmada="handleConsultaConfirmada"
+        @consulta-atualizada="getConsultas"
+        class="mb-3"
+      />
+
+      <div
+        v-if="!consultasFiltradas.length"
+        class="text-center py-4 text-muted"
+      >
+        <i class="bi bi-calendar-x fs-4"></i>
+        <p class="mt-2">Nenhuma consulta encontrada</p>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -91,17 +127,26 @@ export default {
     area: {
       type: String,
       required: true,
-      default: ""
+      default: "",
     },
     isProfessor: {
       type: Object,
       required: true,
-      default: {
-      	status: false,
-      	name: "",
-      	id: 0
-      }
-    }
+      default: () => ({
+        status: false,
+        name: "",
+        id: 0,
+      }),
+    },
+    isPaciente: {
+      type: Object,
+      required: true,
+      default: () => ({
+        status: false,
+        name: "",
+        id: 0,
+      }),
+    },
   },
   components: {
     ConsultaView,
@@ -112,56 +157,92 @@ export default {
       isLoading: false,
       especialidades: [],
       professores: [],
-      opcoesStatus: ['Agendada', 'Pendente', 'Em Espera', 'Concluída', 'Cancelada'],
+      opcoesStatus: [
+        "Agendada",
+        "Pendente",
+        "Em Espera",
+        "Concluída",
+        "Cancelada",
+      ],
       filtros: {
-        status: '',
-        especialidade: '',
-        professorId: ''
-      }
+        status: "",
+        especialidade: "",
+        professorId: "",
+        paciente: "", // Novo campo
+      },
     };
   },
   computed: {
-  	filterProfessorId() {
-  	  const prof = this.professores.find(p => p.id_Usuario === this.isProfessor.id);
-  	  return prof ? prof.id_Usuario : '';
+    filterProfessorId() {
+      const prof = this.professores.find(
+        (p) => p.id_Usuario === this.isProfessor.id
+      );
+      return prof ? prof.id_Usuario : "";
     },
     filtrosAtivos() {
-      return this.filtros.status || this.filtros.especialidade || this.filtros.professorId;
+      return (
+        this.filtros.paciente ||
+        this.filtros.status ||
+        this.filtros.especialidade ||
+        this.filtros.professorId
+      );
     },
     consultasFiltradas() {
-      return this.consultas.filter(c => {
+      return this.consultas.filter((c) => {
+        const nomePaciente = c.nomePaciente ? c.nomePaciente.toLowerCase() : "";
+        const filtroPaciente = this.filtros.paciente.toLowerCase();
+
+        // Se for paciente, ignora o filtro pois já está pré-filtrado
+        const filtroPacienteAtivo = this.isPaciente.status
+          ? true
+          : !this.filtros.paciente || nomePaciente.includes(filtroPaciente);
+
         return (
           c.area === this.area &&
+          (!this.filtros.paciente || nomePaciente.includes(filtroPaciente)) &&
           (!this.filtros.status || c.status === this.filtros.status) &&
-          (!this.filtros.especialidade || c.especialidade === this.filtros.especialidade) &&
-          (!this.filtros.professorId || c.professorId == this.filtros.professorId)
+          (!this.filtros.especialidade ||
+            c.especialidade === this.filtros.especialidade) &&
+          (!this.filtros.professorId ||
+            c.professorId == this.filtros.professorId)
         );
       });
     },
     consultasOrdenadas() {
       return [...this.consultasFiltradas].sort((a, b) => {
-        if (a.status === 'Em Espera' && b.status === 'Em Espera') {
+        if (a.status === "Em Espera" && b.status === "Em Espera") {
           return new Date(a.dataCadastro) - new Date(b.dataCadastro);
         }
         const dateA = new Date(a.data);
         const dateB = new Date(b.data);
         return dateA - dateB || a.horario.localeCompare(b.horario);
       });
-    }
+    },
   },
   methods: {
     async getConsultas() {
       this.isLoading = true;
       try {
         if (this.isProfessor.status) {
-          const response = await api.get(`api/Consulta/GetConsultaPorProfessor/${this.isProfessor.professorId}`);
+          const response = await api.get(
+            `api/Consulta/GetConsultaPorProfessor/${this.isProfessor.professorId}`
+          );
 
           if (response.data?.data) {
             this.consultas = response.data.data;
           }
+        } else if (this.isPaciente.status) {
+          const response = await api.get(
+            `api/Consulta/GetConsultaPorPaciente/${this.isPaciente.id}`
+          );
+          if (response.data?.data) {
+            this.consultas = response.data.data;
+            // Preenche automaticamente o filtro com o nome do paciente
+            this.filtros.paciente = this.isPaciente.name;
+          }
         } else {
-         const response = await api.get("api/Consulta/FiltrarConsultas", {
-            params: { Area: this.area }
+          const response = await api.get("api/Consulta/FiltrarConsultas", {
+            params: { Area: this.area },
           });
           if (response.data?.data) {
             this.consultas = response.data.data;
@@ -169,15 +250,15 @@ export default {
 
             // Se for professor, filtra automaticamente após carregar professores
             if (this.isProfessor.status) {
-              const prof = this.professores.find(p => p.nome === this.isProfessor.name);
+              const prof = this.professores.find(
+                (p) => p.nome === this.isProfessor.name
+              );
               if (prof) {
                 this.filtros.professorId = prof.id_Usuario;
               }
             }
           }
         }
-
-        
       } catch (error) {
         console.log(error);
       } finally {
@@ -186,7 +267,9 @@ export default {
     },
 
     async getEspecialidades() {
-      const response = await api.get(`api/Consulta/especialidades/${this.area}`);
+      const response = await api.get(
+        `api/Consulta/especialidades/${this.area}`
+      );
       if (response.data?.data) {
         this.especialidades = response.data.data;
       }
@@ -194,39 +277,54 @@ export default {
 
     carregarProfessores() {
       const professoresMap = {};
-      this.consultas.forEach(c => {
+      this.consultas.forEach((c) => {
         if (c.professorId && !professoresMap[c.professorId]) {
           professoresMap[c.professorId] = {
             id_Usuario: c.professorId,
-            nome: c.nomeProfessor
+            nome: c.nomeProfessor,
           };
         }
       });
       this.professores = Object.values(professoresMap);
     },
 
+    filtrarPorPaciente() {
+      // Debounce opcional para melhor performance
+      clearTimeout(this.pacienteTimeout);
+      this.pacienteTimeout = setTimeout(() => {
+        // A filtragem já acontece automaticamente pelo computed property
+      }, 300);
+    },
+
     limparFiltros() {
       this.filtros = {
-        status: '',
-        especialidade: '',
-        professorId: ''
+        paciente: this.isPaciente.status ? this.isPaciente.name : "", // Mantém o nome se for paciente
+        status: "",
+        especialidade: "",
+        professorId: this.isProfessor.status ? this.filterProfessorId : "",
       };
     },
 
     handleConsultaConfirmada() {
       this.getConsultas();
-    }
+    },
   },
   async mounted() {
-	  await Promise.all([
-	    this.getEspecialidades(),
-	    this.getConsultas()
-	  ]);
-	}
+    await Promise.all([this.getEspecialidades(), this.getConsultas()]);
+  },
 };
 </script>
 
 <style scoped>
+.form-control[type="search"] {
+  padding: 0.375rem 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.form-control[type="search"]:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
 .container {
   margin-top: 6rem;
   margin-bottom: 2rem;
@@ -332,15 +430,15 @@ export default {
     margin-top: 5rem;
     padding: 1rem;
   }
-  
+
   .filtros .row > div {
     margin-bottom: 1rem;
   }
-  
+
   .lista-consultas {
     max-height: 50vh;
   }
-  
+
   .btn-limpar-filtros {
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;

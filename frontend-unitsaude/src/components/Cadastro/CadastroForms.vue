@@ -17,29 +17,18 @@
       <div class="grid">
         <div class="leftCad p-2">
           <!-- CPF com Máscara e Validação -->
-          <div class="mb-3 position-relative">
+          <div class="mb-3">
             <label for="cpf" class="form-label">CPF</label>
             <input
               type="text"
               id="cpf"
               class="form-control"
-              :class="{
-                'is-invalid': erroCPF,
-                'is-valid': cpf && !erroCPF && isCpfPotencialmenteValido,
-              }"
               v-model="cpf"
-              maxlength="14"
-              minlength="14"
-              @input="validarInputNumerico($event, 'cpf')"
-              v-maska
-              data-maska="###.###.###-##"
+              @input="formatarCPF"
               @blur="validarCPF"
               placeholder="000.000.000-00"
               required
             />
-            <div v-if="erroCPF" class="invalid-feedback d-block">
-              {{ erroCPF }}
-            </div>
           </div>
 
           <!-- Nome -->
@@ -48,8 +37,11 @@
             <input
               type="text"
               id="nome"
-              @input="validarNome($event, 'nome')"        
+              @input="formatarNome($event)"
               class="form-control"
+              :class="{
+                'is-invalid': erroApi && erroApi.includes('Nome inválido'),
+              }"
               v-model="nome"
               placeholder="Digite seu nome completo"
               required
@@ -58,12 +50,17 @@
 
           <!-- Data de Nascimento -->
           <div class="mb-3">
-            <label for="dataNascimento" class="form-label">Data de Nascimento</label>
+            <label for="dataNascimento" class="form-label"
+              >Data de Nascimento</label
+            >
             <input
               type="date"
               id="dataNascimento"
               @input="validarDataNascimento($event)"
               class="form-control"
+              :class="{
+                'is-invalid': erroApi && erroApi.includes('Data de nascimento'),
+              }"
               v-model="dataNascimento"
               required
             />
@@ -95,7 +92,9 @@
 
             <!-- Especialidades -->
             <div class="mb-3">
-              <label for="especialidades" class="form-label">Especialidades</label>
+              <label for="especialidades" class="form-label"
+                >Especialidades</label
+              >
               <div class="multiselect-wrapper">
                 <multiselect
                   v-model="especialidadesSelecionadas"
@@ -111,8 +110,14 @@
                   :preselect-first="false"
                   required
                 >
-                  <template slot="selection" slot-scope="{ values, search, isOpen }">
-                    <span class="multiselect__single" v-if="values.length && !isOpen">
+                  <template
+                    slot="selection"
+                    slot-scope="{ values, search, isOpen }"
+                  >
+                    <span
+                      class="multiselect__single"
+                      v-if="values.length && !isOpen"
+                    >
                       {{ values.length }} especialidades selecionadas
                     </span>
                   </template>
@@ -124,7 +129,9 @@
         <div class="RightCad p-2">
           <!-- Código Profissional -->
           <div class="mb-3" v-if="user === 'professor'">
-            <label for="codigo-profissional" class="form-label">Código profissional</label>
+            <label for="codigo-profissional" class="form-label"
+              >Código profissional</label
+            >
             <input
               type="text"
               id="codigo-profissional"
@@ -181,14 +188,15 @@
           </div>
           <!-- Confirmar Senha (Professor) -->
           <div class="mb-3" v-if="user === 'professor'">
-            <label for="confirmarSenhaProf" class="form-label">Confirmar Senha</label>
+            <label for="confirmarSenhaProf" class="form-label"
+              >Confirmar Senha</label
+            >
             <input
               type="password"
               id="confirmarSenhaProf"
               class="form-control"
-              v-model="confirmarSenha"
               :class="{ 'is-invalid': senhaNaoConfere }"
-
+              v-model="confirmarSenha"
               placeholder="Confirme sua senha"
               required
             />
@@ -199,22 +207,19 @@
       <!-- Confirmar Senha (Paciente/Outros) -->
       <div v-if="user !== 'professor'">
         <div class="mb-3">
-          <label for="confirmarSenhaPac" class="form-label">Confirmar Senha</label>
+          <label for="confirmarSenhaPac" class="form-label"
+            >Confirmar Senha</label
+          >
           <input
             type="password"
             id="confirmarSenhaPac"
             class="form-control"
-
-            v-model="confirmarSenha"
             :class="{ 'is-invalid': senhaNaoConfere }"
+            v-model="confirmarSenha"
             placeholder="Confirme sua senha"
             required
           />
         </div>
-      </div>
-
-      <div v-if="senhaNaoConfere && !erroApi" class="alert alert-danger">
-        As senhas não coincidem.
       </div>
 
       <!-- Botão centralizado abaixo -->
@@ -225,7 +230,12 @@
           :disabled="senhaNaoConfere || erroCPF || isLoading || erroApi"
         >
           <span v-if="!isLoading">Cadastrar</span>
-          <span v-else class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <span
+            v-else
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
         </button>
       </div>
     </form>
@@ -240,8 +250,8 @@ import BackButton from "@/components/btnVoltar.vue";
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.css";
 
-import { isCPF } from 'validation-br';
-// import { cpf as cpfValidator } from "cpf-cnpj-validator"; // Renomeando para evitar conflito com data.cpf
+//import { isCPF } from "validation-br";
+import { cpf } from "cpf-cnpj-validator"; // Importação da biblioteca
 
 export default {
   props: {
@@ -262,8 +272,7 @@ export default {
       nome: "",
       dataNascimento: "",
       telefone: "", // Maska irá formatar este valor
-      cpf: "",      // Maska irá formatar este valor
-      erroCPF: null, // Erro específico para CPF
+      cpf: "", // Maska irá formatar este valor
       erroApi: null, // Para erros gerais da API ou validações não cobertas por campos específicos
       senhaNaoConfere: false,
       codigoProfissional: "",
@@ -275,16 +284,54 @@ export default {
       especialidadesSelecionadas: [],
     };
   },
-  computed: {
-    // Para o feedback visual 'is-valid' do CPF
-    isCpfPotencialmenteValido() {
-      const cpfLimpo = this.cpf ? this.cpf.replace(/\D/g, '') : '';
-      return cpfLimpo.length === 11;
-    }
-  },
   watch: {
-    confirmarSenha(newValue) {
-      this.senhaNaoConfere = newValue !== this.senha;
+    // Novo watcher para validação de senha em tempo real
+    senha(newVal, oldVal) {
+      if (this.confirmarSenha && newVal !== this.confirmarSenha) {
+        this.erroApi = "As senhas não coincidem";
+        this.senhaNaoConfere = true;
+      } else if (this.erroApi === "As senhas não coincidem") {
+        this.erroApi = null;
+        this.senhaNaoConfere = false;
+      }
+    },
+
+    confirmarSenha(newVal, oldVal) {
+      if (this.senha && newVal !== this.senha) {
+        this.erroApi = "As senhas não coincidem";
+        this.senhaNaoConfere = true;
+      } else if (this.erroApi === "As senhas não coincidem") {
+        this.erroApi = null;
+        this.senhaNaoConfere = false;
+      }
+    },
+    cpf(newValue) {
+      this.formatarCPF();
+      // Validação em tempo real enquanto digita
+      if (newValue.replace(/\D/g, "").length === 11) {
+        this.erroApi = cpf.isValid(newValue) ? null : "CPF inválido";
+      } else if (newValue.replace(/\D/g, "").length > 0) {
+        this.erroApi = "CPF deve conter 11 dígitos";
+      } else {
+        this.erroApi = null;
+      }
+    },
+    nome(newValue) {
+      this.formatarNome({ target: { value: newValue } }); // Chama formatarNome programaticamente
+
+      // Validação em tempo real
+      if (newValue.trim().length < 5 || !newValue.includes(" ")) {
+        this.erroApi = "Nome inválido. Por favor, escreva nome e sobrenome.";
+      } else if (
+        this.erroApi === "Nome inválido. Por favor, escreva nome e sobrenome."
+      ) {
+        this.erroApi = null;
+      }
+    },
+    dataNascimento(newValue) {
+      if (newValue) {
+        this.validarDataNascimento({ target: { value: newValue } });
+      }
     },
   },
   methods: {
@@ -298,13 +345,46 @@ export default {
     validarInputTexto(event, campo) {
       const valor = event.target.value;
 
-      const apenasLetras = valor.replace(/[^A-Za-zÀ-ÿ\s]/g, "");
+      // Permite letras, acentos, ç, Ç e espaços
+      const regex = /[^A-Za-zÀ-ÿ\sçÇ]/g;
+      const apenasLetrasEEspacos = valor.replace(regex, "");
 
-      this.nome = apenasLetras;
+      this[campo] = apenasLetrasEEspacos;
     },
+
+    formatarCPF() {
+      // Remove tudo que não é dígito
+      let cpfLimpo = this.cpf.replace(/\D/g, "");
+
+      // Limita a 11 caracteres
+      cpfLimpo = cpfLimpo.substring(0, 11);
+
+      // Formata usando a biblioteca
+      this.cpf = cpf.format(cpfLimpo);
+    },
+
+    validarCPF() {
+      const cpfNumeros = this.cpf.replace(/\D/g, "");
+
+      this.erroApi = null;
+      return true;
+    },
+
+    formatarNome(event) {
+      let valor = event.target ? event.target.value : event;
+
+      // Permite letras, espaços e caracteres acentuados
+      valor = valor.replace(/[^A-Za-zÀ-ÿ\sçÇ]/g, "");
+
+      // Remove espaços múltiplos
+      valor = valor.replace(/\s{2,}/g, " ");
+
+      // Atualiza o modelo de dados
+      this.nome = valor;
+    },
+
     validarNome(event, campo) {
       this.validarInputTexto(event, campo);
-
       this[campo] = this[campo].trim();
 
       if (this[campo].length < 5 || !this[campo].includes(" ")) {
@@ -314,24 +394,9 @@ export default {
 
       this.erroApi = null;
     },
-    validarCPF() {
-      const cpfLimpo = this.cpf ? this.cpf.replace(/\D/g, '') : '';
 
-      if (!cpfLimpo) {
-        return false;
-      }
-      // Use a função importada correta:
-      if (!isCPF(cpfLimpo)) { // Usando isCPF de validation-br
-      // if (!cpfValidator.isValid(cpfLimpo)) { // Se estivesse usando cpf-cnpj-validator
-        this.erroCPF = "CPF inválido";
-        return false;
-      }
-      this.erroCPF = null;
-      return true;
-    },
     validarDataNascimento(event) {
       const dataNascimento = event.target.value;
-
       const hoje = new Date();
       const dataNasc = new Date(dataNascimento);
 
@@ -339,13 +404,14 @@ export default {
       const mes = hoje.getMonth() - dataNasc.getMonth();
       const dia = hoje.getDate() - dataNasc.getDate() - 1;
 
-      const tem18AnosOuMais = idade > 18 || (idade === 18 && (mes > 0 || (mes === 0 && dia >= 0)));
+      const tem18AnosOuMais =
+        idade > 18 || (idade === 18 && (mes > 0 || (mes === 0 && dia >= 0)));
 
       if (!tem18AnosOuMais) {
         this.erroApi = "Usuário deve ter 18 anos ou mais.";
         return;
       }
-      this.erroApi = null; // limpa erro se estiver ok
+      this.erroApi = null;
     },
     handleHome(auth) {
       if (!auth.token) {
@@ -397,8 +463,8 @@ export default {
     },
     getValoresLimpos() {
       return {
-        cpf: this.cpf ? this.cpf.replace(/\D/g, '') : '',
-        telefone: this.telefone ? this.telefone.replace(/\D/g, '') : '',
+        cpf: this.cpf ? this.cpf.replace(/\D/g, "") : "",
+        telefone: this.telefone ? this.telefone.replace(/\D/g, "") : "",
       };
     },
     async cadastrarPaciente() {
@@ -435,13 +501,18 @@ export default {
 
       // 1. Validar CPF
       if (!this.validarCPF()) {
-        // erroCPF já foi setado e será exibido
+        return;
+      }
+
+      if (this.nome.trim().length < 5 || !this.nome.includes(" ")) {
+        this.erroApi = "Nome inválido. Por favor, escreva nome e sobrenome.";
         return;
       }
 
       // 2. Validar Senhas
       if (this.senha !== this.confirmarSenha) {
         this.senhaNaoConfere = true;
+        this.erroApi = "As senhas não coincidem.";
         return;
       }
 
@@ -539,15 +610,6 @@ export default {
 }
 .mb-3 {
   margin-bottom: 1rem !important;
-}
-.form-control.is-invalid { /* Classe específica para inputs de formulário */
-  border-color: #dc3545 !important;
-}
-.form-control.is-valid { /* Classe específica para inputs de formulário */
-  border-color: #198754 !important;
-}
-.invalid-feedback.d-block, .valid-feedback.d-block {
-    display: block !important;
 }
 :deep(.multiselect__option--highlight) {
   background: #186fc0;
