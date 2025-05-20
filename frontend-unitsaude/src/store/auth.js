@@ -11,20 +11,20 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     setToken(token) {
       this.token = token;
-      Cookies.set("token", token, { expires: 0.1667 }); // 4 horas
+      Cookies.set("token", token, { expires: 0.1667 , secure: true, sameSite: 'strict' });
     },
     setTipoUsuario(tipo) {
       this.tipoUsuario = tipo;
-      Cookies.set("tipoUsuario", tipo, { expires: 0.1667 }); // 4 horas
+      Cookies.set("tipoUsuario", tipo, { expires: 0.1667, secure: true, sameSite: 'strict' });
     },
     setNomeUsuario(nome) {
       this.nomeUsuario = nome;
-      Cookies.set("nome", nome, { expires: 0.1667 }); // 4 horas
+      Cookies.set("nome", nome, { expires: 0.1667 , secure: true, sameSite: 'strict' });
     },
     setUserId(id) {
       // Adicione este método
       this.id_Usuario = id;
-      Cookies.set("id_Usuario", id, { expires: 0.1667 });
+      Cookies.set("id_Usuario", id, { expires: 0.1667, secure: true, sameSite: 'strict' });
     },
     logout() {
       this.token = null;
