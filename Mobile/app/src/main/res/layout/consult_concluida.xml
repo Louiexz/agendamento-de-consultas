@@ -14,39 +14,11 @@
             android:paddingLeft="10dp"
             android:text="Consultas concluídas"/>
 
-        <LinearLayout
+        <include
+            android:id="@+id/concluidasHeader"
+            layout="@layout/consult_sem_acao_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="#186FC0"
-            android:padding="10dp"
-            android:paddingBottom="4dp"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Área"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Data"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Horário"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"/>
-        </LinearLayout>
+            android:layout_height="wrap_content"/>
 
         <ProgressBar
             android:id="@+id/progressBarConcluida"

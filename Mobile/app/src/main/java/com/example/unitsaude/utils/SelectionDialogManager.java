@@ -69,7 +69,7 @@ public class SelectionDialogManager {
         });
 
         new AlertDialog.Builder(context)
-            .setTitle("Selecione a visualização")
+            .setTitle("Selecione o status")
             .setView(dialogView)
             .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
             .setOnDismissListener(dialog -> {
