@@ -14,10 +14,17 @@ public class SharedPreferencesManager {
     private static final String KEY_USER_NOME = "user_nome";
     private static final String KEY_USER_TIPO = "user_tipo";
     private static final String KEY_USER_ID = "user_id";
+    private static SharedPreferencesManager instance;
     private SharedPreferences sharedPreferences;
 
     public SharedPreferencesManager(Context context) {
         sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    }
+    public static SharedPreferencesManager getInstance(Context context) {
+        if (instance == null) {
+            instance = new SharedPreferencesManager(context.getApplicationContext());
+        }
+        return instance;
     }
 
     public void setLoginIn(boolean saveLogin) {

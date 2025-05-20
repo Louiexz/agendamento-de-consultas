@@ -12,7 +12,7 @@
             android:textSize="20sp"
             android:padding="20dp"
             android:paddingLeft="10dp"
-            android:text="Consultas agendadas"/>
+            android:text="Consultas concluídas"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -49,7 +49,7 @@
         </LinearLayout>
 
         <ProgressBar
-            android:id="@+id/progressBarAgendadas"
+            android:id="@+id/progressBarConcluida"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -57,9 +57,9 @@
             android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerAgendadas"
+            android:id="@+id/recyclerConcluida"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="true"
-            android:gravity="center_vertical"/>            
+            android:gravity="center_vertical"/>
 </LinearLayout>

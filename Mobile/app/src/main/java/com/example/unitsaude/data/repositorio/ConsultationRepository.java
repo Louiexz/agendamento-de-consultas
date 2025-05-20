@@ -23,6 +23,10 @@ public class ConsultationRepository {
         this.apiService = ApiClient.getInstance().create(ApiService.class);
     }
 
+    public Call<Void> cancelConsultation(int consultaId) {
+        return apiService.cancelConsultation(consultaId);
+    }
+
     public Call<GetConsultationResponse> getConsultas(int pacienteId) {
         return apiService.getConsultas(pacienteId);
     }

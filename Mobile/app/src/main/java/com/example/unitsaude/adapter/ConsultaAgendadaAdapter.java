@@ -1,50 +1,62 @@
 package com.example.unitsaude.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.example.unitsaude.R;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.unitsaude.R;
 import com.example.unitsaude.data.dto.consultation.GetConsultationDto;
+
+import com.example.unitsaude.utils.AlertDialogUtils;
 
 import java.util.List;
 
-public class ConsultaAgendadaAdapter extends ConsultaAdapter {
+public class ConsultaAgendadaAdapter extends RecyclerView.Adapter<ConsultaAgendadaAdapter.ViewHolder> {
+    private Context context;
+    private List<GetConsultationDto> consultas;
+    private AlertDialogUtils alertDialogUtils;
 
     public ConsultaAgendadaAdapter(Context context, List<GetConsultationDto> consultas) {
-        super(context, consultas); // Chama o construtor da classe pai (ConsultaAdapter)
+        this.context = context;
+        this.consultas = consultas;
+        this.alertDialogUtils = new AlertDialogUtils(context);
     }
-    
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        // Se a view (convertView) for nula, inflar um novo layout
-        if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.list_consulta_agendada, parent, false);
-        }
 
-        // Obter o objeto GetConsultationDto na posição atual
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.list_consulta_agendada, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
         GetConsultationDto consulta = consultas.get(position);
 
-        convertView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog(consultas.get(position));
-            }
-        });
+        holder.tvArea.setText(consulta.getArea());
+        holder.tvData.setText(consulta.getData());
+        holder.tvHora.setText(consulta.getHora());
 
-        TextView tvArea = convertView.findViewById(R.id.tvArea);
-        TextView tvData = convertView.findViewById(R.id.tvData);
-        TextView tvHora = convertView.findViewById(R.id.tvHora);
+        holder.itemView.setOnClickListener(v -> this.alertDialogUtils.showConsultDetailsDialog(consulta));
+    }
 
-        // Definir os valores nas views
-        tvArea.setText(consulta.getArea());
-        tvData.setText(consulta.getData());
-        tvHora.setText(consulta.getHora());
+    @Override
+    public int getItemCount() {
+        return consultas.size();
+    }
 
-        return convertView;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        TextView tvArea, tvData, tvHora;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            tvArea = itemView.findViewById(R.id.tvArea);
+            tvData = itemView.findViewById(R.id.tvData);
+            tvHora = itemView.findViewById(R.id.tvHora);
+        }
     }
 }

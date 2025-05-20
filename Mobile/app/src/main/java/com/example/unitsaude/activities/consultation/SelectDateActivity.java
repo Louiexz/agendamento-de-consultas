@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import android.view.LayoutInflater;
 import android.view.View;
+
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
@@ -15,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.CalendarView;
 import android.widget.Toast;
+
 import android.app.AlertDialog;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,6 +49,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import com.example.unitsaude.utils.AlertDialogUtils;
+
 public class SelectDateActivity extends AppCompatActivity {
     private String formattedDate;
     private String selected_hour;
@@ -62,9 +66,10 @@ public class SelectDateActivity extends AppCompatActivity {
     private ProgressBar progressBarHours;
     private Context context;
     private List<GetHourDto> hourList = new ArrayList<>();
-    private AlertDialog dialog;
     private CreateConsultationView createConsultationViewModel;
     private SharedPreferencesManager preferencesManager;
+
+    private AlertDialogUtils alertDialogUtils;
 
     private void formatDate(String date) {
         String mesNumero = date.substring(5, 7);
@@ -77,44 +82,18 @@ public class SelectDateActivity extends AppCompatActivity {
 
     private void showConfirmationDialog(GetConsultationDto consulta) {
         createConsultationViewModel.getLoadingLiveData().observe(this, isLoading -> {
-            // Você pode adicionar um spinner de carregamento aqui
-            AlertDialog loadingDialog = new AlertDialog.Builder(this)
-                .setTitle("Carregando consulta...")
-                .setView(new ProgressBar(this))
-                .setCancelable(false)
-                .create();
-            
-
-            AlertDialog confirmationDialog = new AlertDialog.Builder(this)
-                .setTitle("Confirmação da consulta")
-                .setMessage(
-                    "Área: " + consulta.getArea() + "\n" +
-                    "Especialidade: " + consulta.getEspecialidade() + "\n" +
-                    "Data: " + dateList[0] + " de " +
-                    dateList[1] + " de " + dateList[2] + "\n" +
-                    "Professor: " + consulta.getProfessorName() + "\n" +
-                    "Horário: " + consulta.getHora() + "\n" +
-                    "Status: " + consulta.getStatus())
-                .setPositiveButton("OK", (dialog, which) -> {
-                    // Ação ao confirmar a consulta
-                    Intent intent = new Intent(this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                })
-                .create();
-            
             if (isLoading) {
-                loadingDialog.show();
+                alertDialogUtils.showLoadingDialog("Carregando confirmação...");
             } else {
-                loadingDialog.dismiss();
+                alertDialogUtils.closeLoadingDialog();
                 formatDate(consulta.getData());
 
-                confirmationDialog.show();
+                alertDialogUtils.showConsultConfirmationDialog(consulta, dateList);
             }
         });
     }
 
-    protected void createConsult() {
+    protected void createConsult(String[] dateList) {
         createConsultationViewModel.createConsulta(
             new CreateConsultationRequest(
                 formattedDate,
@@ -129,7 +108,8 @@ public class SelectDateActivity extends AppCompatActivity {
 
         createConsultationViewModel.getConsultationResponseLiveData().observe(this, responseBody -> {
             if (responseBody != null) {
-                showConfirmationDialog(responseBody.getConsulta());
+                alertDialogUtils.closeLoadingDialog();
+                alertDialogUtils.showConsultConfirmationDialog(responseBody.getConsulta(), dateList);
             }
         });
     }
@@ -140,6 +120,8 @@ public class SelectDateActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_date);
 
         preferencesManager = new SharedPreferencesManager(this);
+
+        alertDialogUtils = new AlertDialogUtils(this);
 
         user_id = preferencesManager.getUserId();
 
@@ -156,6 +138,7 @@ public class SelectDateActivity extends AppCompatActivity {
         hourViewModel.getHourResponseLiveData().observe(this, response -> {
             if (response != null && response.getHours() != null && !response.getHours().isEmpty()) {
                 hourList = response.getHours();
+                alertDialogUtils.closeLoadingDialog();
                 showHourPickerDialog(hourList);
             } else {
                 Toast.makeText(this, "Nenhum horário disponível para a data selecionada", Toast.LENGTH_SHORT).show();
@@ -184,6 +167,7 @@ public class SelectDateActivity extends AppCompatActivity {
             formatDate(formattedDate);
 
             GetHourRequest request = new GetHourRequest(formattedDate, selectedArea, selectedSpecialty);
+            alertDialogUtils.showLoadingDialog("Carregando horários...");
             hourViewModel.getHours(request);
         });
     }
@@ -203,13 +187,14 @@ public class SelectDateActivity extends AppCompatActivity {
             )
             .setPositiveButton("Sim", (dialog, which) -> {
                 // Ação ao confirmar a consulta
-                createConsult();
+                alertDialogUtils.showLoadingDialog("Criando consulta...");
+                createConsult(dateList);
             })
             .setNegativeButton("Não", (dialog, which) -> dialog.dismiss())
             .create();
         
         optionsDialog.show();
-    }    
+    }
 
     private void showHourPickerDialog(List<GetHourDto> hours) {
         BottomSheetDialog dialog = new BottomSheetDialog(context);
@@ -251,6 +236,8 @@ public class SelectDateActivity extends AppCompatActivity {
             params.setMargins(16, 16, 16, 16);
             grid.addView(button, params);
         }
+
+        alertDialogUtils.closeLoadingDialog();
 
         dialog.setContentView(view);
         dialog.show();

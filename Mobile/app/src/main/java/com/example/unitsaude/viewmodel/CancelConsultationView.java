@@ -17,14 +17,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ConsultationView extends AndroidViewModel {
+public class CancelConsultationView extends AndroidViewModel {
     private final MutableLiveData<String> errorLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loadingLiveData = new MutableLiveData<>(false);
-    private final MutableLiveData<GetConsultationResponse> consultationResponseLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> consultationResponseLiveData = new MutableLiveData<>();
     private final ConsultationRepository consultationRepository;
     private final SharedPreferencesManager preferencesManager;
 
-    public ConsultationView(Application application) {
+    public CancelConsultationView(Application application) {
         super(application);
         consultationRepository = new ConsultationRepository();
         preferencesManager = SharedPreferencesManager.getInstance(application);
@@ -38,55 +38,31 @@ public class ConsultationView extends AndroidViewModel {
         return loadingLiveData;
     }
 
-    public LiveData<GetConsultationResponse> getConsultationResponseLiveData() {
+    public LiveData<String> getConsultationResponseLiveData() {
         return consultationResponseLiveData;
     }
 
-    public void getConsultas(int pacienteId) {
+    public void cancelConsultation(int consultaId) {
         loadingLiveData.setValue(true);
 
-        consultationRepository.getConsultas(pacienteId).enqueue(new Callback<GetConsultationResponse>() {
+        consultationRepository.cancelConsultation(consultaId).enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<GetConsultationResponse> call, Response<GetConsultationResponse> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 loadingLiveData.setValue(false);
-                if (response.isSuccessful() && response.body() != null) {
-                    consultationResponseLiveData.setValue(response.body());
+                if (response.isSuccessful()) {
+                    consultationResponseLiveData.setValue("Consulta cancelada com sucesso");
                 } else {
-                    handleConsultationError(response);
+                    handleError(response);
                 }
             }
 
             @Override
-            public void onFailure(Call<GetConsultationResponse> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
                 loadingLiveData.setValue(false);
                 errorLiveData.setValue("Erro ao conectar com o servidor");
-                Log.e("CONSULTATION_ERROR", "Erro ao conectar com o servidor", t);
+                Log.e("CANCEL_CONSULTATION", "Erro ao conectar com o servidor", t);
             }
         });
-    }
-
-    private void handleConsultationError(Response<GetConsultationResponse> response) {
-        String errorBody = "";
-        try {
-            if (response.errorBody() != null) {
-                errorBody = response.errorBody().string();
-            }
-        } catch (Exception e) {
-            errorBody = "Erro ao ler o corpo de erro: " + e.getMessage();
-        }
-
-        if (response.code() == 401) {
-            errorLiveData.setValue("Sessão expirada. Faça login novamente.");
-            preferencesManager.clearAll();
-        } else if (response.code() == 403) {
-            errorLiveData.setValue("Acesso negado. Você não tem permissão para acessar este recurso.");
-        } else if (response.code() == 404) {
-            errorLiveData.setValue("Consulta não encontrada.");
-        } else {
-            errorLiveData.setValue("Erro ao consultar: " + errorBody);
-        }
-
-        Log.e("CONSULTATION_FAIL", "Código HTTP: " + response.code() + ", Erro: " + errorBody);
     }
 
     private void handleError(Response<Void> response) {

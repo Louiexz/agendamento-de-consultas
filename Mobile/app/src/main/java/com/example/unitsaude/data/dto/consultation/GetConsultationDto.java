@@ -1,7 +1,7 @@
 package com.example.unitsaude.data.dto.consultation;
 
 public class GetConsultationDto {
-    private int id;
+    private int id_Consulta;
     private String data;
     private String horario;
     private String status;
@@ -12,6 +12,9 @@ public class GetConsultationDto {
     private String nomePaciente;
     private String nomeProfessor;
 
+    public int getId() {
+        return this.id_Consulta;
+    }
     public String getData() {
         return this.data;
     }

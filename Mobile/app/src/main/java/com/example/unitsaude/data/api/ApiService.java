@@ -26,6 +26,7 @@ import retrofit2.http.Body;
 import retrofit2.http.Query;
 import retrofit2.http.Path;
 import retrofit2.http.POST;
+import retrofit2.http.PATCH;
 import retrofit2.http.GET;
 
 public interface ApiService {
@@ -59,4 +60,7 @@ public interface ApiService {
 
     @POST("api/Consulta/CreateConsulta")
     Call<CreateConsultationResponse> createConsulta(@Body CreateConsultationRequest createConsultaRequest);
+
+    @PATCH("api/Consulta/CancelarConsulta/{consultaId}")
+    Call<Void> cancelConsultation(@Path("consultaId") int consultaId);
 }

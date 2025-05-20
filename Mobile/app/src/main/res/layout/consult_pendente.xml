@@ -29,9 +29,10 @@
             android:layout_gravity="center"
             android:visibility="gone" />
 
-        <ListView
-            android:id="@+id/listViewPendente"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerPendente"
             android:layout_width="match_parent"
-            android:layout_height="130dp"
-            android:gravity="center_vertical" />
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="true"
+            android:gravity="center_vertical"/>
 </LinearLayout>
