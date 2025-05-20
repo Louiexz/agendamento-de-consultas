@@ -141,6 +141,7 @@ public class SelectDateActivity extends AppCompatActivity {
                 alertDialogUtils.closeLoadingDialog();
                 showHourPickerDialog(hourList);
             } else {
+                alertDialogUtils.closeLoadingDialog();
                 Toast.makeText(this, "Nenhum horário disponível para a data selecionada", Toast.LENGTH_SHORT).show();
             }
         });
