@@ -8,7 +8,7 @@ namespace UnitSaude.Interfaces
         public Task<ResponseModel<ReadDisponibilidadeDto>> CadastrarDisponibilidade(CreateDisponibilidadeDto dto);
         public Task<ResponseModel<List<ReadDisponibilidadeDto>>> ListarDisponibilidades();
 
-        public Task<ResponseModel<Disponibilidade>> RemoverDisponibilidade(int DisponibilidadeId);
+        public Task<ResponseModel<ReadDisponibilidadeDto>> RemoverDisponibilidade(int DisponibilidadeId);
 
     }
 }

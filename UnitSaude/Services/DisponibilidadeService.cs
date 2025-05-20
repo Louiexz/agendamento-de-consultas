@@ -10,9 +10,11 @@ namespace UnitSaude.Services
     public class DisponibilidadeService : DisponibilidadeInterface
     {
         private readonly ClinicaDbContext _context;
-        public DisponibilidadeService(ClinicaDbContext context)
+        private readonly EmailService _emailService;  // Incluir o serviço de e-mail
+        public DisponibilidadeService(ClinicaDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;  // Inicializando o serviço de e-mail
         }
 
 
@@ -147,9 +149,10 @@ namespace UnitSaude.Services
             return await Task.FromResult(response);
         }
 
-        public async Task<ResponseModel<Disponibilidade>> RemoverDisponibilidade(int disponibilidadeId)
+
+        public async Task<ResponseModel<ReadDisponibilidadeDto>> RemoverDisponibilidade(int disponibilidadeId)
         {
-            ResponseModel<Disponibilidade> response = new();
+            ResponseModel<ReadDisponibilidadeDto> response = new();
 
             try
             {
@@ -158,16 +161,62 @@ namespace UnitSaude.Services
                 if (disponibilidade == null)
                 {
                     response.Status = false;
-                    response.Message = "Disponibilidade.";
+                    response.Message = "Disponibilidade não encontrada.";
                     return response;
                 }
 
-                _context.Disponibilidades.Remove(disponibilidade);
+                // Busca consultas ativas no mesmo período, área e especialidade
+                var consultasParaCancelar = await _context.Consultas
+                    .Where(c => c.Area == disponibilidade.Area &&
+                               c.Especialidade == disponibilidade.Especialidade &&
+                               c.Data >= disponibilidade.DataInicio &&
+                               c.Data <= disponibilidade.DataFim &&
+                               c.Status != "Concluída" &&
+                               c.Status != "Cancelada")
+                    .Include(c => c.Paciente)
+                    .Include(c => c.Professor)
+                    .ToListAsync();
 
+                int consultasCanceladas = 0;
+                foreach (var consulta in consultasParaCancelar)
+                {
+                    consulta.Status = "Cancelada";
+                    consultasCanceladas++;
+
+                    // Envia e-mail de notificação
+                    await _emailService.EnviarAsync(
+                        consulta.Paciente.email,
+                        "Consulta Cancelada - Disponibilidade Removida",
+                        $"Sua consulta com {consulta.Professor.nome} para {consulta.Data} às {consulta.Horario} " +
+                        "foi cancelada porque a disponibilidade do profissional foi removida."
+                    );
+
+                    await _emailService.EnviarAsync(
+                        consulta.Professor.email,
+                        "Consulta Cancelada - Disponibilidade Removida",
+                        $"A consulta com {consulta.Paciente.nome} para {consulta.Data} às {consulta.Horario} " +
+                        "foi cancelada porque sua disponibilidade foi removida."
+                    );
+                }
+
+                _context.Disponibilidades.Remove(disponibilidade);
                 await _context.SaveChangesAsync();
 
-                response.Data = disponibilidade;
-                response.Message = "Disponibilidade removida com sucesso!";
+                var readDto = new ReadDisponibilidadeDto
+                {
+                    Id = disponibilidade.Id,
+                    DataInicio = disponibilidade.DataInicio,
+                    DataFim = disponibilidade.DataFim,
+                    HorarioInicio = disponibilidade.HorarioInicio,
+                    HorarioFim = disponibilidade.HorarioFim,
+                    Area = disponibilidade.Area,
+                    Especialidade = disponibilidade.Especialidade,
+                };
+
+                response.Data = readDto;
+                response.Message = consultasCanceladas > 0
+                    ? $"Disponibilidade removida. {consultasCanceladas} consulta(s) cancelada(s)."
+                    : "Disponibilidade removida com sucesso.";
             }
             catch (Exception ex)
             {
@@ -177,7 +226,6 @@ namespace UnitSaude.Services
 
             return response;
         }
-
 
     }
 }
