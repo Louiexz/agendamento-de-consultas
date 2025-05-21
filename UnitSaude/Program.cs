@@ -15,14 +15,18 @@ using Hangfire.PostgreSql;
 Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddEnvironmentVariables(); // sobrescreve o que veio antes
 // L� vari�veis de ambiente para sobrescrever configura��es sens�veis
 var config = builder.Configuration;
 
 void SetIfExists(string key, string envVar)
 {
     var value = Environment.GetEnvironmentVariable(envVar);
-    if (!string.IsNullOrEmpty(value))
+    if (!string.IsNullOrEmpty(value)) {
         config[key] = value;
+    }
 }
 
 // JWT
@@ -41,7 +45,6 @@ SetIfExists("EmailSettings:Senha", "EMAIL_SENHA");
 SetIfExists("EmailSettings:UsarSSL", "EMAIL_SSL");
 SetIfExists("EmailSettings:UrlRedefinicaoSenha", "URL_REDEFINICAO");
 
-
 // Add services to the container.
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -50,6 +53,7 @@ builder.Services.AddDbContext<ClinicaDbContext>(options =>
 );
 
 var hangfireConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? connectionString;
+
 builder.Services.AddHangfire(configuration => configuration
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
@@ -78,6 +82,7 @@ builder.Services.AddScoped<ProfessorInterface, ProfessorService>();
 builder.Services.AddScoped<ProntuarioInterface, ProntuarioService>();
 builder.Services.AddScoped<UsuarioInterface, UsuarioService>();
 builder.Services.AddScoped<DisponibilidadeInterface, DisponibilidadeService>();
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<EmailService>();
 
 
@@ -167,12 +172,21 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Paciente"));
 });
 
+var allowedOrigins = new[] {
+    "https://agendamento-de-consultas-psi.vercel.app",
+    "http://localhost:5173"
+};
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontendOrigin",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod());
+        policy =>
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        }
+    );
 });
 
 

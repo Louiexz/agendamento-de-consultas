@@ -2,7 +2,7 @@
 {
     public class HorarioDisponivelDto
     {
-        public string Horario { get; set; }
-        public string Status { get; set; }
+        public required string Horario { get; set; }
+        public required string Status { get; set; }
     }
 }

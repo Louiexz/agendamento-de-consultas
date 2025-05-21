@@ -8,24 +8,25 @@ using UnitSaude.Dto.Usuario;
 
 namespace UnitSaude.Services
 {
-    public class AuthService(IConfiguration configuration)
+    public class AuthService
     {
-        private readonly IConfiguration _configuration = configuration;
-        private static byte[] _key;
+        private readonly IConfiguration _configuration;
+        private readonly byte[] _key;
 
-        static AuthService()
+        public AuthService(IConfiguration configuration)
         {
-            Env.Load();
-            var envKey = Environment.GetEnvironmentVariable("JWT_KEY");
-            if (string.IsNullOrWhiteSpace(envKey))
-            {
-                throw new Exception("Chave JWT não encontrada no .env");
-            }
+            _configuration = configuration;
 
-            _key = Encoding.UTF8.GetBytes(envKey);
+            var key = _configuration["Jwt:Key"]
+                   ?? Environment.GetEnvironmentVariable("JWT_KEY");
+
+            if (string.IsNullOrWhiteSpace(key))
+                throw new Exception("A chave JWT não foi encontrada.");
+
+            _key = Encoding.UTF8.GetBytes(key);
         }
 
-        public static string GerarToken(Usuario usuario, IConfiguration configuration)
+        public string GerarToken(Usuario usuario)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -38,8 +39,8 @@ namespace UnitSaude.Services
                     new Claim(ClaimTypes.Role, usuario.TipoUsuario)
                 }),
                 Expires = DateTime.UtcNow.AddHours(4),
-                Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
-                Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+                Issuer = _configuration["Jwt:Issuer"] ?? Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                Audience = _configuration["Jwt:Audience"] ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(_key), SecurityAlgorithms.HmacSha256Signature)
             };
@@ -48,30 +49,29 @@ namespace UnitSaude.Services
             return tokenHandler.WriteToken(token);
         }
 
-        public static string GerarTokenRecuperacao(string email, IConfiguration config)
+        public string GerarTokenRecuperacao(string email)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(config["Jwt:Key"]);
 
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Email, email),
-        new Claim("tipo", "recuperacao")
-    };
+            {
+                new Claim(ClaimTypes.Email, email),
+                new Claim("tipo", "recuperacao")
+            };
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(10),
+                Issuer = _configuration["Jwt:Issuer"] ?? Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                Audience = _configuration["Jwt:Audience"] ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
                 SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key),
+                    new SymmetricSecurityKey(_key),
                     SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-
-
     }
 }

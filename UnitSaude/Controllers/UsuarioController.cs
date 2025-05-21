@@ -24,24 +24,27 @@ namespace UnitSaude.Controllers
         private readonly ProfessorInterface _professorInterface;
         private readonly PacienteInterface _pacienteInterface;
         private readonly AdminInterface _administradorInterface;
+         private readonly AuthService _authService;
 
-        public UsuarioController(ClinicaDbContext context, IConfiguration configuration, ProfessorInterface professorInterface, PacienteInterface pacienteInterface, AdminInterface adminInterface)
+        public UsuarioController(ClinicaDbContext context, IConfiguration configuration, AuthService authService,
+            ProfessorInterface professorInterface, PacienteInterface pacienteInterface, AdminInterface adminInterface)
         {
             _context = context;
             _configuration = configuration;
             _professorInterface = professorInterface;
             _pacienteInterface = pacienteInterface;
             _administradorInterface = adminInterface;
+            _authService = authService;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            Usuario? usuario = await _context.Professores.FirstOrDefaultAsync(p => p.email == dto.Credential);
+            Usuario? usuario = await _context.Administradores.FirstOrDefaultAsync(a => a.email == dto.Credential);
             if (usuario == null)
-                usuario = await _context.Pacientes.FirstOrDefaultAsync(p => p.email == dto.Credential);
+                usuario = await _context.Professores.FirstOrDefaultAsync(p => p.email == dto.Credential);
             if (usuario == null)
-                usuario = await _context.Administradores.FirstOrDefaultAsync(a => a.email == dto.Credential);
+                usuario = await _context.Pacientes.FirstOrDefaultAsync(p => p.email == dto.Credential);            
 
             if (usuario == null)
                 return Unauthorized(new { message = "Credenciais inválidas." });
@@ -49,17 +52,11 @@ namespace UnitSaude.Controllers
             if (!PasswordHasher.VerifyPassword(dto.Password, usuario.senhaHash))
                 return Unauthorized(new { message = "Credenciais inválidas." });
 
-            var token = AuthService.GerarToken(usuario, _configuration);
+            var token = _authService.GerarToken(usuario);
 
             return Ok(new
             {
-                token,
-                usuario = new
-                {
-                    usuario.Id_Usuario,
-                    usuario.nome,
-                    usuario.TipoUsuario
-                }
+                token
             });
         }
 
@@ -74,7 +71,7 @@ namespace UnitSaude.Controllers
             if (!usuarioExiste)
                 return NotFound("Usuário não encontrado.");
 
-            var token = AuthService.GerarTokenRecuperacao(dto.Email, _configuration);
+            var token = _authService.GerarTokenRecuperacao(dto.Email);
             var baseUrl = _configuration["EmailSettings:UrlRedefinicaoSenha"];
             var link = $"{baseUrl}?token={token}";
 

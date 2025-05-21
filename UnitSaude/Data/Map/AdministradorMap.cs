@@ -22,7 +22,6 @@ namespace UnitSaude.Data.Map
             builder.HasIndex(u => u.cpf).IsUnique();
             builder.HasIndex(u => u.email).IsUnique();
             builder.HasIndex(u => u.telefone).IsUnique();
-
         }
     }
 }

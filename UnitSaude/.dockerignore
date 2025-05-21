@@ -1,0 +1,24 @@
+# Diretórios de build
+bin/
+obj/
+out/
+
+# Arquivos de IDE
+.vscode/
+*.user
+*.suo
+*.sln.docstates
+
+# Logs e bancos locais
+*.log
+*.db
+*.sqlite
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Pacotes e publicação
+*.nupkg
+publish/
+app/publish/

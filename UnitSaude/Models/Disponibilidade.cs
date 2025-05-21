@@ -10,8 +10,8 @@ namespace UnitSaude.Models
         public DateOnly DataFim { get; set; } // Data de fim
         public TimeOnly HorarioInicio { get; set; }
         public TimeOnly HorarioFim { get; set; }
-        public string Area { get; set; }
-        public string Especialidade { get; set; }
-        public bool Ativo { get; set; } = true;
+        public required string Area { get; set; }
+        public required string Especialidade { get; set; }
+        public required bool Ativo { get; set; } = true;
     }
 }
