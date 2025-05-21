@@ -22,8 +22,8 @@
       :class="{ 'd-none-mobile': !isMenuOpen }"
     >
       <div class="text-end">
-        <strong>{{ auth.nomeUsuario }}</strong> <br />
-        <small>{{ auth.tipoUsuario }}</small>
+        <strong>{{ auth.getNomeUsuario() }}</strong> <br />
+        <small>{{ auth.getTipoUsuario() }}</small>
       </div>
       <RouterLink
         :to="perfilRoute"

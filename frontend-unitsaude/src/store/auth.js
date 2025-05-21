@@ -1,48 +1,61 @@
 import { defineStore } from "pinia";
-import Cookies from "js-cookie"; // Importa a biblioteca js-cookie
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    token: Cookies.get("token"), // Carrega o token do cookie, se existir
-    tipoUsuario: Cookies.get("tipoUsuario"), // Carrega o tipo de usuário do cookie, se existir
-    nomeUsuario: Cookies.get("nome"), // Carrega o nome do usuário do cookie, se existir
-    id_Usuario: Cookies.get("id_Usuario"), // Adicione esta linha
+    token: Cookies.get("token") || null,
+    tipoUsuario: null,
+    nomeUsuario: null,
+    id_Usuario: null,
   }),
   actions: {
     setToken(token) {
       this.token = token;
-      Cookies.set("token", token, { expires: 0.1667 , secure: true, sameSite: 'strict' });
+      Cookies.set("token", token, { expires: 0.1667, secure: true, sameSite: 'strict' });
+
+      try {
+        const decoded = jwtDecode(token);
+        console.log(decoded);
+        this.tipoUsuario = decoded.role;       // ou "TipoUsuario", dependendo do claim
+        this.nomeUsuario = decoded.unique_name;
+        this.id_Usuario = decoded.nameid;      // ou "Id_Usuario", dependendo do claim
+      } catch (error) {
+        console.error("Token inválido");
+        this.logout();
+      }
     },
-    setTipoUsuario(tipo) {
-      this.tipoUsuario = tipo;
-      Cookies.set("tipoUsuario", tipo, { expires: 0.1667, secure: true, sameSite: 'strict' });
+    getNomeUsuario() {
+      return this.nomeUsuario;
     },
-    setNomeUsuario(nome) {
-      this.nomeUsuario = nome;
-      Cookies.set("nome", nome, { expires: 0.1667 , secure: true, sameSite: 'strict' });
+    getTipoUsuario() {
+      return this.tipoUsuario;
     },
-    setUserId(id) {
-      // Adicione este método
-      this.id_Usuario = id;
-      Cookies.set("id_Usuario", id, { expires: 0.1667, secure: true, sameSite: 'strict' });
+    decodeToken(token) {
+      try {
+        const decoded = jwtDecode(token);
+        this.tipoUsuario = decoded.role || null; // Ajuste o campo conforme o nome do claim no seu JWT
+        this.nomeUsuario = decoded.name || null;
+        this.id_Usuario = decoded.nameid || null;
+      } catch (error) {
+        this.tipoUsuario = null;
+        this.nomeUsuario = null;
+        this.id_Usuario = null;
+      }
     },
     logout() {
       this.token = null;
       this.tipoUsuario = null;
       this.nomeUsuario = null;
-      this.id_Usuario = null,
-      Cookies.remove("token"); // Remove o token do cookie
-      Cookies.remove("tipoUsuario"); // Remove o tipo de usuário do cookie
-      Cookies.remove("nome"); // Remove o nome do usuário do cookie
-      Cookies.remove('id_Usuario'); // Adicione esta linha
+      this.id_Usuario = null;
+      Cookies.remove("token");
     },
     carregarToken() {
-      // Método que pode ser chamado para garantir que o estado inicial
-      // está sincronizado com os cookies
-      this.token = Cookies.get("token");
-      this.tipoUsuario = Cookies.get("tipoUsuario");
-      this.nomeUsuario = Cookies.get("nome");
-      this.id_Usuario = Cookies.get('id_Usuario'); // Adicione esta linha
-    },
+      const token = Cookies.get("token");
+      this.token = token || null;
+      if (token) {
+        this.decodeToken(token);
+      }
+    }
   },
 });

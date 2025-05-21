@@ -22,9 +22,10 @@
             v-if="userInfo.name" 
             :area="area" 
             :isProfessor="userInfo"
+            :isPaciente="false"
           />
           <div v-else class="loading">
-            Carregando informações do professor...
+            Carregando consultas do professor...
           </div>
         </div>
       </div>

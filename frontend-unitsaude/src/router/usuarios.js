@@ -14,11 +14,11 @@ export default [
     name: 'Login',
     component: LoginView,
   },
-  {
+  /*{
     path: '/registrar',
     name: 'Registrarse',
     component: Registrarse,
-  },
+  },*/
   {
     path: '/recuperarSenha',
     name: 'RecuperarSenha',

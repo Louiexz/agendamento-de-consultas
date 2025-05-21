@@ -65,9 +65,9 @@
             </button>
           </div>
         </form>
-        <span>
+        <!--<span>
           <RouterLink to="/registrar" class="link"> Registre-se </RouterLink>
-        </span>
+        </span>-->
       </div>
     </div>
   </div>
@@ -85,7 +85,7 @@ export default {
       erro: null,
       isLoading: false,
       
-      captchaVerified: false,
+      captchaVerified: true,
     };
   },
   methods: {
@@ -121,22 +121,16 @@ export default {
         });
 
         // Se a resposta for bem-sucedida, pega o token
-        const token = response.data.token;
-        const tipoUsuario = response.data.usuario.tipoUsuario;
-        const nomeUsuario = response.data.usuario.nome;
-        const id_Usuario = response.data.usuario.id_Usuario;        
+        const token = response.data.token;  
 
         const auth = useAuthStore();
         auth.setToken(token);
-        auth.setNomeUsuario(nomeUsuario);
-        auth.setTipoUsuario(tipoUsuario);
-        auth.setUserId(id_Usuario);
 
-        if (tipoUsuario === "Administrador") {
+        if (auth.getTipoUsuario() === "Administrador") {
           this.$router.push("/admin");
-        } else if (tipoUsuario === "Professor") {
+        } else if (auth.getTipoUsuario() === "Professor") {
           this.$router.push("/professor");
-        } else if (tipoUsuario === "Paciente") {
+        } else if (auth.getTipoUsuario() === "Paciente") {
           this.$router.push("/paciente");
         } else {
           this.erro = "Tipo de usuário desconhecido.";
@@ -160,6 +154,9 @@ export default {
   },
   mounted() {
   // Define funções globais
+    localStorage.clear();
+    sessionStorage.clear();
+
     window.onCaptchaVerified = (token) => {
       this.onCaptchaVerified(token);
     };

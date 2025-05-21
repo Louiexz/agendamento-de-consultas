@@ -13,6 +13,7 @@
     "cpf-cnpj-validator": "^1.0.3",
     "dotenv": "^16.5.0",
     "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
     "lodash.debounce": "^4.0.8",
     "maska": "^3.1.1",
     "pinia": "^3.0.2",
