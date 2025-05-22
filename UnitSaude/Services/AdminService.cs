@@ -22,20 +22,38 @@ namespace UnitSaude.Services
 
             try
             {
-                var cpfExiste = await _context.Pacientes.AnyAsync(p => p.cpf == adminDTO.cpf);
+                var cpfAdm = adminDTO.cpf.Trim();
+
+                var cpfExiste = await _context.Administradores.AnyAsync(p => p.cpf == cpfAdm) ||
+                                await _context.Professores.AnyAsync(p => p.cpf == cpfAdm) ||
+                                await _context.Pacientes.AnyAsync(p => p.cpf == cpfAdm);
+                                
+
                 if (cpfExiste)
                 {
                     response.Status = false;
-                    response.Message = "Já existe um paciente cadastrado com esse CPF.";
+                    response.Message = "CPF inválido.";
+                    return response;
+                }
+
+                var emailAdm = adminDTO.email.Trim();
+
+                var emailExiste = await _context.Administradores.AnyAsync(p => p.cpf == emailAdm) ||
+                                await _context.Professores.AnyAsync(p => p.cpf == emailAdm) ||
+                                await _context.Pacientes.AnyAsync(p => p.cpf == emailAdm);
+
+                if (emailExiste) {
+                    response.Status = false;
+                    response.Message = "Email inválido.";
                     return response;
                 }
                 var admin = new Administrador
                 {
-                    cpf = adminDTO.cpf.Trim(),
-                    nome = adminDTO.nome,
-                    email = adminDTO.email,
-                    senhaHash = PasswordHasher.HashPassword(adminDTO.senhaHash),
-                    telefone = adminDTO.telefone,
+                    cpf = cpfAdm,
+                    nome = adminDTO.nome.Trim(),
+                    email = emailAdm,
+                    senhaHash = PasswordHasher.HashPassword(adminDTO.senhaHash.Trim()),
+                    telefone = adminDTO.telefone.Trim(),
                     dataCadastro = DateOnly.FromDateTime(DateTime.UtcNow),
                     dataNascimento = adminDTO.dataNascimento,
                     TipoUsuario = "Administrador",

@@ -140,6 +140,7 @@ namespace UnitSaude.Services
                     Status = status,
                     Area = consultaDTO.Area,
                     Especialidade = consultaDTO.Especialidade,
+                    Anamnese = consultaDTO.Anamnese,
                     PacienteId = consultaDTO.PacienteId,
                     ProfessorId = consultaDTO.ProfessorId,
                     Professor = professor,
@@ -158,6 +159,7 @@ namespace UnitSaude.Services
                     Status = consulta.Status,
                     Area = consulta.Area,
                     Especialidade = consulta.Especialidade,
+                    Anamnese = consulta.Anamnese,
                     PacienteId = consulta.PacienteId,
                     ProfessorId = consulta.ProfessorId,
                     NomePaciente = paciente.nome,
@@ -326,6 +328,7 @@ namespace UnitSaude.Services
                     Status = consulta.Status,
                     Area = consulta.Area,
                     Especialidade = consulta.Especialidade,
+                    Anamnese = consulta.Anamnese,
                     PacienteId = consulta.PacienteId,
                     ProfessorId = consulta.ProfessorId,
                     NomePaciente = consulta.Paciente.nome,
@@ -821,6 +824,7 @@ namespace UnitSaude.Services
                     Status = consulta.Status,
                     Area = consulta.Area,
                     Especialidade = consulta.Especialidade,
+                    Anamnese = consulta.Anamnese,
                     PacienteId = consulta.PacienteId,
                     ProfessorId = consulta.ProfessorId,
                     NomePaciente = consulta.Paciente.nome,
@@ -877,6 +881,7 @@ namespace UnitSaude.Services
                     Status = consulta.Status,
                     Area = consulta.Area,
                     Especialidade = consulta.Especialidade,
+                    Anamnese = consulta.Anamnese,
                     PacienteId = consulta.PacienteId,
                     ProfessorId = consulta.ProfessorId,
                     NomePaciente = consulta.Paciente.nome,
@@ -922,6 +927,7 @@ namespace UnitSaude.Services
                     Status = consulta.Status,
                     Area = consulta.Area,
                     Especialidade = consulta.Especialidade,
+                    Anamnese = consulta.Anamnese,
                     PacienteId = consulta.PacienteId,
                     ProfessorId = consulta.ProfessorId,
                     NomePaciente = consulta.Paciente.nome,
@@ -980,6 +986,7 @@ namespace UnitSaude.Services
                     Status = consulta.Status,
                     Area = consulta.Area,
                     Especialidade = consulta.Especialidade,
+                    Anamnese = consulta.Anamnese,
                     PacienteId = consulta.PacienteId,
                     ProfessorId = consulta.ProfessorId,
                     NomePaciente = consulta.Paciente.nome,
@@ -1017,6 +1024,7 @@ namespace UnitSaude.Services
                         Status = x.Status,
                         Area = x.Area,
                         Especialidade = x.Especialidade,
+                        Anamnese = x.Anamnese,
                         PacienteId = x.PacienteId,
                         ProfessorId = x.ProfessorId,
                         NomePaciente = x.Paciente.nome,
@@ -1063,6 +1071,7 @@ namespace UnitSaude.Services
                     Status = consulta.Status,
                     Area = consulta.Area,
                     Especialidade = consulta.Especialidade,
+                    Anamnese = consulta.Anamnese,
                     PacienteId = consulta.PacienteId,
                     ProfessorId = consulta.ProfessorId,
                     NomePaciente = consulta.Paciente.nome,
@@ -1110,8 +1119,9 @@ namespace UnitSaude.Services
                     Status = c.Status,
                     Area = c.Area,
                     Especialidade = c.Especialidade,
+                    Anamnese = c.Anamnese,
                     NomeProfessor = c.Professor?.nome,  // Se houver professor, coloca o nome
-                     NomePaciente= c.Paciente?.nome  // Se houver professor, coloca o nome
+                    NomePaciente= c.Paciente?.nome  // Se houver professor, coloca o nome
 
                 }).ToList();
 
@@ -1126,9 +1136,5 @@ namespace UnitSaude.Services
 
             return response;  // Retorna a resposta com sucesso ou falha
         }
-
-
-
-
     }
 }

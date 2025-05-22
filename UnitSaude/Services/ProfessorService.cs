@@ -23,11 +23,16 @@ namespace UnitSaude.Services
 
             try
             {
-                var cpfExiste = await _context.Pacientes.AnyAsync(p => p.cpf == professorDto.cpf);
+                var cpfProf = professorDto.cpf.Trim();
+
+                var cpfExiste = await _context.Administradores.AnyAsync(p => p.cpf == cpfProf) ||
+                                await _context.Professores.AnyAsync(p => p.cpf == cpfProf) ||
+                                await _context.Pacientes.AnyAsync(p => p.cpf == cpfProf);
+                                
                 if (cpfExiste)
                 {
                     response.Status = false;
-                    response.Message = "Já existe um paciente cadastrado com esse CPF.";
+                    response.Message = "CPF inválido.";
                     return response;
                 }
 
@@ -36,6 +41,18 @@ namespace UnitSaude.Services
                 {
                     response.Status = false;
                     response.Message = "�rea inv�lida.";
+                    return response;
+                }
+
+                var emailProf = professorDto.email.Trim();
+
+                var emailExiste = await _context.Administradores.AnyAsync(p => p.cpf == emailProf) ||
+                                await _context.Professores.AnyAsync(p => p.cpf == emailProf) ||
+                                await _context.Pacientes.AnyAsync(p => p.cpf == emailProf);
+
+                if (emailExiste) {
+                    response.Status = false;
+                    response.Message = "Email inválido.";
                     return response;
                 }
 
@@ -53,11 +70,11 @@ namespace UnitSaude.Services
 
                 var professor = new Professor
                 {
-                    cpf = professorDto.cpf.Trim(),
-                    nome = professorDto.nome,
-                    email = professorDto.email,
-                    senhaHash = PasswordHasher.HashPassword(professorDto.senhaHash),
-                    telefone = professorDto.telefone,
+                    cpf = cpfProf,
+                    nome = professorDto.nome.Trim(),
+                    email = emailProf,
+                    senhaHash = PasswordHasher.HashPassword(professorDto.senhaHash.Trim()),
+                    telefone = professorDto.telefone.Trim(),
                     dataCadastro = DateOnly.FromDateTime(DateTime.UtcNow),
                     dataNascimento = professorDto.dataNascimento,
                     area = professorDto.area,

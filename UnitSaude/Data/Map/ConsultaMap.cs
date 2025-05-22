@@ -12,11 +12,11 @@ namespace UnitSaude.Data.Map
             builder.Property(u => u.Data).IsRequired(false).HasColumnType("date");
             builder.Property(u => u.Horario).IsRequired(false);
             builder.Property(u => u.Status).IsRequired().HasMaxLength(20);
+            builder.Property(u => u.Anamnese).IsRequired().HasMaxLength(255);
 
             // Para definir um valor padrão na aplicação (caso não queira usar SQL)
             builder.Property(u => u.DataCadastro)
                    .IsRequired();
-
 
             builder.HasOne(u => u.Paciente)
                    .WithMany(u => u.Consultas)
@@ -29,9 +29,6 @@ namespace UnitSaude.Data.Map
                 .HasForeignKey(u => u.ProfessorId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
-
-
-
         }
     }
 }

@@ -21,25 +21,46 @@ namespace UnitSaude.Services
 
             try
             {
-                var cpfExiste = await _context.Pacientes.AnyAsync(p => p.cpf == pacienteDTO.cpf);
+                var cpfPac = pacienteDTO.cpf.Trim();
+
+                var cpfExiste = await _context.Administradores.AnyAsync(p => p.cpf == cpfPac) ||
+                                await _context.Professores.AnyAsync(p => p.cpf == cpfPac) ||
+                                await _context.Pacientes.AnyAsync(p => p.cpf == cpfPac);
+                                
+
                 if (cpfExiste)
                 {
                     response.Status = false;
-                    response.Message = "Já existe um paciente cadastrado com esse CPF.";
+                    response.Message = "CPF inválido.";
+                    return response;
+                }
+
+                var emailPac = pacienteDTO.email.Trim();
+
+                var emailExiste = await _context.Administradores.AnyAsync(p => p.cpf == emailPac) ||
+                                await _context.Professores.AnyAsync(p => p.cpf == emailPac) ||
+                                await _context.Pacientes.AnyAsync(p => p.cpf == emailPac);
+
+                if (emailExiste) {
+                    response.Status = false;
+                    response.Message = "Email inválido.";
                     return response;
                 }
 
                 var paciente = new Paciente
                 {
-                    cpf = pacienteDTO.cpf.Trim(),
-                    nome = pacienteDTO.nome,
-                    email = pacienteDTO.email,
-                    senhaHash = PasswordHasher.HashPassword(pacienteDTO.senhaHash),
-                    telefone = pacienteDTO.telefone,
+                    cpf = cpfPac,
+                    nome = pacienteDTO.nome.Trim(),
+                    email = emailPac,
+                    senhaHash = PasswordHasher.HashPassword(pacienteDTO.senhaHash.Trim()),
+                    telefone = pacienteDTO.telefone.Trim(),
                     dataCadastro = DateOnly.FromDateTime(DateTime.UtcNow),
                     dataNascimento = pacienteDTO.dataNascimento,
                     TipoUsuario = "Paciente",
-                    ativo = true
+                    ativo = true,
+                    cep = pacienteDTO.cep.Trim(),
+                    estado = pacienteDTO.estado.Trim(),
+                    cidade = pacienteDTO.cidade.Trim(),
                 };
 
                 _context.Pacientes.Add(paciente);
@@ -52,7 +73,10 @@ namespace UnitSaude.Services
                     nome = paciente.nome,
                     email = paciente.email,
                     telefone = paciente.telefone,
-                    dataNascimento = paciente.dataNascimento
+                    dataNascimento = paciente.dataNascimento,
+                    cep = paciente.cep,
+                    estado = paciente.estado,
+                    cidade = paciente.cidade,
                 };
 
                 response.Data = readPacienteDto;
@@ -82,7 +106,10 @@ namespace UnitSaude.Services
                         nome = x.nome,
                         email = x.email,
                         telefone = x.telefone,
-                        dataNascimento = x.dataNascimento
+                        dataNascimento = x.dataNascimento,
+                        cep = x.cep,
+                        estado = x.estado,
+                        cidade = x.cidade,
 
                     }).ToListAsync();
 
@@ -121,7 +148,10 @@ namespace UnitSaude.Services
                     nome = paciente.nome,
                     email = paciente.email,
                     telefone = paciente.telefone,
-                    dataNascimento = paciente.dataNascimento
+                    dataNascimento = paciente.dataNascimento,
+                    cep = paciente.cep,
+                    estado = paciente.estado,
+                    cidade = paciente.cidade,
                 };
 
                 response.Data = pacienteDTO;
@@ -174,8 +204,10 @@ namespace UnitSaude.Services
                     nome = pacienteExistente.nome,
                     email = pacienteExistente.email,
                     telefone = pacienteExistente.telefone,
-                    dataNascimento = pacienteExistente.dataNascimento
-
+                    dataNascimento = pacienteExistente.dataNascimento,
+                    cep = pacienteExistente.cep,
+                    estado = pacienteExistente.estado,
+                    cidade = pacienteExistente.cidade,
                 };
 
                 response.Data = ReadPacienteDto;
@@ -304,7 +336,11 @@ namespace UnitSaude.Services
                     nome = paciente.nome,
                     email = paciente.email,
                     telefone = paciente.telefone,
-                    dataNascimento = paciente.dataNascimento
+                    dataNascimento = paciente.dataNascimento,
+                    cep = paciente.cep,
+                    estado = paciente.estado,
+                    cidade = paciente.cidade,
+
                 }).ToList();
 
                 response.Status = true;
@@ -318,8 +354,5 @@ namespace UnitSaude.Services
 
             return response;
         }
-
-
-
     }
 }

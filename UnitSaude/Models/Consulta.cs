@@ -12,7 +12,7 @@ namespace UnitSaude.Models
         public required string Status { get; set; }
         public required string Area { get; set; }
         public required string Especialidade { get; set; }
-
+        public required string Anamnese { get; set; }
 
         // Chaves estrangeiras
 

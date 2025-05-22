@@ -19,6 +19,10 @@ namespace UnitSaude.Data.Map
             builder.Property(u => u.TipoUsuario).HasMaxLength(50);
             builder.Property(u => u.ativo).HasDefaultValue(true);
 
+            builder.Property(u => u.cep).IsRequired().HasMaxLength(8);
+            builder.Property(u => u.estado).IsRequired().HasMaxLength(18);
+            builder.Property(u => u.cidade).IsRequired().HasMaxLength(31);
+
             builder.HasIndex(u => u.cpf).IsUnique();
             builder.HasIndex(u => u.email).IsUnique();
             builder.HasIndex(u => u.telefone).IsUnique();

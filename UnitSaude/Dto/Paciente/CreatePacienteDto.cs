@@ -10,6 +10,9 @@ namespace UnitSaude.Dto.Paciente
         public required string email { get; set; }
         public required string senhaHash { get; set; }
         public required string telefone { get; set; }
+        public required string cep { get; set; }
+        public required string estado { get; set; }
+        public required string cidade { get; set; }
         public DateOnly? dataNascimento { get; set; }
     }
 }
