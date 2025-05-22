@@ -16,7 +16,6 @@ Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables(); // sobrescreve o que veio antes
 // L� vari�veis de ambiente para sobrescrever configura��es sens�veis
 var config = builder.Configuration;
