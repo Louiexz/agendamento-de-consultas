@@ -1,6 +1,6 @@
 <template>
     <Header/>
-    <Perfil/>
+    <Perfil :isPaciente="true"/>
 </template>
 
 <script>

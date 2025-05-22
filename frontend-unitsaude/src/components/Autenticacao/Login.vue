@@ -85,7 +85,7 @@ export default {
       erro: null,
       isLoading: false,
       
-      captchaVerified: true,
+      captchaVerified: false,
     };
   },
   methods: {

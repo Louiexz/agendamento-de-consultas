@@ -22,7 +22,6 @@
             v-if="userInfo.name" 
             :area="area" 
             :isProfessor="userInfo"
-            :isPaciente="false"
           />
           <div v-else class="loading">
             Carregando consultas do professor...

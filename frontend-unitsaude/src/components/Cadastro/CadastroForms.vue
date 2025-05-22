@@ -65,6 +65,29 @@
               required
             />
           </div>
+          <div v-if="user === 'paciente'">
+            <div class="mb-3">
+              <label for="cep" class="form-label">CEP</label>
+              <input
+                id="cep"
+                type=text
+                class="form-control"
+                v-model="cep"
+                @input="validarInputNumerico($event, 'cep')"
+                minlength=8
+                maxlength=8
+                required/>
+            </div>
+            <div class="mb-3">
+              <br>
+              <button
+                id="carrega-endereco"
+                type="button"
+                class="btn btn-primary w-70 h-30"
+                @click="pegaEndereco(false)"
+              >Carregar endereço</button><br>
+            </div>
+          </div>
 
           <!-- Campos do Professor -->
           <div v-if="user === 'professor'">
@@ -153,7 +176,6 @@
               v-model="telefone"
               maxlength="11"
               minlength="10"
-              v-maska
               :data-maska="['(##) ####-####', '(##) #####-####']"
               placeholder="(00) 00000-0000"
               required
@@ -172,6 +194,34 @@
               placeholder="Digite seu e-mail"
               required
             />
+          </div>
+          <div v-if="user === 'paciente'">
+            <!-- Cidade -->
+            <div class="mb-3">
+              <label for="cidade" class="form-label">Cidade</label>
+              <input
+                id="cidade"
+                type=text
+                class="form-control"
+                v-model="cidade"
+                @input="validarInputTexto($event, 'cidade')"
+                minlength=2
+                maxlength=31
+                required/>
+            </div>
+            <!-- Estado -->
+            <div class="mb-3">
+              <label for="estado" class="form-label">Estado</label>
+              <input
+                id="estado"
+                type=text
+                class="form-control"
+                v-model="estado"
+                @input="validarInputTexto($event, 'estado')"
+                minlength=2
+                maxlength=2
+                required/>
+            </div>
           </div>
           <!-- Senha -->
           <div class="mb-3">
@@ -249,6 +299,7 @@ import Swal from "sweetalert2";
 import BackButton from "@/components/btnVoltar.vue";
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.css";
+import axios from 'axios';
 
 //import { isCPF } from "validation-br";
 import { cpf } from "cpf-cnpj-validator"; // Importação da biblioteca
@@ -273,6 +324,10 @@ export default {
       dataNascimento: "",
       telefone: "", // Maska irá formatar este valor
       cpf: "", // Maska irá formatar este valor
+      cep: "",
+      cidade: "",
+      estado: "",
+      erroCPF: null,
       erroApi: null, // Para erros gerais da API ou validações não cobertas por campos específicos
       senhaNaoConfere: false,
       codigoProfissional: "",
@@ -335,6 +390,32 @@ export default {
     },
   },
   methods: {
+    async pegaEndereco(retorna=false) {
+      try {
+        if (this.cep.length < 8 || (this.cep.length > 8)) {
+          this.erroApi = "O campo de CEP deve ter 8 dígitos.";
+          return;
+        }
+        const response = await axios.get(`https://viacep.com.br/ws/${this.cep}/json/`);
+
+        const dados = response.data;  // aqui temos o objeto JS com os dados
+
+        if (dados && dados.erro) {
+          this.erroApi = "Digite um CEP válido."
+          return;
+        }
+
+        this.estado = dados.estado;
+        this.cidade = dados.localidade;
+
+        if(retorna){
+          return dados;
+        }
+
+      } catch (error) {
+        console.error("Erro ao buscar o endereço:", error);
+      }
+    },
     validarInputNumerico(event, campo) {
       const valor = event.target.value;
       const apenasNumeros = valor.replace(/\D/g, "");
@@ -347,9 +428,9 @@ export default {
 
       // Permite letras, acentos, ç, Ç e espaços
       const regex = /[^A-Za-zÀ-ÿ\sçÇ]/g;
-      const apenasLetrasEEspacos = valor.replace(regex, "");
+      const apenasLetrasEspacos = valor.replace(regex, "");
 
-      this[campo] = apenasLetrasEEspacos;
+      this[campo] = apenasLetrasEspacos;
     },
 
     formatarCPF() {
@@ -456,6 +537,9 @@ export default {
       this.area = "";
       this.especialidade = "";
       this.especialidadesSelecionadas = [];
+      this.cep = "";
+      this.estado = "";
+      this.cidade = "";
       this.erroCPF = null;
       this.erroApi = null;
       this.senhaNaoConfere = false;
@@ -469,6 +553,14 @@ export default {
     },
     async cadastrarPaciente() {
       const valoresLimpos = this.getValoresLimpos();
+
+      const cepDados = await this.pegaEndereco(true);
+      if (cepDados.localidade !== this.localidade
+          && cepDados.estado !== this.estado) {
+          this.erroApi = "A cidade e estado devem ser condizentes com o CEP."
+          return;
+      }
+
       return api.post("/api/Paciente/CreatePaciente", {
         cpf: valoresLimpos.cpf,
         nome: this.nome,
@@ -476,6 +568,9 @@ export default {
         senhaHash: this.senha,
         telefone: valoresLimpos.telefone,
         dataNascimento: this.dataNascimento,
+        cep: this.cep,
+        estado: this.estado,
+        cidade: this.cidade,
       });
     },
     async cadastrarProfessor() {
@@ -483,6 +578,7 @@ export default {
       const especialidades = this.especialidadesSelecionadas.map(
         (esp) => esp.nome
       );
+
       return api.post("/api/Professor/CreateProfessor", {
         cpf: valoresLimpos.cpf,
         nome: this.nome,

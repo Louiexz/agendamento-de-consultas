@@ -36,7 +36,29 @@
                 disabled
               />
             </div>
+            <div v-if="isPaciente">
+              <div class="mb-3">
+                <label for="cep" class="form-label">CEP</label>
+                <input
+                  type="cep"
+                  class="form-control"
+                  id="cep"
+                  :value="usuario.cep"
+                  disabled
+                />
+              </div>
 
+              <div class="mb-3">
+                <label for="estado" class="form-label">Estado</label>
+                <input
+                  type="estado"
+                  class="form-control"
+                  id="estado"
+                  :value="usuario.estado"
+                  disabled
+                />
+              </div>
+            </div>
             <div class="mb-3" v-if="isProfessor">
               <label class="form-label">Especialidades</label>
               <div class="especialidades-container">
@@ -93,6 +115,17 @@
                 disabled
               />
             </div>
+
+            <div class="mb-3" v-if="isPaciente" >
+              <label for="cidade" class="form-label">Cidade</label>
+              <input
+                type="cidade"
+                class="form-control"
+                id="cidade"
+                :value="usuario.cidade"
+                disabled
+              />
+            </div>
           </div>
         </div>
       </form>
@@ -113,6 +146,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    isPaciente: {
+      type: Boolean,
+      default: false,
+    }
   },
   components: {
     BackButton,
@@ -124,10 +161,11 @@ export default {
       erro: "",
       isLoadingProfile: false,
       isLoadingConsultas: false,
+      authStore: useAuthStore(),
+      usuarioStore: useUsuarioStore()
     };
   },
   isOwnAdminProfile() {
-    const authStore = useAuthStore();
     return (
       authStore.tipoUsuario === "Administrador" &&
       this.usuario?.id &&
@@ -138,12 +176,10 @@ export default {
   methods: {
     async carregaPerfil() {
       this.isLoadingProfile = true;
-      const authStore = useAuthStore();
-      const usuarioStore = useUsuarioStore();
 
       try {
         // Verifica se há um usuário específico na store (perfil listado)
-        const usuarioStoreData = usuarioStore.getUsuario();
+        const usuarioStoreData = this.usuarioStore.getUsuario();
 
         if (usuarioStoreData && usuarioStoreData.id) {
           // Se tem usuário na store, usa esses dados (perfil listado)
@@ -163,12 +199,12 @@ export default {
           // Se não tem usuário na store, busca do usuário logado
           let endpoint = "";
 
-          if (authStore.tipoUsuario === "Paciente") {
-            endpoint = `/api/Paciente/${authStore.id_Usuario}`;
-          } else if (authStore.tipoUsuario === "Professor") {
-            endpoint = `/api/Professor/${authStore.id_Usuario}`;
-          } else if (authStore.tipoUsuario === "Administrador") {
-            endpoint = `/api/Admin/${authStore.id_Usuario}`;
+          if (this.authStore.tipoUsuario === "Paciente") {
+            endpoint = `/api/Paciente/${this.authStore.id_Usuario}`;
+          } else if (this.authStore.tipoUsuario === "Professor") {
+            endpoint = `/api/Professor/${this.authStore.id_Usuario}`;
+          } else if (this.authStore.tipoUsuario === "Administrador") {
+            endpoint = `/api/Admin/${this.authStore.id_Usuario}`;
           }
 
           if (endpoint) {
@@ -195,11 +231,9 @@ export default {
         this.isLoadingProfile = false;
       }
     },
-
   },
   mounted() {
     this.carregaPerfil();
-
   },
   watch: {
     "$route.fullPath"() {

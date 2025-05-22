@@ -131,7 +131,7 @@ export default {
     },
     isProfessor: {
       type: Object,
-      required: true,
+      required: false,
       default: () => ({
         status: false,
         name: "",
@@ -140,7 +140,7 @@ export default {
     },
     isPaciente: {
       type: Object,
-      required: true,
+      required: false,
       default: () => ({
         status: false,
         name: "",

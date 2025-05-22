@@ -5,6 +5,7 @@
             <span>Paciente: {{ consulta.nomePaciente }}</span>
             <span>Área: {{ consulta.area }}</span>
             <span>Especialidade: {{ consulta.especialidade }}</span>
+            <span class="anamneses">Anamnese: {{ consulta.anamnese }} </span>
             <span>Status: {{ consulta.status }}</span>
             <span>Data e hora: <b>{{ consulta.data }} às {{ consulta.horario }}</b></span>
             <div class="buttons">
@@ -67,5 +68,11 @@ export default {
     gap: 20px;
     min-width: 100%;
     opacity: 1 !important
+}
+.anamneses {
+    display: inline-block; /* ou block, se preferir */
+    white-space: nowrap;   /* impede quebra de linha */
+    overflow-x: auto;      /* adiciona rolagem horizontal */
+    max-width: 20px       /* ou qualquer valor fixo (ex: 200px) */
 }
 </style>

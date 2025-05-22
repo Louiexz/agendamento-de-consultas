@@ -90,6 +90,17 @@
           </div>
 
           <div class="form-group">
+            <label for="anamnese">Anamnese</label>
+            <textarea
+            id="anamnese"
+            placeholder="Escreva um pouco sobre as queixas do paciente"
+            class="form-control"
+            maxlength="255"
+            v-model="anamnese"
+            required/>
+          </div>
+
+          <div class="form-group">
             <label for="professor">Professor</label>
             <select
               v-model="selectedProfessor"
@@ -122,7 +133,7 @@
               type="button"
               class="btn btn-primary"
               @click="avancarEtapa(3)"
-              :disabled="!selectedPacienteId || !selectedProfessor"
+              :disabled="!selectedPacienteId || !selectedProfessor || !anamnese"
             >
               Próximo
             </button>
@@ -192,6 +203,7 @@ export default {
       selectedArea: "",
       selectedEspecialidade: "",
       selectedPacienteId: "",
+      anamnese: "",
       selectedProfessor: "",
       searchPaciente: "",
       dataConsulta: "",
@@ -495,6 +507,7 @@ export default {
         status: this.statusConsulta,
         area: this.selectedArea,
         especialidade: this.selectedEspecialidade,
+        anamnese: this.anamnese,
         pacienteId: this.selectedPacienteId,
         professorId: this.selectedProfessor,
         dataCadastro: new Date().toISOString(), // Adiciona a data de cadastro atual
@@ -590,6 +603,9 @@ export default {
 
 <style scoped>
 /* Estilos para o formulário */
+#anamnese {
+  max-height: 110px
+}
 .form {
   padding: 2rem;
   border-radius: 8px;

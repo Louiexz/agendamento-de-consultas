@@ -137,6 +137,7 @@ export default {
           <p><strong>Paciente:</strong> ${consulta.nomePaciente}</p>
           <p><strong>Área:</strong> ${consulta.area}</p>
           <p><strong>Especialidade:</strong> ${consulta.especialidade}</p>
+          <p class="anamneses"><strong>Anamnese:</strong> ${ consulta.anamnese }</p>
           <p><strong>Status:</strong> ${consulta.status}</p>
           <p><strong>Data e hora:</strong> ${this.formatData(
             consulta.data
@@ -694,6 +695,12 @@ export default {
 </script>
 
 <style scoped>
+.anamneses {
+    display: inline-block; /* ou block, se preferir */
+    white-space: nowrap;   /* impede quebra de linha */
+    overflow-x: auto;      /* adiciona rolagem horizontal */
+    max-width: 20px       /* ou qualquer valor fixo (ex: 200px) */
+}
 .btn-cancelar {
   background-color: #dc3545;
   color: white;

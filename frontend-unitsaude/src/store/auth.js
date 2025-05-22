@@ -16,7 +16,6 @@ export const useAuthStore = defineStore("auth", {
 
       try {
         const decoded = jwtDecode(token);
-        console.log(decoded);
         this.tipoUsuario = decoded.role;       // ou "TipoUsuario", dependendo do claim
         this.nomeUsuario = decoded.unique_name;
         this.id_Usuario = decoded.nameid;      // ou "Id_Usuario", dependendo do claim
@@ -35,7 +34,7 @@ export const useAuthStore = defineStore("auth", {
       try {
         const decoded = jwtDecode(token);
         this.tipoUsuario = decoded.role || null; // Ajuste o campo conforme o nome do claim no seu JWT
-        this.nomeUsuario = decoded.name || null;
+        this.nomeUsuario = decoded.unique_name || null;
         this.id_Usuario = decoded.nameid || null;
       } catch (error) {
         this.tipoUsuario = null;
@@ -58,4 +57,5 @@ export const useAuthStore = defineStore("auth", {
       }
     }
   },
+  persist: true,
 });
