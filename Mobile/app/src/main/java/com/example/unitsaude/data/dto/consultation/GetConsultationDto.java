@@ -11,6 +11,7 @@ public class GetConsultationDto {
     private int professorId;
     private String nomePaciente;
     private String nomeProfessor;
+    private String anamnese; // Novo campo
 
     public int getId() {
         return this.id_Consulta;
@@ -33,9 +34,12 @@ public class GetConsultationDto {
     public String getProfessorName() {
         return this.nomeProfessor;
     }
+    public String getAnamnese() { // Novo getter
+        return this.anamnese;
+    }
 
     public String[] getConsulta() {
-        String[] consulta = new String[7];
+        String[] consulta = new String[8];
         consulta[0] = this.data;
         consulta[1] = this.horario;
         consulta[2] = this.status;
@@ -43,6 +47,7 @@ public class GetConsultationDto {
         consulta[4] = this.area;
         consulta[5] = this.nomeProfessor;
         consulta[6] = this.nomePaciente;
+        consulta[7] = this.anamnese; // Adicionado anamnese
         return consulta;
     }
 }

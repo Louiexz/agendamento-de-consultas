@@ -1,6 +1,7 @@
 package com.example.unitsaude.viewmodel;
 
 import android.app.Application;
+import android.util.Base64;
 import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
@@ -12,6 +13,11 @@ import com.example.unitsaude.data.dto.auth.LoginRequest;
 import com.example.unitsaude.data.dto.auth.LoginResponse;
 import com.example.unitsaude.data.repositorio.AuthRepository;
 import com.example.unitsaude.utils.SharedPreferencesManager;
+
+import org.json.JSONObject;
+
+import java.io.IOException;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -68,15 +74,21 @@ public class LoginViewModel extends AndroidViewModel {
                 if (response.isSuccessful() && response.body() != null) {
                     handleSuccessfulLogin(response.body(), saveLogin);
                 } else {
-                    handleLoginError(response);
+                    try {
+                        String errorBody = response.errorBody() != null ?
+                                response.errorBody().string() : "Erro desconhecido";
+                        errorLiveData.setValue(errorBody);
+                    } catch (IOException e) {
+                        errorLiveData.setValue("Erro ao processar resposta");
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 loadingLiveData.setValue(false);
-                errorLiveData.setValue("Erro ao conectar com o servidor");
-                Log.e("LOGIN_ERROR", "Erro ao conectar com o servidor", t);
+                errorLiveData.setValue("Erro de conexão: " + t.getMessage());
+                Log.e("LOGIN_ERROR", "Erro na requisição", t);
             }
         });
     }
@@ -91,13 +103,24 @@ public class LoginViewModel extends AndroidViewModel {
              // Adicione esta linha:
             com.example.unitsaude.data.api.ApiClient.setAuthToken(token);
 
-            String nome = response.getUsuario().get("nome").getAsString();
-            String tipo = response.getUsuario().get("tipoUsuario").getAsString();
-            int idUsuario = response.getUsuario().get("id_Usuario").getAsInt();
-            preferencesManager.saveUserInfo(nome, tipo, idUsuario);
+            try {
+                String[] parts = token.split("\\.");
+                String payload = new String(Base64.decode(parts[1], Base64.URL_SAFE), "UTF-8");
+                JSONObject payloadJson = new JSONObject(payload);
 
-            tokenLiveData.setValue(token);
-            loginResponseLiveData.setValue(response);
+                String nome = payloadJson.getString("unique_name"); // ou "Name" dependendo do seu claim
+                String tipo = payloadJson.getString("role"); // Claim de role
+                int idUsuario = payloadJson.getInt("nameid"); // Claim de NameIdentifier
+
+                preferencesManager.saveUserInfo(nome, tipo, idUsuario);
+
+                tokenLiveData.setValue(token);
+                loginResponseLiveData.setValue(response);
+            } catch (Exception e) {
+                Log.e("JWT_DECODE", "Erro ao decodificar token", e);
+                // Se não conseguir decodificar, ainda pode continuar com o token
+                tokenLiveData.setValue(token);
+            }
         } else {
             errorLiveData.setValue("Token inválido ou não encontrado");
             Log.e("LOGIN_FAIL", "Token inválido ou não encontrado");

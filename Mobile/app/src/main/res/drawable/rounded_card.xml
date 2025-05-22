@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Cor de fundo do card -->
+    <solid android:color="@android:color/white" />
+
+    <!-- Bordas arredondadas -->
+    <corners android:radius="20dp" />
+
+    <!-- Sombra (opcional, já que você já tem elevation) -->
+    <padding
+        android:bottom="4dp"
+        android:left="4dp"
+        android:right="4dp"
+        android:top="4dp" />
+</shape>

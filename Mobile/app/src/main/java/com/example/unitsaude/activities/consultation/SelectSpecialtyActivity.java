@@ -88,23 +88,22 @@ public class SelectSpecialtyActivity extends AppCompatActivity {
                 spinner.setAdapter(adapter);
 
                 new AlertDialog.Builder(this)
-                    .setTitle("Selecione um professor")
-                    .setView(dialogView)
-                    .setPositiveButton("Confirmar", (dialog, which) -> {
-                        int selectedIndex = spinner.getSelectedItemPosition();
-                        GetProfessorDto selectedProfessor = professors.get(selectedIndex);
+                        .setTitle("Selecione um professor")
+                        .setView(dialogView)
+                        .setPositiveButton("Confirmar", (dialog, which) -> {
+                            int selectedIndex = spinner.getSelectedItemPosition();
+                            GetProfessorDto selectedProfessor = professors.get(selectedIndex);
 
-                        Intent intent = new Intent(this, SelectDateActivity.class);
+                            Intent intent = new Intent(this, AnamneseActivity.class);
+                            intent.putExtra("selected_professor_name", selectedProfessor.getNome());
+                            intent.putExtra("selected_professor_id", selectedProfessor.getId());
+                            intent.putExtra("selected_specialty", selectedSpecialty);
+                            intent.putExtra("selected_area", selectedArea);
 
-                        intent.putExtra("selected_professor_name", selectedProfessor.getNome());
-                        intent.putExtra("selected_professor_id", selectedProfessor.getId());
-                        intent.putExtra("selected_specialty", selectedSpecialty);
-                        intent.putExtra("selected_area", selectedArea);
-
-                        startActivity(intent);
-                    })
-                    .setNegativeButton("Cancelar", null)
-                    .show();
+                            startActivity(intent);
+                        })
+                        .setNegativeButton("Cancelar", null)
+                        .show();
             } else {
                 new AlertDialog.Builder(this)
                     .setTitle("Erro")

@@ -21,7 +21,8 @@ public class AuthRepository {
     }
 
     public Call<LoginResponse> login(String credential, String password) {
-        return apiService.login(new LoginRequest(credential, password));
+        LoginRequest request = new LoginRequest(credential, password);
+        return apiService.login(request); // Deve mapear para o JSON {token: "..."}
     }
 
     public Call<ResponseBody> recuperarSenha(String email) {

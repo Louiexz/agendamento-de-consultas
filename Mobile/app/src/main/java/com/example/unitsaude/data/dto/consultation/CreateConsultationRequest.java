@@ -8,9 +8,10 @@ public class CreateConsultationRequest {
     private String especialidade;
     private int pacienteId;
     private int professorId;
+    private String anamnese; // Novo campo
 
     public CreateConsultationRequest(String data, String horario, String status, String area,
-        String especialidade, int pacienteId, int professorId) {
+        String especialidade, int pacienteId, int professorId, String anamnese) {
         
         this.data = data;
         this.horario = horario;
@@ -19,5 +20,6 @@ public class CreateConsultationRequest {
         this.especialidade = especialidade;
         this.pacienteId = pacienteId;
         this.professorId = professorId;
+        this.anamnese = anamnese;
     }
 }

@@ -34,10 +34,11 @@
             android:id="@+id/loginCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_marginHorizontal="40dp"
             android:layout_below="@id/logoContainer"
-            android:background="@android:color/white"
+            android:layout_centerVertical="true"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="43dp"
+            android:background="@drawable/rounded_card"
             android:elevation="6dp"
             android:gravity="center_horizontal"
             android:orientation="vertical"
@@ -68,25 +69,24 @@
                 android:backgroundTint="@android:color/black"
                 android:hint="Digite sua senha"
                 android:inputType="textPassword" />
-            
-            <CheckBox
-                android:id="@+id/lembrarCheckBox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="Lembrar login" />
 
             <TextView
                 android:id="@+id/esqueciSenhaText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_gravity="start"
                 android:text="Esqueceu sua senha?"
                 android:textColor="@android:color/darker_gray"
-                android:textSize="14sp"
-                android:clickable="true"
-                android:focusable="true"/>
+                android:textSize="14sp" />
+
+            <CheckBox
+                android:id="@+id/lembrarCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lembrar login"
+                />
 
             <Button
                 android:id="@+id/loginButton"
@@ -97,16 +97,16 @@
                 android:text="Entrar"
                 android:textColor="@android:color/white" />
 
-            <Button
+           <!-- <Button
                 android:id="@+id/registrarButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
                 android:clickable="true"
                 android:focusable="true"
                 android:text="Registre-se"
                 android:textColor="@android:color/black"
-                android:background="@android:color/transparent"
-                android:textStyle="bold" />
+                android:textStyle="bold" /> -->
 
             <ProgressBar
                 android:id="@+id/loginProgressBar"

@@ -113,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        Button registerButton = findViewById(R.id.registrarButton);
+        /*Button registerButton = findViewById(R.id.registrarButton);
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,5 +122,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+         */
     }
 }

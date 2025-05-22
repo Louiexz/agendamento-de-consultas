@@ -15,6 +15,9 @@
         android:theme="@style/Theme.UnitSaude"
         tools:targetApi="31">
         <activity
+            android:name=".activities.consultation.AnamneseActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.RedefinirSenhaActivity"
             android:exported="true"> <!-- PRECISA estar como true para aceitar links externos -->
 
@@ -25,9 +28,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="agendamento-de-consultas-psi.vercel.app"
-                    android:pathPrefix="/redefinirSenha" />
+                    android:pathPrefix="/redefinirSenha"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <activity

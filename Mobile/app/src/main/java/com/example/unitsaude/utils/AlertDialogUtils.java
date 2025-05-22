@@ -44,7 +44,8 @@ public class AlertDialogUtils {
                 dateList[1] + " de " + dateList[2] + "\n" +
                 "Professor: " + consulta.getProfessorName() + "\n" +
                 "Horário: " + consulta.getHora() + "\n" +
-                "Status: " + consulta.getStatus())
+                "Status: " + consulta.getStatus() + "\n" +
+                "Anamnese: " + consulta.getAnamnese())
             .setPositiveButton("OK", (dialog, which) -> {
                 // Ação ao confirmar a consulta
                 Intent intent = new Intent(context, com.example.unitsaude.MainActivity.class);
@@ -92,7 +93,7 @@ public class AlertDialogUtils {
     public void showConsultDetailsDialog(com.example.unitsaude.data.dto.consultation.GetConsultationDto consulta) {
         String[] detalhes = consulta.getConsulta();
 
-        if (detalhes == null || detalhes.length < 7) {
+        if (detalhes == null || detalhes.length < 8) {
             new AlertDialog.Builder(context)
                 .setTitle("Erro")
                 .setMessage("Erro ao carregar os detalhes da consulta.")
@@ -109,7 +110,9 @@ public class AlertDialogUtils {
                         "Especialidade: " + detalhes[3] + "\n" +
                         "Data: " + detalhes[0] + "\n" +
                         "Hora: " + detalhes[1] + "\n" +
-                        "Status: " + detalhes[2])
+                        "Status: " + detalhes[2] + "\n" +
+                "Anamnese: " + detalhes[7])
+
             .setPositiveButton("OK", null)
             .create();
         if(consultDetailsDialog != null && !consultDetailsDialog.isShowing()) {

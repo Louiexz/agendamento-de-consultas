@@ -60,6 +60,7 @@ public class SelectDateActivity extends AppCompatActivity {
     private String selectedProfessorName;
     private int user_id;
     private int selectedProfessorId;
+    private String anamnese;
     private String[] dateList = new String[3];
     
     private SelectHourView hourViewModel;
@@ -102,7 +103,8 @@ public class SelectDateActivity extends AppCompatActivity {
                 selectedArea,
                 selectedSpecialty,
                 user_id,
-                selectedProfessorId
+                selectedProfessorId,
+                    anamnese
             )
         );
 
@@ -131,6 +133,7 @@ public class SelectDateActivity extends AppCompatActivity {
         selectedSpecialty = getIntent().getStringExtra("selected_specialty");
         selectedProfessorName = getIntent().getStringExtra("selected_professor_name");
         selectedProfessorId = getIntent().getIntExtra("selected_professor_id", -1);
+        anamnese = getIntent().getStringExtra("anamnese");
 
         hourViewModel = new ViewModelProvider(this).get(SelectHourView.class);
         createConsultationViewModel = new ViewModelProvider(this).get(CreateConsultationView.class);
@@ -148,8 +151,12 @@ public class SelectDateActivity extends AppCompatActivity {
 
         ImageButton backButton = findViewById(R.id.btnVoltar);
         backButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, SelectSpecialtyActivity.class);
+            Intent intent = new Intent(this,  AnamneseActivity.class);
             intent.putExtra("selected_area", selectedArea);
+            intent.putExtra("selected_specialty", selectedSpecialty);
+            intent.putExtra("selected_professor_name", selectedProfessorName);
+            intent.putExtra("selected_professor_id", selectedProfessorId);
+            intent.putExtra("anamnese", anamnese);
             startActivity(intent);
             finish();
         });
@@ -184,7 +191,8 @@ public class SelectDateActivity extends AppCompatActivity {
                 "Data: " + dateList[0] + " de " +
                 dateList[1] + " de " + dateList[2] + "\n" +
                 "Hora: " + selected_hour + "\n" +
-                "Status: " + consult_status
+                "Status: " + consult_status + "\n" +
+                        "Anamnese: " + anamnese
             )
             .setPositiveButton("Sim", (dialog, which) -> {
                 // Ação ao confirmar a consulta

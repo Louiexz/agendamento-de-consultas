@@ -1,0 +1,65 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white">
+
+    <!-- Header Bar com Logo e Sino (mantido) -->
+    <include
+        android:id="@+id/HeaderBar"
+        layout="@layout/header_bar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"/>
+
+    <!-- Conteúdo principal -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Título da consulta (mantido) -->
+        <include
+            android:id="@+id/consultationTitle"
+            layout="@layout/consultation_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Texto explicativo (alterado para anamnese) -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Descreva seus sintomas em poucas palavras"
+            android:textSize="18sp"
+            android:padding="10dp" />
+
+        <!-- Campo de texto para anamnese (substitui o ListView) -->
+        <EditText
+            android:id="@+id/etAnamnese"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/edittext_border"
+            android:gravity="top|start"
+            android:hint="Ex.: Dor de cabeça há 3 dias, febre leve..."
+            android:inputType="textMultiLine"
+            android:maxLength="200"
+            android:maxLines="10"
+            android:minLines="5"
+            android:padding="12dp" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp"/>
+
+        <Button
+            android:id="@+id/btnProximo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Próximo"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:paddingVertical="12dp"/>
+    </LinearLayout>
+</LinearLayout>

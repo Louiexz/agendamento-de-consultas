@@ -9,6 +9,7 @@
         android:id="@+id/HeaderBar"
         layout="@layout/header_bar"
         android:layout_width="match_parent"
+        android:background="@android:color/white"
         android:layout_height="70dp"/>
     
     <!-- Conteúdo dividido proporcionalmente -->
