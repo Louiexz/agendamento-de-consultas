@@ -73,7 +73,6 @@ export default {
   },
 
   methods: {
-    
     podeCancelar(consulta) {
       const statusPermitidos = ["Pendente", "Em Espera", "Agendada"];
       return statusPermitidos.includes(consulta.status);
@@ -137,7 +136,9 @@ export default {
           <p><strong>Paciente:</strong> ${consulta.nomePaciente}</p>
           <p><strong>Área:</strong> ${consulta.area}</p>
           <p><strong>Especialidade:</strong> ${consulta.especialidade}</p>
-          <p class="anamneses"><strong>Anamnese:</strong> ${ consulta.anamnese }</p>
+          <p class="anamneses"><strong>Anamnese:</strong> ${
+            consulta.anamnese
+          }</p>
           <p><strong>Status:</strong> ${consulta.status}</p>
           <p><strong>Data e hora:</strong> ${this.formatData(
             consulta.data
@@ -192,18 +193,10 @@ export default {
 
     async cancelarConsulta(consulta) {
       try {
-        // Verificação adicional para consultas agendadas
-        if (consulta.status === "Agendada") {
-          // Poderia verificar aqui se passaram 24h da confirmação
-          // Mas essa verificação já é feita no backend
-        }
-
         const { isConfirmed } = await Swal.fire({
           title: "Cancelar Consulta",
           html: `Deseja cancelar a consulta marcada para<br>
-               <b>${this.formatData(consulta.data)} às ${
-            consulta.horario
-          }</b>?`,
+           <b>${this.formatData(consulta.data)} às ${consulta.horario}</b>?`,
           icon: "question",
           showCancelButton: true,
           confirmButtonColor: "#d33",
@@ -238,18 +231,70 @@ export default {
           novoStatus: "Cancelada",
         });
       } catch (error) {
-        this.handleError(error, "Erro ao cancelar consulta");
+        // Fecha o loading antes de mostrar o erro
+        Swal.close();
 
-        // Mostra mensagem específica se for por causa das 24h
-        if (error.response?.data?.message?.includes("24 horas")) {
-          Swal.fire({
-            icon: "info",
-            title: "Atenção",
-            html: `Consultas agendadas só podem ser canceladas após 24 horas da confirmação.<br><br>
-                Entre em contato com a clínica se precisar de ajuda.`,
+        // Verifica se há resposta do servidor
+        if (error.response) {
+          const errorMessage =
+            error.response.data?.message || "Erro ao cancelar consulta";
+
+          // Tratamento específico para cada tipo de erro
+          if (errorMessage.includes("24 horas")) {
+            await Swal.fire({
+              icon: "info",
+              title: "Atenção",
+              html: `Consultas agendadas só podem ser canceladas após 24 horas da confirmação.<br><br>
+              Entre em contato com a clínica se precisar de ajuda.`,
+              confirmButtonColor: "#d8bd2c",
+            });
+          } else if (
+            errorMessage.includes(
+              "não é possível cancelar uma consulta com status"
+            )
+          ) {
+            await Swal.fire({
+              icon: "warning",
+              title: "Não foi possível cancelar",
+              text: errorMessage,
+              confirmButtonColor: "#d8bd2c",
+            });
+          } else if (errorMessage.includes("Consulta não encontrada")) {
+            await Swal.fire({
+              icon: "error",
+              title: "Consulta não encontrada",
+              text: "A consulta que você tentou cancelar não foi encontrada no sistema.",
+              confirmButtonColor: "#d8bd2c",
+            });
+          } else {
+            // Erro genérico do servidor
+            await Swal.fire({
+              icon: "error",
+              title: "Erro no servidor",
+              text: errorMessage,
+              confirmButtonColor: "#d8bd2c",
+            });
+          }
+        } else if (error.request) {
+          // Erro de conexão (sem resposta do servidor)
+          await Swal.fire({
+            icon: "error",
+            title: "Sem conexão",
+            text: "Não foi possível conectar ao servidor. Verifique sua conexão com a internet.",
+            confirmButtonColor: "#d8bd2c",
+          });
+        } else {
+          // Outros erros (ex: erro na construção da requisição)
+          await Swal.fire({
+            icon: "error",
+            title: "Erro inesperado",
+            text: "Ocorreu um erro ao tentar cancelar a consulta.",
             confirmButtonColor: "#d8bd2c",
           });
         }
+
+        // Log do erro completo no console para debug
+        console.error("Erro ao cancelar consulta:", error);
       }
     },
 
@@ -696,10 +741,10 @@ export default {
 
 <style scoped>
 .anamneses {
-    display: inline-block; /* ou block, se preferir */
-    white-space: nowrap;   /* impede quebra de linha */
-    overflow-x: auto;      /* adiciona rolagem horizontal */
-    max-width: 20px       /* ou qualquer valor fixo (ex: 200px) */
+  display: inline-block; /* ou block, se preferir */
+  white-space: nowrap; /* impede quebra de linha */
+  overflow-x: auto; /* adiciona rolagem horizontal */
+  max-width: 20px; /* ou qualquer valor fixo (ex: 200px) */
 }
 .btn-cancelar {
   background-color: #dc3545;
