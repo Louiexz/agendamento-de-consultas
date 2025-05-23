@@ -121,6 +121,7 @@
 <script>
 import api from "@/services/api";
 import ConsultaView from "@/components/Consulta";
+import { useAuthStore } from "@/store/auth";
 
 export default {
   props: {
@@ -137,16 +138,6 @@ export default {
         status: false,
         name: "",
         id: 0,
-      }),
-    },
-    isPaciente: {
-      type: Object,
-      required: false,
-      
-      default: () => ({
-        status: false,
-        name: "",
-        id: -1,
       }),
     },
   },
@@ -172,6 +163,12 @@ export default {
         professorId: "",
         paciente: "", // Novo campo
       },
+      auth: null,
+      isPaciente: {
+        status: false,
+        name: "",
+        id: 0,
+      }
     };
   },
   computed: {
@@ -314,7 +311,16 @@ export default {
     },
   },
   async created() {
-    await this.isPaciente.status;
+    this.auth = useAuthStore()
+
+    if (await this.auth.tipoUsuario === 'Paciente') {
+      this.isPaciente = {
+        status: true,
+        name: this.auth.nomeUsuario, 
+        id: this.auth.id_Usuario
+      }
+    }
+
     await Promise.all([this.getEspecialidades(), this.getConsultas()]);
   },
 };

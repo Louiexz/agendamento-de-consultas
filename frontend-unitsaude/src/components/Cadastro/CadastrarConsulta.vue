@@ -200,13 +200,6 @@ import "vue-cal/style";
 import { useAuthStore } from "@/store/auth";
 
 export default {
-  props: {
-    isPaciente: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
-  },
   components: {
     Header,
     BackButton,
@@ -218,6 +211,7 @@ export default {
       areas: [],
       especialidades: [],
       pacientes: [],
+      isPaciente: false,
       localPaciente: {
         status: false,
         name: null,
@@ -621,10 +615,11 @@ export default {
   },
   async mounted() {
     await this.obterAreas();
+    this.auth = useAuthStore();
+
+    if (await this.auth.tipoUsuario === 'Paciente') this.isPaciente = true
     
     if (this.isPaciente){
-      this.auth = useAuthStore();
-
       this.localPaciente = {
         status: true, 
         name: this.auth.nomeUsuario, 

@@ -40,18 +40,12 @@ const routes = [
     name: 'VisualizarConsultas',
     component: VisualizarConsultas,
     meta: { requiresAuth: true, allowedRoles: ["Administrador", "Paciente"] },
-    props: {
-      isPaciente: getAuth.tipoUsuario === "Paciente" ? true : false,
-    }
   },
   {
     path: "/cadastrar-consultas",
     name: "cadastrar-consultas",
     component: CadastrarConsulta,
     meta: { requiresAuth: true, allowedRoles: ["Administrador", "Paciente"] },
-    props: {
-      isPaciente: getAuth.tipoUsuario === "Paciente" ? true : false,
-    }
   },
   {
     path: "/pacientes",
