@@ -72,8 +72,7 @@ export default {
         const response = await api.post("/api/Usuario/recuperar-senha", {
           email: this.email,
         });
-
-        console.log("Resposta completa da API:", response.data);
+        
         this.emailEnviado = true; // exibe a mensagem de sucesso
         setTimeout(() => {
           this.emailEnviado = false;

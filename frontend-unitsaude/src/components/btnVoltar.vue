@@ -20,6 +20,8 @@ export default {
         this.$router.push("/admin"); // Substitua '/paginaX' pela página do administrador
       }  else if (auth.tipoUsuario === "Professor") {
         this.$router.push("/professor");
+      } else if (auth.tipoUsuario === "Paciente") {
+        this.$router.push("/paciente");
       }
     },
   },

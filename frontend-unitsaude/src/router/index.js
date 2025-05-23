@@ -14,6 +14,7 @@ import professor_routes from "./professor.js";
 
 //Admin e Paciente
 import CadastrarConsulta from "@/views/Cadastro/CadastrarConsultaView.vue";
+import VisualizarConsultas from '@/views/Visualizar/VisualizarConsultasView.vue';
 
 // Admin e Professor
 import VisualizarPacientesView from "@/views/Visualizar/VisualizarPacientesView.vue";
@@ -35,10 +36,22 @@ const routes = [
   ...paciente_routes,
   ...professor_routes,
   {
+    path: '/consultas/:area',
+    name: 'VisualizarConsultas',
+    component: VisualizarConsultas,
+    meta: { requiresAuth: true, allowedRoles: ["Administrador", "Paciente"] },
+    props: {
+      isPaciente: getAuth.tipoUsuario === "Paciente" ? true : false,
+    }
+  },
+  {
     path: "/cadastrar-consultas",
     name: "cadastrar-consultas",
     component: CadastrarConsulta,
     meta: { requiresAuth: true, allowedRoles: ["Administrador", "Paciente"] },
+    props: {
+      isPaciente: getAuth.tipoUsuario === "Paciente" ? true : false,
+    }
   },
   {
     path: "/pacientes",

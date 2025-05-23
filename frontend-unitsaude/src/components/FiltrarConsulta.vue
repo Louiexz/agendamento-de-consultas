@@ -132,6 +132,7 @@ export default {
     isProfessor: {
       type: Object,
       required: false,
+      
       default: () => ({
         status: false,
         name: "",
@@ -141,10 +142,11 @@ export default {
     isPaciente: {
       type: Object,
       required: false,
+      
       default: () => ({
         status: false,
         name: "",
-        id: 0,
+        id: -1,
       }),
     },
   },
@@ -231,7 +233,9 @@ export default {
           if (response.data?.data) {
             this.consultas = response.data.data;
           }
-        } else if (this.isPaciente.status) {
+          return;
+        }
+        if (this.isPaciente.status) {
           const response = await api.get(
             `api/Consulta/GetConsultaPorPaciente/${this.isPaciente.id}`
           );
@@ -246,8 +250,7 @@ export default {
           });
           if (response.data?.data) {
             this.consultas = response.data.data;
-            this.carregarProfessores();
-
+            
             // Se for professor, filtra automaticamente após carregar professores
             if (this.isProfessor.status) {
               const prof = this.professores.find(
@@ -258,9 +261,10 @@ export default {
               }
             }
           }
-        }
+        } 
+        await this.carregarProfessores();       
       } catch (error) {
-        console.log(error);
+        console.error(error);
       } finally {
         this.isLoading = false;
       }
@@ -309,7 +313,8 @@ export default {
       this.getConsultas();
     },
   },
-  async mounted() {
+  async created() {
+    await this.isPaciente.status;
     await Promise.all([this.getEspecialidades(), this.getConsultas()]);
   },
 };

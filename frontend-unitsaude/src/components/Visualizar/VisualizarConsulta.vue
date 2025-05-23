@@ -40,7 +40,6 @@ export default {
         this.carregaConsulta();
 
         if (Object.keys(this.consulta).length === 0) {
-            console.log(this.consulta);
             this.$router.go(-1);
         }
     }

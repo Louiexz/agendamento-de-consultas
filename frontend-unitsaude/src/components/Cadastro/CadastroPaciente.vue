@@ -56,8 +56,6 @@ export default {
           dataNascimento: this.dataNascimento,
         });
 
-        console.log("Resposta completa da API:", response.data);
-
         const auth = useAuthStore();
 
         await Swal.fire({

@@ -113,8 +113,7 @@ export default {
           token: this.token, // Envia o token da URL
           novaSenha: this.novaSenha, // Envia apenas a senha nova para a API
         });
-
-        console.log("Resposta completa da API:", response.data);
+        
         this.sucesso = true; // Exibe a mensagem de sucesso
 
         await Swal.fire({

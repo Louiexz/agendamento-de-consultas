@@ -54,9 +54,9 @@ export default {
   async created() {
     this.auth = useAuthStore();
     this.professor = await this.getProfessor();
-    this.userInfo = { 
+    this.userInfo = {
       status: true, 
-      name: this.auth.nomeUsuario, 
+      name: this.auth.nomeUsuario,
       professorId: this.professor?.id
     };
     if (this.professor) {

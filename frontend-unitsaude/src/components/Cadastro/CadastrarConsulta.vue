@@ -71,9 +71,20 @@
               class="form-control"
               placeholder="Digite nome ou CPF do paciente"
               autocomplete="off"
+              v-if="!isPaciente"
+            />
+            <input
+              :v-model="searchPaciente"
+              type="text"
+              id="paciente"
+              class="form-control"
+              :placeholder="localPaciente.name"
+              autocomplete="off"
+              disabled
+              v-else
             />
             <ul
-              v-if="pacientes.length"
+              v-if="pacientes.length || !isPaciente"
               class="list-group position-absolute w-100"
               style="z-index: 1000"
             >
@@ -186,8 +197,16 @@ import Swal from "sweetalert2";
 import debounce from "lodash.debounce";
 import { VueCal } from "vue-cal";
 import "vue-cal/style";
+import { useAuthStore } from "@/store/auth";
 
 export default {
+  props: {
+    isPaciente: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
   components: {
     Header,
     BackButton,
@@ -195,9 +214,15 @@ export default {
   },
   data() {
     return {
+      auth: null,
       areas: [],
       especialidades: [],
       pacientes: [],
+      localPaciente: {
+        status: false,
+        name: null,
+        id: -1,
+      },
       professores: [],
       horariosDisponiveis: [],
       selectedArea: "",
@@ -225,7 +250,6 @@ export default {
     },
     async obterEspecialidades() {
       if (!this.selectedArea) return; // Não tenta carregar especialidades se nenhuma área for selecionada
-      console.log("Área selecionada:", this.selectedArea);
       try {
         const response = await api.get(
           `/api/Consulta/especialidades/${this.selectedArea}`
@@ -240,6 +264,9 @@ export default {
     async obterPacientes() {
       if (this.searchPaciente.length < 2) {
         this.pacientes = [];
+        return;
+      }
+      if (this.isPaciente){
         return;
       }
       try {
@@ -314,7 +341,6 @@ export default {
       }
 
       this.dataConsulta = dataSelecionada.toISOString().split("T")[0];
-      console.log("Data selecionada:", this.dataConsulta);
       this.obterHorariosDisponiveis();
     },
 
@@ -326,7 +352,6 @@ export default {
         const response = await api.get(
           `/api/Professor/listar-professores-especialidade?especialidade=${this.selectedEspecialidade}`
         );
-        console.log(response);
         this.professores = response.data.data;
       } catch (error) {
         console.error("Erro ao carregar professores:", error);
@@ -577,377 +602,42 @@ export default {
     },
   },
   watch: {
-    selectedArea(newArea) {
+    async selectedArea(newArea) {
       // Chama obterEspecialidades sempre que a área for alterada
-      this.obterEspecialidades();
-      this.obterHorariosDisponiveis(); // Chama quando a área é alterada
+      await this.obterEspecialidades();
+      await this.obterHorariosDisponiveis(); // Chama quando a área é alterada
     },
-    selectedEspecialidade(newEspecialidade) {
+    async selectedEspecialidade(newEspecialidade) {
       // Chama obterProfessores sempre que a especialidade for alterada
-      this.obterProfessores();
-      this.obterHorariosDisponiveis(); // Chama quando a especialidade é alterada
+      await this.obterProfessores();
+      await this.obterHorariosDisponiveis(); // Chama quando a especialidade é alterada
     },
-    dataConsulta(newData) {
-      this.obterHorariosDisponiveis(); // Chama quando a data é alterada
+    async dataConsulta(newData) {
+      await this.obterHorariosDisponiveis(); // Chama quando a data é alterada
     },
     searchPaciente: debounce(function () {
       this.obterPacientes();
     }, 500), // Espera 500ms após a digitação para disparar a requisição
   },
-  mounted() {
-    this.obterAreas();
-    this.obterPacientes();
+  async mounted() {
+    await this.obterAreas();
+    
+    if (this.isPaciente){
+      this.auth = useAuthStore();
+
+      this.localPaciente = {
+        status: true, 
+        name: this.auth.nomeUsuario, 
+        id: this.auth.id_Usuario
+      }
+
+      this.selectedPacienteId = this.localPaciente.id;
+    } else {
+      await this.obterPacientes();
+    }
   },
 };
 </script>
 
-<style scoped>
-/* Estilos para o formulário */
-#anamnese {
-  max-height: 110px
-}
-.form {
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 900px;
-  gap: 1rem;
-}
-.consulta {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 colunas com largura igual */
-  gap: 1rem; /* Espaçamento entre os itens */
-}
-.main {
-  margin-top: 15vh;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.botaocentro {
-  margin-bottom: 1rem;
-}
-
-.Title {
-  text-align: center;
-  display: grid;
-  grid-template-columns: auto 1fr; /* 2 colunas: uma para a seta e outra para o título */
-  align-items: center; /* Alinha os itens verticalmente */
-}
-
-.Title h2 {
-  text-align: center;
-  font-weight: 400;
-}
-
-select.form-control {
-  appearance: none;
-  background-color: #f9f9f9;
-  border: 1px solid #ced4da;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-select.form-control:hover {
-  background-color: #f1f1f1;
-}
-
-.btn-primary {
-  background-color: #d8bd2c;
-  border: none;
-  transition: 0.3s ease;
-}
-.btn-primary:hover {
-  background-color: #186fc0;
-}
-
-.botaocentro {
-  text-align: center;
-}
-
-.calendario-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Novos estilos para o fluxo em etapas */
-.etapa {
-  padding: 1rem;
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.botoes-navegacao {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 2rem;
-}
-
-/* Estilos para a grade de horários */
-.horarios-container {
-  margin-top: 2rem;
-  animation: slideUp 0.4s ease;
-}
-
-.horarios-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 0.8rem;
-  margin-top: 1rem;
-}
-
-.horario-btn {
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-  text-align: center;
-}
-
-.horario-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.horario-disponivel {
-  background-color: #f8f9fa;
-  border-color: #186fc0;
-  color: #186fc0;
-}
-
-.horario-disponivel:hover {
-  background-color: #e7f3ff;
-}
-
-.horario-indisponivel {
-  background-color: #f8f9fa;
-  border-color: #ddd;
-  color: #6c757d;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.horario-selecionado {
-  background-color: #d8bd2c;
-  color: white;
-  border-color: #d8bd2c;
-}
-
-.badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background-color: #dc3545;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 0.7rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Estilos para o SweetAlert de horários */
-.swal-horarios-container {
-  max-height: 60vh;
-  overflow-y: auto;
-  padding: 10px;
-}
-
-.swal-horarios-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.swal-horarios-group h5 {
-  text-align: left;
-  margin: 0 0 10px 0;
-  color: #186fc0;
-  font-size: 1.1rem;
-}
-
-.swal-horarios-buttons {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 10px;
-}
-
-.swal-horario-btn {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-  text-align: center;
-  font-size: 14px;
-  outline: none;
-}
-
-.swal-horario-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.swal-horario-btn:not(.espera) {
-  border-color: #186fc0;
-  color: #186fc0;
-}
-
-.swal-horario-btn:not(.espera):hover {
-  background-color: #e7f3ff;
-}
-
-.swal-horario-btn.selected {
-  background-color: #d8bd2c;
-  color: white;
-  border-color: #d8bd2c;
-}
-
-.swal-horario-btn.espera {
-  border-color: #ddd;
-  color: #6c757d;
-  opacity: 0.9;
-}
-
-.swal-horario-btn.espera:hover {
-  opacity: 1;
-}
-
-.swal-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background-color: #dc3545;
-  color: white;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 0.6rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Ajustes para mobile */
-@media (max-width: 600px) {
-  .swal-horarios-buttons {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  }
-
-  .swal-horarios-group h5 {
-    font-size: 1rem;
-  }
-}
-
-/* Estiliza o contêiner principal do calendário */
-:deep(.vuecal) {
-  border-radius: 2px !important;
-  overflow: hidden;
-  background-color: #fff;
-}
-
-/* Estiliza o cabeçalho (barra de navegação do mês/ano) */
-:deep(.vuecal__title-bar) {
-  border-radius: 8px 8px 0 0 !important;
-  background-color: #186fc0;
-  color: #ffffff;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  font-weight: bold;
-}
-
-/* Estilo de hover para as células */
-:deep(.vuecal__cell:hover) {
-  background-color: #f0f8ff;
-  cursor: pointer;
-}
-
-/* Impede o hover nas células dos domingos */
-:deep(.vuecal__cell--sun:hover) {
-  background-color: transparent !important; /* Não altera a cor de fundo nas células de domingo */
-  cursor: not-allowed !important; /* Muda o cursor para 'não permitido' nas células de domingo */
-}
-
-/* Estilo visual para desabilitar os domingos */
-:deep(.vuecal__cell--sun) {
-  pointer-events: none; /* Desativa qualquer evento de clique */
-  background-color: #f1f1f100; /* Muda a cor de fundo para indicar que está desabilitado */
-  color: #cdc3c3; /* Altera a cor do texto para dar um visual "desabilitado" */
-  cursor: not-allowed; /* Muda o cursor para indicar que não é interativo */
-}
-:deep(.vuecal__cell--disabled:hover) {
-  pointer-events: none; /* Desativa qualquer evento de clique */
-  cursor: not-allowed; /* Muda o cursor para indicar que não é interativo */
-}
-
-:deep(.vuecal__cell-date) {
-  font-size: 0.9rem !important; /* Aumenta o tamanho do número do dia */
-  text-align: center;
-}
-
-/* Célula selecionada */
-:deep(.vuecal__cell--selected) {
-  background-color: #d8bd2c !important;
-  color: white !important;
-}
-
-/* Aumenta largura e altura do calendário */
-:deep(.calendario-wrapper .vuecal) {
-  width: 400px;
-  height: 43vh;
-}
-:deep(.vuecal__views-bar) {
-  display: none !important; /* Esconde a barra superior com o título e navegação */
-}
-
-:deep(.vuecal__nav--today) {
-  display: none !important; /* Esconde o botão 'Hoje' */
-}
-
-@media (max-width: 1000px) {
-  :deep(.calendario-wrapper .vuecal) {
-    width: 40vw;
-  }
-}
-
-@media (max-width: 400px) {
-  .consulta {
-    display: grid;
-    grid-template-columns: repeat(1, 1fr); /* 2 colunas com largura igual */
-    gap: 1rem; /* Espaçamento entre os itens */
-  }
-
-  :deep(.calendario-wrapper .vuecal) {
-    width: 80vw;
-  }
-
-  .voltar {
-    display: none;
-  }
-  .main {
-    margin-top: 10vh;
-  }
-}
+<style src="@/css/criaConsulta.css" scoped>
 </style>

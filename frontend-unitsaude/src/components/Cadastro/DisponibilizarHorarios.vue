@@ -338,7 +338,6 @@ export default {
       try {
         const response = await api.get("/api/Consulta/areas");
         this.areas = response.data.data;
-        console.log("Áreas carregadas:", this.areas);
       } catch (error) {
         console.error("Erro ao carregar áreas:", error);
         this.erro = "Erro ao carregar áreas. Tente novamente mais tarde.";
@@ -347,7 +346,6 @@ export default {
 
     // Método para obter as especialidades com base na área selecionada
     async obterEspecialidades() {
-      console.log("Área selecionada:", this.selectedArea);
       try {
         const response = await api.get(
           `/api/Consulta/especialidades/${this.selectedArea}`
@@ -362,7 +360,6 @@ export default {
 
     // Método para enviar os dados de disponibilidade de horários
     async enviarDisponibilidade() {
-      console.log("Especialidade selecionada:", this.selectedEspecialidade);
       if (
         !this.selectedArea ||
         !this.selectedEspecialidade ||

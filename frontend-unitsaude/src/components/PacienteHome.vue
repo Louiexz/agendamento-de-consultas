@@ -3,28 +3,66 @@
     <!-- Componente Header -->
     <Header/>
 
-    <div
+      <div
       class="main d-flex min-vh-100 justify-content-center align-items-center"
     >
       <div class="funcoes d-flex flex-column gap-3">
-     
         <router-link
-          to="/pacientes"
+          to="/cadastrar-consultas"
           class="card align-items-center p-4 no-underline"
         >
-        <i class="bi bi-calendar-plus-fill"></i>
+          <i class="bi bi-calendar-plus-fill"></i>
           <span>Agendar Consultas</span>
         </router-link>
-
-      
       </div>
 
+      <div class="consultas d-flex flex-column gap-3 no-underline">
+        <div class="title">
+          <h1>Consultas Agendadas</h1>
+        </div>
+        <router-link
+          to="/consultas/Estetica"
+          class="card p-3 no-underline"
+        >
+          <span>Estética e Saúde</span>
+        </router-link>
+        <router-link
+          to="/consultas/Fisioterapia"
+          class="card p-3 no-underline"
+        >
+          <span>Fisioterapia</span>
+        </router-link>
+        <router-link
+          to="/consultas/Nutrição"
+          class="card p-3 no-underline"
+        >
+          <span>Nutrição</span>
+        </router-link>
+        <router-link
+          to="/consultas/Odontologia"
+          class="card p-3 no-underline"
+        >
+          <span>Odontologia</span>
+        </router-link>
+        <router-link
+          to="/consultas/Psicologia"
+          class="card p-3 no-underline"
+        >
+          <span>Psicologia</span>
+        </router-link>
+        <router-link
+          to="/consultas/Enfermagem"
+          class="card p-3 no-underline"
+        >
+          <span>Enfermagem</span>
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import Header from "@/components/Header.vue"; 
+import Header from "@/components/Header.vue";
 
 export default {
   components: {
