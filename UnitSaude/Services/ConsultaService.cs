@@ -538,7 +538,8 @@ namespace UnitSaude.Services
                         // Verifica se esse horário está ocupado por uma consulta
                         var consultaExistente = await _context.Consultas
                             .AnyAsync(c => c.Area == area && c.Especialidade == especialidade
-                                           && c.Data == data && c.Horario == horarioAtual);
+                                           && c.Data == data && c.Horario == horarioAtual
+                                           && (c.Status == "Agendada" || c.Status == "Pendente"));
 
                         // Se não houver consulta nesse horário, marca como "Disponível"
                         var status = !consultaExistente ? "Disponível" : "Indisponível, entrar na fila de espera";
