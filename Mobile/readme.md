@@ -94,8 +94,8 @@ Professor: Diógenes Carvalho Matias.
 
 ## Autores
 
-Artur Ramos    - [@4rturr](https://github.com/4rturr) -<br>
-Carlos Eduardo - [@carlos-1ima](https://github.com/carlos-1ima) -<br>
+Artur Ramos    - [@4rturr](https://github.com/4rturr) - 1231309706<br>
+Carlos Eduardo - [@carlos-1ima](https://github.com/carlos-1ima) - 1231309625<br>
 Luiz Augusto   - [@Louiexz](https://github.com/Louiexz) - 1231309870<br>
-Paulo Arthur   - [@pauludelimaa](https://github.com/pauludelimaa) -<br>
+Paulo Arthur   - [@pauludelimaa](https://github.com/pauludelimaa) - 1242303569<br>
 Vinicius José  - [@ViniciusRKX](https://github.com/ViniciusRKX) - 1232303990

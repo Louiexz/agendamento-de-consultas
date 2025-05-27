@@ -74,13 +74,7 @@ public class LoginViewModel extends AndroidViewModel {
                 if (response.isSuccessful() && response.body() != null) {
                     handleSuccessfulLogin(response.body(), saveLogin);
                 } else {
-                    try {
-                        String errorBody = response.errorBody() != null ?
-                                response.errorBody().string() : "Erro desconhecido";
-                        errorLiveData.setValue(errorBody);
-                    } catch (IOException e) {
-                        errorLiveData.setValue("Erro ao processar resposta");
-                    }
+                    handleLoginError(response);
                 }
             }
 
