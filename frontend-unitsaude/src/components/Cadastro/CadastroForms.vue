@@ -165,18 +165,17 @@
             />
           </div>
 
-          <!-- Telefone com Máscara -->
+                    <!-- Telefone com Máscara -->
           <div class="mb-3">
             <label for="telefone" class="form-label">Telefone</label>
             <input
+              ref="telefoneInput" 
               type="text"
               id="telefone"
-              @input="validarInputNumerico($event, 'telefone')"
+              @input="formatarTelefone" 
               class="form-control"
               v-model="telefone"
-              maxlength="11"
-              minlength="10"
-              :data-maska="['(##) ####-####', '(##) #####-####']"
+              maxlength="15" 
               placeholder="(00) 00000-0000"
               required
             />
@@ -390,6 +389,109 @@ export default {
     },
   },
   methods: {
+    formatarTelefone() {
+      const input = this.$refs.telefoneInput;
+      if (!input) return;
+
+      const valorOriginal = this.telefone;
+      const cursorPosOriginal = input.selectionStart;
+
+      // 1. Remove tudo que não é dígito
+      let numeros = this.telefone.replace(/\D/g, '');
+
+      // 2. Limita o número de dígitos (máximo 11 para celular)
+      numeros = numeros.substring(0, 11);
+
+      // 3. Aplica a máscara
+      let telefoneFormatado = '';
+      if (numeros.length > 0) {
+        telefoneFormatado = '(' + numeros.substring(0, 2);
+      }
+      if (numeros.length > 2) {
+        telefoneFormatado += ') ';
+        if (numeros.length <= 10) { // DDD + 8 dígitos (fixo ou celular antigo)
+          telefoneFormatado += numeros.substring(2, 6);
+          if (numeros.length > 6) {
+            telefoneFormatado += '-' + numeros.substring(6, 10);
+          }
+        } else { // DDD + 9 dígitos (celular novo)
+          telefoneFormatado += numeros.substring(2, 7);
+          if (numeros.length > 7) {
+            telefoneFormatado += '-' + numeros.substring(7, 11);
+          }
+        }
+      }
+
+      // 4. Atualiza o v-model
+    
+      if (this.telefone !== telefoneFormatado) {
+        this.telefone = telefoneFormatado;
+      }
+
+      // 5. Tenta ajustar a posição do cursor
+
+      this.$nextTick(() => {
+        let digitosAntesCursorOriginal = 0;
+        for (let i = 0; i < cursorPosOriginal; i++) {
+          if (/\d/.test(valorOriginal.charAt(i))) {
+            digitosAntesCursorOriginal++;
+          }
+        }
+
+        let novaPosicaoCursor = 0;
+        let digitosContadosFormatado = 0;
+        for (let i = 0; i < telefoneFormatado.length; i++) {
+          if (/\d/.test(telefoneFormatado.charAt(i))) {
+            digitosContadosFormatado++;
+          }
+          novaPosicaoCursor = i + 1;
+          if (digitosContadosFormatado >= digitosAntesCursorOriginal) {
+            // Se o próximo caractere a ser "pulado" for "não-digito" tenta-se manter o cursor antes dele.
+            if (cursorPosOriginal < valorOriginal.length &&
+                !/\d/.test(valorOriginal.charAt(cursorPosOriginal)) && // Próximo no original era não-dígito
+                telefoneFormatado.charAt(novaPosicaoCursor -1) === valorOriginal.charAt(cursorPosOriginal) && // Caractere de máscara ainda lá
+                valorOriginal.length === telefoneFormatado.length // Nenhum caractere de máscara foi adicionado/removido
+                ) {
+                 novaPosicaoCursor--;
+            }
+            break;
+          }
+        }
+        // Se o usuário apagou tudo e não há mais dígitos
+        if (digitosAntesCursorOriginal > 0 && digitosContadosFormatado === 0) {
+            novaPosicaoCursor = 0;
+        } else if (digitosContadosFormatado < digitosAntesCursorOriginal) {
+            // Se o número de dígitos diminuiu, e o cursor estava no final
+            novaPosicaoCursor = telefoneFormatado.length;
+        }
+
+
+        // Ajuste para quando um caractere de máscara é adicionado automaticamente
+        // Se o comprimento aumentou e o usuário estava digitando no final
+        if (telefoneFormatado.length > valorOriginal.length && cursorPosOriginal >= valorOriginal.length - (telefoneFormatado.length - valorOriginal.length) ) {
+            const diff = telefoneFormatado.length - valorOriginal.length;
+            let caracteresDeMascaraAdicionados = 0;
+            for(let k=0; k < diff; k++){
+                if(!/\d/.test(telefoneFormatado.charAt(cursorPosOriginal + k))) {
+                    caracteresDeMascaraAdicionados++;
+                }
+            }
+            // Se a diferença for só de caracteres de máscara, ajusta para o final do texto formatado
+            if (caracteresDeMascaraAdicionados === diff) {
+                 novaPosicaoCursor = cursorPosOriginal + diff;
+            }
+        }
+
+
+        // Garante que a posição do cursor não ultrapasse os limites do input
+        novaPosicaoCursor = Math.max(0, Math.min(novaPosicaoCursor, telefoneFormatado.length));
+        try {
+            input.setSelectionRange(novaPosicaoCursor, novaPosicaoCursor);
+        } catch(e) {
+            console.warn("Erro ao definir a posição do cursor para o telefone", e);
+        }
+      });
+    },
     async pegaEndereco(retorna=false) {
       try {
         if (this.cep.length < 8 || (this.cep.length > 8)) {
