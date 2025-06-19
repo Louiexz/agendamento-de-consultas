@@ -19,7 +19,7 @@ Entrega final das disciplinas: experiência extensionista, desenvolvimento web, 
 ## Instalação e Configuração
 1. Clone o repositório:
    ```sh
-   git clone https://github.com/Louiexz/BackendNoDoc.git -b BackendNoDOc --single-branch
+   git clone https://github.com/Louiexz/BackendNoDoc.git -b BackendNoDoc --single-branch
    ```
 2. Navegue até o diretório do projeto:
    ```sh
@@ -42,7 +42,7 @@ Entrega final das disciplinas: experiência extensionista, desenvolvimento web, 
     "Jwt":{
       "Audience":"Users",
       "Issuer":"Users",
-      "Key":"sua_key_aqui",    
+      "Key":"sua_key_aqui",
     },
     "SecretKey":"secret_key_forte",
     }
@@ -70,5 +70,11 @@ Entrega final das disciplinas: experiência extensionista, desenvolvimento web, 
 - Ou utilize o Postman para testar os endpoints manualmente.
 
 ## Contribuição
+
+Artur Ramos - [@4rturr](https://github.com/4rturr)<br>
+Carlos Eduardo - [@carlos-1ima](https://github.com/carlos-1ima)<br>
+Luiz Augusto - [@Louiexz](https://github.com/Louiexz)<br>
+Paulo Arthur - [@pauludelimaa](https://github.com/pauludelimaa)<br>
+Vinicius José - [@ViniciusRKX](https://github.com/ViniciusRKX)
 
 Contribuições restritas! Analisaremos issues e pull requests.
